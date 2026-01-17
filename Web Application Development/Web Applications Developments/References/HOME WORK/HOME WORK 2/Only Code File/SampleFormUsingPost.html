@@ -1,0 +1,40 @@
+<!--
+HOMEWORK ASSIGNMENT 2
+NAME : LE DUY KHANH
+ID :ITIU08050
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>A Sample Form Using POST</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body background="eye.jpg">
+      <H1 ALIGN="CENTER"><font color =" #ADD300"> A Sample FORM using POST</font></H1>
+      <form action="http://localhost:8084/WebApplication1/NewServlet" method="POST">
+          Item Number: <input type="TEXT" NAME ="ItemNum" VALUE="ITIU08050"><br>
+          Description: <input type="TEXT" NAME ="Description"><br>
+          Price Each: <input type ="text" NAME ="Price" value ="$"><br>
+          <hr COLOR ="#AAFFCC">
+          First Name: <input type="text" name ="FirstName" VALUE="KHANH"><br>
+          Last Name : <input type="text" name ="LastName" VALUE="LE"><br>
+          Middle Inital: <input type="text" name ="MiddleInitial" VALUE="DUY"><br>
+          Shipping Address:
+          <textarea name="Address" rows="3" cols ="40">9 Nguyen Du Street, Hoi An city, Quang Nam Province</textarea><br>
+          Credit Card:<br>
+          &nbsp;&nbsp;<input type="RADIO" NAME="CardType" value="Visa">Visa<br>
+          &nbsp;&nbsp;<input type="radio" name="CardType" value="MasterCard">Master Card<br>
+          &nbsp;&nbsp;<input type="radio" name="CardType" value="American Express">American Express<br>
+          &nbsp;&nbsp;<input type="radio" name ="CardType" value="Discover">Discover<br>
+          &nbsp;&nbsp;<input type="radio" name="CardType" value ="Java SmartCard">Java SmartCard<br>
+          Credit Card Number:
+          <input type="password" name="CardNum"><br>
+          Repeat Credit Card Number:
+          <input type="password" name ="CardNum"><br><br>
+          <center><input type="SUBMIT" VALUE ="SubMit Order"></center>
+          
+      </form>
+  </body>
+</html>

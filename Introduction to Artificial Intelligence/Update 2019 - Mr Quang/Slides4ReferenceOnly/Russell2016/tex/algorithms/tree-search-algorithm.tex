@@ -1,0 +1,21 @@
+\code{
+\func{Tree-Search}{{\ts}\var{problem{\ac}\var{fringe}}}{a solution, or failure}
+    \setq{\var{fringe}}{\prog{Insert}(\prog{Make-Node}(\prog{Initial-State}[\var{problem}]){\ac}\var{fringe})}
+    \key{loop} \key{do}
+          \key{if} \var{fringe} is empty \key{then} \key{return} failure
+          \setq{\var{node}}{\prog{Remove-Front}(\var{fringe})}
+          \key{if} \prog{Goal-Test}(\var{problem}{\ac}\noprog{State}(\var{node})) \key{then return} \var{node}       
+          \setq{\var{fringe}}{\fnvar{InsertAll}(\prog{Expand}(\var{node}{\ac}\var{problem}){\ac}\var{fringe})}
+
+\fnsep
+\func{Expand}{{\ts}\var{node{\ac}\var{problem}}}{a set of nodes}
+    \setq{\var{successors}}{the empty set}
+    \key{for} \key{each} \var{action{\ac}result} \key{in} \prog{Successor-Fn}(\var{problem}{\ac}\prog{State}[\var{node}]) \key{do}
+          \setq{\var{s}}{a new \prog{Node}}
+          \setq{\prog{Parent-Node}[\var{s}]}{\var{node}};  \setq{\prog{Action}[\var{s}]}{\var{action}};  \setq{\prog{State}[\var{s}]}{\var{result}}
+          \setq{\prog{Path-Cost}[\var{s}]}{\prog{Path-Cost}[\var{node}] + \prog{Step-Cost}(\prog{State}[\var{node}]{\ac}\var{action}{\ac}\var{result})}
+          \setq{\prog{Depth}[\var{s}]}{\prog{Depth}[\var{node}] + 1}
+          add \var{s} to \var{successors}
+    \key{return} \var{successors}
+}
+

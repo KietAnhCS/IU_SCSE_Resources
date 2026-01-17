@@ -1,0 +1,247 @@
+html, body, form, h1, h2, h3, h4, ul, li {
+	margin: 0;
+	padding: 0;
+}
+h1 img {
+	display: block;
+}
+img {
+	border: 0;
+}
+a {
+	color: #fff;
+}
+a:hover {
+	color: #FFA405;
+	text-decoration:none;
+}
+.left {
+	float: left;
+}
+.right {
+	float: right;
+}
+.more {
+	text-align: right;
+}
+.clear {
+	clear: both;
+}
+
+body {
+	background: #002f43;
+	text-align: center;
+	font: 11px arial, sans-serif;
+	color: #fff;
+	padding-bottom: 10px;
+}
+
+/** layout **/
+#wrapper {
+	text-align: left;
+	margin: auto;
+	width: 749px;
+  position: relative;
+  background: #0179ab top right url(images/header.jpg) no-repeat;
+}
+#logo {
+  width: 357px;
+  background: url(images/logo.jpg) no-repeat;
+  height: 185px;
+  text-align: center;
+}
+#logo h1 {
+  padding-top: 50px;
+  color: #fff;
+  font: bold 27px "arial black", arial, sans-serif;
+}
+#logo p {
+  margin: 0em;
+  padding-left: 50px;
+  font: 17px "arial narrow", arial, sans-serif;
+}
+
+#nav li {
+  list-style: none;
+}
+#nav-left {
+  width: 178px;
+}
+#nav-left li {
+  background: url(images/nav_bg.jpg) repeat-x;
+  font: 18px "arial narrow", arial, sans-serif;
+  height: 62px;
+  line-height: 62px;
+  text-align: right;
+}
+#nav-left a {
+  color: #fff;
+  text-decoration: none;
+  padding-right: 20px;
+  font-weight:bold;
+}
+#nav-left .orange a {
+  color: #fff;
+}
+#nav-left a:hover {
+  text-decoration: underline;
+}
+#nav-right {
+  position: absolute;
+  top: 185px;
+  left: 178px;
+  width: 178px;
+  border-left: 1px solid white;
+}
+#nav-right ul {
+  text-align: right;
+}
+#nav-right li {
+  font: 14px "arial narrow", arial, sans-serif;
+  height: 30px;
+  line-height: 30px;
+  border-top: 1px solid white;
+  background: 152px 10px url(images/arr.gif) no-repeat;
+  padding-right: 40px;
+}
+#nav-right a {
+	color: #fff;
+	text-decoration: none;
+}
+#nav-right a:hover {
+  text-decoration: underline;
+}
+
+/** body **/
+
+#body {
+  border-top: 1px solid white;
+  padding-top: 20px;
+}
+#left {
+  float: left;
+  width: 352px;
+  padding-left: 15px;
+}
+#right {
+  float: right;
+  width: 291px;
+  padding-right: 37px;
+}
+
+#welcome {
+  padding-left: 29px;
+}
+
+h2.guilded {
+  background: bottom left url(images/welcome_bg.gif) repeat-x;
+  height: 20px;
+  margin-bottom: 0.8em;
+  font-weight: normal;
+  font-size: 20px;
+}
+h2.guilded span {
+	background: #fffurl (images/h_glif
+.gif) no-repeat;
+	padding-left: 0px;
+	padding-right: 8px;
+	padding-top: 2px;
+	float: left;
+}
+
+.more a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+.more a:hover {
+  text-decoration: underline;
+}
+
+#chef {
+  background: bottom left url(images/pic_1.jpg) no-repeat;
+  padding-left: 164px;
+  padding-top: 47px;
+}
+#chef h2 {
+  font: 17px "arial narrow", arial, sans-serif;
+  background: bottom url(images/divider.gif) repeat-x;
+  padding-bottom: 5px;
+  margin-left: -50px;
+  padding-left: 70px;
+  padding-right: 0;
+}
+
+p {
+  margin: 1em 0;
+  line-height: 1.1;
+}
+
+/** right **/
+
+#booking {
+  background: #002f43;
+  padding-bottom: 6px;
+  margin-bottom: 1.1em;
+  border:#04b5ff 1px solid;
+}
+#booking h2 {
+	background: url(images/h_booking_bg.jpg) repeat-x;
+	border: 1px solid #04b5ff;
+	height: 27px;
+	line-height: 27px;
+	color: #04b5ff;
+	font-weight: bold;
+	font-size: 16px;
+	padding-left: 20px;
+	margin: 4px 4px 10px 4px;
+}
+#booking th {
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 10px;
+}
+#booking td.submission {
+  text-align: right;
+}
+
+#menu {
+	background: bottom left url(images/specials.jpg) no-repeat;
+	border: 1px solid #04b5ff;
+	padding-left: 160px;
+	padding-right: 8px;
+	padding-top: 22px;
+}
+#menu h2 {
+	margin-left: -38px;
+	font-weight: bold;
+	color: #FFf;
+	margin-bottom: 1em;
+	font-size: 16px;
+}
+#menu form {
+  text-align: center;
+}
+#menu p {
+  margin: 1.3em 0;
+}
+
+/** footer **/
+
+#footer {
+  text-align: center;
+  background: url(images/divider.gif) repeat-x;
+  padding: 20px 20px 12px 20px;
+  margin: 0 2em;
+}
+#footer li {
+  list-style: none;
+  display: inline;
+}
+#footer a {
+	color: #fff;
+	text-decoration: none;
+}
+#footer a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,21 @@
+\code{
+\func{Enumeration-Ask}{\v{X}{\ac}$\e${\ac}\v{bn}}{a distribution over \v{X}}
+    \firstinputs{\v{X}} {the query variable}
+    \inputs{\v{\e}}{observed values for variables $\E$}
+    \inputs{\v{bn}}{a Bayesian network with variables $\{X\} \union \E \union \Y$}
+\bodysep
+    \setq{$\qv(\v{X})$}{a distribution over \v{X}, initially empty}
+    \k{for each} value \v{$x_i$} of \v{X} \k{do}
+          extend \v{$\e$} with value \v{$x_i$} for \v{X}
+          \setq{$\qv(\v{x_i})$}{\prog{Enumerate-All}(\noprog{Vars}[\v{bn}]{\ac}\v{$\e$})}
+    \k{return} \prog{Normalize}($\qv(\v{X})$)
+\fnsep
+\func{Enumerate-All}{\v{vars}{\ac}$\e$}{a real number}
+    \k{if} \noprog{Empty?}(\v{vars}) \k{then return} 1.0
+    \setq{\v{Y}}{\noprog{First}(\v{vars})}
+    \k{if} \v{Y} has value \v{y} in \v{$\e$}
+          \k{then return} $P(\v{y} | Pa(\v{Y})) \times {}$\prog{Enumerate-All}(\noprog{Rest}(\v{vars}){\ac}\v{$\e$})
+          \k{else return} $\sum_{\v{y}} P(\v{y} | Pa(\v{Y})) \times {}$\prog{Enumerate-All}(\noprog{Rest}(\v{vars}){\ac}$\v{\e}_{\v{y}}$)
+                where $\v{\e}_{\v{y}}$ is $\v{\e}$ extended with $\v{Y}\eq \v{y}$
+}
+

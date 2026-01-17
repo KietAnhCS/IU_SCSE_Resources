@@ -1,0 +1,25 @@
+/* 
+    Document   : styles1
+    Created on : 14-10-2010, 20:05:54
+    Author     : Khanh
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+root { 
+    display: block;
+}
+
+body {
+    font-size :20px !important;
+}
+
+p {
+    font: 0.9em Arial;
+    color: #aa22e7;
+}

@@ -1,0 +1,11 @@
+\code{
+\func{KB-Agent}{{\ts}\var{percept}}{an \var{action}}
+    \firststatic{\var{KB}}{a knowledge base}
+    \static{\var{t}}{a counter, initially 0, indicating time}
+\bodysep
+    \noprog{Tell}(\var{KB}{\ac}\prog{Make-Percept-Sentence}({\ts}\var{percept}{\ac}\var{t}))
+    \setq{\var{action}}{\noprog{Ask}(\var{KB}{\ac}\prog{Make-Action-Query}(\var{t}))}
+    \noprog{Tell}(\var{KB}{\ac}\prog{Make-Action-Sentence}(\var{action}{\ac}\var{t}))
+    \setq{\var{t}}{\var{t} + 1}
+    \key{return} \var{action}
+}

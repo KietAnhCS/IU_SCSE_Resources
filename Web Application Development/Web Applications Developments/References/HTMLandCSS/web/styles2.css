@@ -1,0 +1,64 @@
+/* 
+    Document   : styles2
+    Created on : 14-10-2010, 21:04:14
+    Author     : Khanh
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+root { 
+    display: block;
+}
+
+p {
+    font-family: Georgia;
+}
+.feature p{
+    font-family:Arial;
+}
+
+a{
+    font-size: 1.6em;
+}
+
+#globalNav a{
+    font-size: 1.4em;
+}
+
+.blogtitle {
+    border: 3px solid red
+}
+.blogdate {
+    border: 2px solid red
+}
+.blogitem {
+    border: 1px solid red
+}
+
+#content {
+    background-image: url(k3.jpg);
+}
+#sidebar{
+    background:rgb(100,154,102)
+}
+
+body {
+    margin-top:20px;
+    margin-bottom:20px;
+    margin-left:20px;
+    margin-right:20px;
+
+    background: url(k2.jpg) no-repeat right top !important;
+    background: url(k3.jpg) no-repeat right top;
+
+}
+
+#masthead {
+    background: url(.jpg) repeat-x;
+    background-position: center;
+}

@@ -1,0 +1,15 @@
+\code{
+\func{DTL}{\var{examples{\ac}attributes{\ac}default}}{a decision tree}
+\bodysep
+    \key{if} \var{examples} is empty \key{then} \key{return} \var{default}
+    \key{else} \key{if} all \var{examples} have the same classification \key{then} \key{return} the classification
+    \key{else} \key{if} \var{attributes} is empty \key{then} \key{return} \prog{Mode}(\var{examples})
+    \key{else} 
+          \setq{\var{best}}{\prog{Choose-Attribute}(\var{attributes}{\ac}\var{examples})}
+          \setq{\var{tree}}{a new decision tree with root test \var{best}}
+          \key{for} \key{each} value \var{v}$_i$ of \var{best} \key{do}
+                \setq{\var{examples}$_i$}{$\{$elements of \var{examples} with $\var{best} = v_i\}$}
+                \setq{\v{subtree}}{}\prog{DTL}(\var{examples}$_i{\ac}$\var{attributes}$\,-\,$\var{best}{\ac}\prog{Mode}(\var{examples}))
+                add a branch to \var{tree} with label \var{v}$_i$ and subtree \var{subtree}
+          \key{return} \var{tree}
+}

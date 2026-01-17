@@ -1,0 +1,17 @@
+\code{
+\func{TT-Entails?}{\v{KB}{\ac}\(\alpha\)}{\v{true} or \v{false}}
+    \firstinputs{\v{KB}}{the knowledge base, a sentence in propositional logic}
+    \inputs{\(\alpha\)}{the query, a sentence in propositional logic}
+\bodysep
+    \setq{\v{symbols}}{a list of the proposition symbols in \v{KB} and \(\alpha\)}
+    \k{return} \prog{TT-Check-All}(\v{KB}{\ac}\(\alpha\){\ac}\v{symbols}{\ac}\([\,]\))
+\fnsep
+\func{TT-Check-All}{\v{KB}{\ac}\(\alpha\){\ac}\v{symbols}{\ac}\v{model}}{\v{true} or \v{false}}
+    \k{if} \noprog{Empty?}(\v{symbols}) \k{then}
+          \k{if} \prog{PL-True?}(\v{KB}{\ac}\v{model}) \k{then return} \prog{PL-True?}(\(\alpha\){\ac}\v{model})
+          \k{else return} \v{true}
+    \k{else do}
+          \setq{\(P\)}{\noprog{First}(\v{symbols})}; \setq{\v{rest}}{\noprog{Rest}(\v{symbols})}
+          \k{return} \prog{TT-Check-All}(\v{KB}{\ac}\(\alpha\){\ac}\v{rest}{\ac}\prog{Extend}(\(P{\ac}\v{true}{\ac}\v{model}\)) \k{and}
+                       \prog{TT-Check-All}(\v{KB}{\ac}\(\alpha\){\ac}\v{rest}{\ac}\prog{Extend}(\(P{\ac}\v{false}{\ac}\v{model}\)) 
+}

@@ -1,0 +1,10 @@
+\code{
+\func{Rejection-Sampling}{\v{X}{\ac}\v{\e}{\ac}\v{bn}{\ac}\v{N}}{an estimate of $P(\v{X}|\v{\e})$}
+    \firstlocal{\mbf{N}}{a vector of counts over \v{X}, initially zero}
+\bodysep
+    \k{for} \v{j} = 1 to \v{N} \k{do}
+          \setq{\v{\x}}{\prog{Prior-Sample}(\v{bn})}
+          \k{if} \v{\x} is consistent with \v{\e} \k{then}
+              \setq{\mbf{N}[\v{x}]}{\mbf{N}[\v{x}]+1} where \v{x} is the value of \v{X} in \v{\x}
+    \k{return} \noprog{Normalize}(\mbf{N}[\v{X}])
+}

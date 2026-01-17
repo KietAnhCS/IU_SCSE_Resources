@@ -1,0 +1,13 @@
+\code{
+\func{Neural-Network-Learning}{\var{examples}}{\var{network}}
+\bodysep
+    \setq{\var{network}}{a network with randomly assigned weights}
+    \key{repeat}
+          \key{for each} \var{e} \key{in} \var{examples} \key{do}
+                \setq{$\mbf{O}$}{\prog{Neural-Network-Output}(\var{network}{\ac}\var{e})}  
+                \setq{$\mbf{T}$}{the observed output values from \var{e}}
+                update the weights in \var{network} based on \var{e}, $\mbf{O}$, and $\mbf{T}$
+          \key{end}
+    \key{until} all examples correctly predicted or stopping criterion is reached
+    \key{return} \var{network}
+}

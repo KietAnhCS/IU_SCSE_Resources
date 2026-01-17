@@ -1,0 +1,67 @@
+<head>
+    <title>Registration Form</title>
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+    <link rel="stylesheet" href="registerform.css">
+</head>
+
+<body>
+    <form action="Result.html" method="GET">
+        <table>
+            <tr>
+                <th colspan="5">Registration Form</th>
+            </tr>
+            <tr>
+                <td colspan="1">ID</td>
+                <td colspan="4"><input type="text" name="txt-id"> </td>
+            </tr>
+            <tr>
+                <td colspan="1">Full name</td>
+                <td colspan="4"><input type="text" name="txt-fullname"></td>
+            </tr>
+            <tr>
+                <td colspan="1">Email</td>
+                <td colspan="4"><input type="email" name="txt-email"> </td>
+            </tr>
+            <tr>
+                <td colspan="1">Gender</td>
+                <td colspan="2"><input type="radio" name="radio-gender">Male</td>
+                <td colspan="2"><input type="radio" name="radio-gender">Female</td>
+            </tr>
+            <tr>
+                <td colspan="1">Field of Study</td>
+                <td colspan="2">
+                    <select name="sl-field">
+                        <option>CS</option>
+                        <option>IT</option>
+                        <option>BT</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="6">List of subject</td>
+            <tr>
+                <td colspan="4"><input type="checkbox" name="WA">Web Application</td>
+            </tr>
+            <tr>
+                <td colspan="4"><input type="checkbox" name="DB">Database</td>
+            </tr>
+            <tr>
+                <td colspan="4"><input type="checkbox" name="DSA">Data Structure and Algorithm</td>
+            </tr>
+            <tr>
+                <td colspan="4"><input type="checkbox" name="OOP">OOP</td>
+            </tr>
+            <tr>
+                <td colspan="4"><input type="checkbox" name="CA">Computer Architecture</td>
+            </tr>
+            <tr>
+                <td colspan="1">Comment</td>
+                <td colspan="4"><textarea rows="5" name="txtar-cmt"></textarea></td>
+            </tr>
+            <tr>
+                <td colspan="3"><input type="submit" value="Submit" name="s1"></td>
+                <td colspan="2"><input type="reset" value="Reset" name="s2"></td>
+            </tr>
+        </table>
+    </form>
+</body>

@@ -1,0 +1,470 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Bayesian networks}{Chapter 14.1--3}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Syntax
+
+\blob Semantics
+
+\blob Parameterized distributions
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Bayesian networks}
+
+A simple, graphical notation for conditional independence assertions\\
+and hence for compact specification of full joint distributions
+
+Syntax:\al
+  a set of nodes, one per variable\al
+  a directed, acyclic graph (link \mat{$\approx$} ``directly influences'')\al
+  a conditional distribution for each node given its parents:\nl
+    \mat{$\pv(X_i|\Parents(X_i))$}
+
+In the simplest case, conditional distribution represented as\\
+a \defn{conditional probability table} (CPT) giving the\\
+distribution over \mat{$X_i$} for each combination of parent values
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+Topology of network encodes conditional independence assertions:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{dentist-network.ps}}
+
+\mat{$Weather$} is independent of the other variables
+
+\mat{$Toothache$} and \mat{$Catch$} are conditionally independent given \mat{$Cavity$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+I'm at work, neighbor John calls to say my alarm is ringing, but
+neighbor Mary doesn't call. Sometimes it's set off by minor
+earthquakes. Is there a burglar?
+
+Variables: \mat{$Burglar$}, \mat{$Earthquake$}, \mat{$Alarm$}, \mat{$JohnCalls$}, \mat{$MaryCalls$}\\
+Network topology reflects ``causal'' knowledge:\al
+ -- A burglar can set the alarm off\al
+ -- An earthquake can set the alarm off\al
+ -- The alarm can cause Mary to call\al
+ -- The alarm can cause John to call
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example contd.}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{burglary2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Compactness}
+
+A CPT for Boolean \mat{$X_i$} with \mat{$k$} Boolean parents has\hspace*{1.75in}\epsfxsize=1.5in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{burglary-small.ps}}}\\
+\mat{$2^k$} rows for the combinations of parent values
+
+Each row requires one number \mat{$p$} for \mat{$X_i\eq true$}\\
+(the number for  \mat{$X_i\eq false$} is just \mat{$1-p$})
+
+If each variable has no more than \mat{$k$} parents, \\
+the complete network requires \mat{$O(n\cdot 2^k)$} numbers
+
+I.e., grows linearly with \mat{$n$}, vs.~\mat{$O(2^n)$} for the full joint distribution
+
+For burglary net, \mat{$1 + 1 + 4 + 2 + 2 \eq 10$} numbers (vs.~\mat{$2^5-1 = 31$})
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Global semantics}
+
+\defn{Global} semantics defines the full joint distribution\hspace*{1.2in}\epsfxsize=1.5in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{burglary-small.ps}}}\\
+as the product of the local conditional distributions:
+\mat{\[
+  P(x_1,\ldots,x_n) = \myprod_{i\eq 1}^n P(x_i|\parents(X_i))
+\]}
+e.g., \mat{$P(j\land m\land a\land \lnot b \land \lnot e)$}
+\mat{\[
+  =
+\]}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Global semantics}
+
+``Global'' semantics defines the full joint distribution\hspace*{1.2in}\epsfxsize=1.5in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{burglary-small.ps}}}\\
+as the product of the local conditional distributions:
+\mat{\[
+  P(x_1,\ldots,x_n) = \myprod_{i\eq 1}^n P(x_i|\parents(X_i))
+\]}
+e.g., \mat{$P(j\land m\land a\land \lnot b \land \lnot e)$} 
+\mat{\begin{eqnarray*}
+  &=& P(j|a) P(m|a) P(a|\lnot b, \lnot e) P(\lnot b) P(\lnot e)\\
+  &=& 0.9\stimes 0.7\stimes 0.001\stimes 0.999 \stimes 0.998\\
+  &\approx& 0.00063
+\end{eqnarray*}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Local semantics}
+
+\defn{Local} semantics: each node is conditionally independent\\
+of its nondescendants given its parents
+
+\vspace*{0.2in}
+
+\epsfxsize=0.55\textwidth
+\fig{\file{figures}{nondescendants.ps}}
+
+Theorem: \mat{Local semantics} \mat{$\lequiv$} \mat{global semantics}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Markov blanket}
+
+Each node is conditionally independent of all others given its\\
+\defn{Markov blanket}: parents + children + children's parents
+
+\vspace*{0.3in}
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{markov-blanket.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Constructing Bayesian networks}
+
+Need a method such that a series of locally testable assertions of\\
+conditional independence guarantees the required global semantics
+
+1. Choose an ordering of variables \mat{$X_1,\ldots,X_n$}\\
+2. For \mat{$i$} = 1 to \mat{$n$}\al
+  add \mat{$X_i$} to the network\al
+  select parents from \mat{$X_1,\ldots,X_{i-1}$} such that\nl
+    \mat{$ \pv(X_i|\Parents(X_i)) = \pv(X_i|X_1,\, \ldots,\, X_{i-1}) $}
+
+This choice of parents guarantees the global semantics:
+\mat{\begin{eqnarray*}
+\pv(X_1,\ldots,X_n) &=& \myprod_{i\eq 1}^n \pv(X_i | X_1,\, \ldots,\, X_{i-1})
+\quad\bbox{(chain rule)}\\
+    &=& \myprod_{i\eq 1}^n \pv(X_i|\Parents(X_i))
+\quad\bbox{(by construction)}
+\end{eqnarray*}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+Suppose we choose the ordering \mat{$M$}, \mat{$J$}, \mat{$A$}, \mat{$B$}, \mat{$E$}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{burglary-make1.ps}}
+
+\vspace*{-0.65in}
+
+\mat{$P(J|M) = P(J)$}?
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Example}
+
+\ptext{Suppose we choose the ordering \mat{$M$}, \mat{$J$}, \mat{$A$}, \mat{$B$}, \mat{$E$}}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{burglary-make2.ps}}
+
+\vspace*{-0.65in}
+
+\ptext{\mat{$P(J|M) = P(J)$}?}\quad No\\
+\mat{$P(A|J,M) = P(A|J)$}? \mat{$P(A|J,M) = P(A)$}?
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Example}
+
+\ptext{Suppose we choose the ordering \mat{$M$}, \mat{$J$}, \mat{$A$}, \mat{$B$}, \mat{$E$}}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{burglary-make3.ps}}
+
+\vspace*{-0.65in}
+
+\ptext{\mat{$P(J|M) = P(J)$}?\quad No}\\
+\ptext{\mat{$P(A|J,M) = P(A|J)$}? \mat{$P(A|J,M) = P(A)$}?}\quad No\\
+\mat{$P(B|A,J,M) = P(B|A)$}?\\
+\mat{$P(B|A,J,M) = P(B)$}?
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Example}
+
+\ptext{Suppose we choose the ordering \mat{$M$}, \mat{$J$}, \mat{$A$}, \mat{$B$}, \mat{$E$}}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{burglary-make4.ps}}
+
+\vspace*{-0.65in}
+
+\ptext{\mat{$P(J|M) = P(J)$}?\quad No}\\
+\ptext{\mat{$P(A|J,M) = P(A|J)$}? \mat{$P(A|J,M) = P(A)$}?\quad No}\\
+\ptext{\mat{$P(B|A,J,M) = P(B|A)$}?}\quad Yes\\
+\ptext{\mat{$P(B|A,J,M) = P(B)$}?}\quad No\\
+\mat{$P(E|B,A,J,M) = P(E|A)$}?\\
+\mat{$P(E|B,A,J,M) = P(E|A,B)$}?
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Example}
+
+\ptext{Suppose we choose the ordering \mat{$M$}, \mat{$J$}, \mat{$A$}, \mat{$B$}, \mat{$E$}}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{burglary-make5.ps}}
+
+\vspace*{-0.65in}
+
+\ptext{\mat{$P(J|M) = P(J)$}?\quad No}\\
+\ptext{\mat{$P(A|J,M) = P(A|J)$}? \mat{$P(A|J,M) = P(A)$}?\quad No}\\
+\ptext{\mat{$P(B|A,J,M) = P(B|A)$}?\quad Yes}\\
+\ptext{\mat{$P(B|A,J,M) = P(B)$}?\quad No}\\
+\ptext{\mat{$P(E|B,A,J,M) = P(E|A)$}?}\quad No\\
+\ptext{\mat{$P(E|B,A,J,M) = P(E|A,B)$}?}\quad Yes
+
+%%[[13 numbers (vs.~10), and CPTs hard to assess---use \emph{causal} direction!!]]
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Example contd.}
+
+\vspace*{0.15in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{burglary-make5.ps}}
+
+\vspace*{-0.15in}
+
+Deciding conditional independence is hard in noncausal directions
+
+(Causal models and conditional independence seem hardwired for humans!)
+
+Assessing conditional probabilities is hard in noncausal directions
+
+Network is less compact: \mat{$1 + 2 + 4 + 2 + 4 \eq 13$} numbers needed
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: Car diagnosis}
+
+Initial evidence: car won't start\\
+Testable variables (green), ``broken, so fix it'' variables (orange)\\
+Hidden variables (gray) ensure sparse structure, reduce parameters
+
+\vspace*{0.1in}
+
+\epsfxsize=1.05\textwidth
+\fig{\file{figures}{car-net.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: Car insurance}
+
+\vspace*{0.1in}
+
+\epsfxsize=1.05\textwidth
+\fig{\file{figures}{insurance-net.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Compact conditional distributions}
+
+CPT grows exponentially with number of parents\\
+CPT becomes infinite with continuous-valued parent or child
+
+Solution: \defn{canonical} distributions that are defined compactly
+
+\defn{Deterministic} nodes are the simplest case:\al
+   \mat{$X = f(Parents(X))$} for some function \mat{$f$}
+
+E.g., Boolean functions\al
+  \mat{$NorthAmerican \lequiv Canadian \lor US \lor Mexican$}
+
+E.g., numerical relationships among continuous variables
+\mat{\[
+  \frac{\partial Level}{\partial t} = \mbox{ inflow + precipitation 
+                                            - outflow - evaporation}
+\]}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Compact conditional distributions contd.}
+
+\defn{Noisy-OR} distributions model multiple noninteracting causes\al
+  1) Parents \mat{$U_1\ldots U_k$} include all causes (can add \defn{leak node})\al
+  2) Independent failure probability \mat{$q_i$} for each cause alone\nl
+    \mat{${} \implies 
+     P(X|U_1\ldots U_j,\lnot U_{j+1}\ldots \lnot U_k)
+     = 1 - \myprod_{i\eq 1}^j q_i$}
+
+\begin{center}
+\begin{tabular}{|ccc|@{\ \ }l|@{\ \ }l|}
+\hline
+% .6      .2      .1
+\tabhead \makebox[72pt]{\mat{$Cold$}}  & \makebox[72pt]{\mat{$Flu$}} & \makebox[72pt]{\mat{$Malaria$}}     & \mat{$P(Fever)$}    & \mat{$P(\lnot Fever)$} \\
+\hline
+\tabtop 
+F       & F     & F             & \mat{$\mbf{0.0}$} &       \mat{$1.0$}\\
+F       & F     & T             & \mat{$0.9$} &       \mat{$\mbf{0.1}$}\\
+F       & T     & F             & \mat{$0.8$} &       \mat{$\mbf{0.2}$}\\
+F       & T     & T             & \mat{$0.98$} &      \mat{$0.02 = 0.2 \times 0.1$}\\
+T       & F     & F             & \mat{$0.4$} &       \mat{$\mbf{0.6}$}\\
+T       & F     & T             & \mat{$0.94$} &      \mat{$0.06 = 0.6 \times 0.1$}\\
+T       & T     & F             & \mat{$0.88$} &      \mat{$0.12 = 0.6 \times 0.2$}\\
+\tabbot T       & T     & T             & \mat{$0.988$} &     \mat{$0.012 = 0.6 \times 0.2 \times 0.1$}\\
+\hline
+\end{tabular}
+\end{center}
+
+Number of parameters \emph{linear} in number of parents
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hybrid (discrete+continuous) networks}
+
+Discrete (\mat{$Subsidy?$} and \mat{$Buys?$});  continuous (\mat{$Harvest$} and \mat{$Cost$})
+
+\vspace*{0.2in}
+
+\epsfxsize=0.42\textwidth
+\fig{\file{figures}{continuous-net.ps}}
+
+Option 1: discretization---possibly large errors, large CPTs\\
+Option 2: finitely parameterized canonical families
+
+1) Continuous variable, discrete+continuous parents (e.g., \mat{$Cost$})\\
+2) Discrete variable, continuous parents (e.g., \mat{$Buys?$})
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Continuous child variables}
+
+Need one \defn{conditional density} function for child variable given
+continuous parents, for each possible assignment to discrete parents
+
+Most common is the \defn{linear Gaussian} model, e.g.,:
+\begin{eqnarray*}
+\lefteqn{P(Cost\eq c|Harvest\eq h,Subsidy?\eq true)}\\
+ & = & N(a_t h + b_t, \sigma_t)(c)\\
+ &=& \frac{1}{\sigma_t \sqrt{2\pi}}
+ exp\left(-\frac{1}{2} 
+          \left(\frac{c-(a_t h + b_t)}{\sigma_t}\right)^2
+    \right)
+\end{eqnarray*}
+
+Mean \mat{$Cost$} varies linearly with \mat{$Harvest$}, variance is fixed
+
+Linear variation is unreasonable over the full range\al
+  but works OK if the \emph{likely} range of \mat{$Harvest$} is narrow
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Continuous child variables}
+
+\vspace*{-0.4in}
+
+\epsfxsize=0.5\textwidth
+\fig{\file{graphs}{linear-gaussian-true.ps}}
+
+\vspace*{-0.4in}
+
+All-continuous network with LG distributions\al
+  \mat{$\implies$} full joint distribution is a multivariate Gaussian\al
+
+Discrete+continuous LG network is a \defn{conditional Gaussian} network
+i.e., a multivariate Gaussian over all continuous variables
+for each combination of discrete variable values
+
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Discrete variable w/ continuous parents}
+
+Probability of \mat{$Buys?$} given \mat{$Cost$} should be a ``soft'' threshold:
+
+\epsfxsize=0.6\textwidth
+\fig{\file{graphs}{probit.ps}}
+
+\defn{Probit} distribution uses integral of Gaussian:\al
+  \mat{$\Phi(x) = \int_{-\infty}^{x} N(0,1)(x) dx$}\al
+  \mat{$P(Buys?\eq true \given Cost \eq c) = \Phi((-c + \mu)/\sigma)$}\\
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Why the probit?}
+
+1. It's sort of the right shape
+
+2. Can view as hard threshold whose location is subject to noise
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{noisy-threshold.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Discrete variable contd.}
+
+\defn{Sigmoid} (or \defn{logit}) distribution also used in neural networks:
+\mat{\[
+P(Buys?\eq true \given Cost \eq c) = \frac{1}{1+exp(-2\frac{-c+\mu}{\sigma})}
+\]}
+Sigmoid has similar shape to probit but much longer tails:
+
+\epsfxsize=0.6\textwidth
+\fig{\file{graphs}{logit.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Bayes nets provide a natural representation for (causally induced)\\
+conditional independence
+
+Topology + CPTs = compact representation of joint distribution
+
+Generally easy for (non)experts to construct
+
+Canonical distributions (e.g., noisy-OR) = compact representation of CPTs
+
+Continuous variables $\implies$ parameterized distributions (e.g., linear
+Gaussian)
+
+
+
+\end{huge} 
+\end{document}

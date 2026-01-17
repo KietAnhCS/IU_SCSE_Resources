@@ -1,0 +1,18 @@
+table{
+    table-layout: fixed;
+}
+
+td{
+    text-align: center;
+    word-wrap:break-word;
+    width: 7%;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+td:nth-child(1) {  
+    width: 1%;
+  }

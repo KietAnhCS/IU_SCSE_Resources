@@ -1,0 +1,10 @@
+\code{
+\func{Tree-Search}{{\ts}\var{problem{\ac}strategy}}{a solution, or failure}
+    initialize the search tree using the initial state of \var{problem}
+    \key{loop} \key{do}
+          \key{if} there are no candidates for expansion \key{then} \key{return} failure
+          choose a leaf node for expansion according to \var{strategy}
+          \key{if} the node contains a goal state \key{then} \key{return} the corresponding solution
+          \key{else} expand the node and add the resulting nodes to the search tree
+    \key{end}
+}

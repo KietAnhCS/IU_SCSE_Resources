@@ -1,0 +1,462 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+\def\Astar{A$^*$}
+\begin{document}
+
+\begin{huge}
+\titleslide{Informed search algorithms}{Chapter 4, Sections 1--2}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Best-first search
+
+\blob {\Astar} search
+
+\blob Heuristics
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Review: Tree search}
+
+\input{\file{algorithms}{tree-search-short-algorithm}}
+
+A strategy is defined by picking the \emph{order of node expansion}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Best-first search}
+
+\note{Idea}: use an \defn{evaluation function} for each node\nl
+-- estimate of ``desirability''
+
+$\Rightarrow$ Expand most desirable unexpanded node
+
+\note{Implementation}:\\
+\v{fringe} is a queue sorted in decreasing order of desirability
+
+Special cases:\nl
+greedy search\nl
+{\Astar} search
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Romania with step costs in km}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.08\textwidth
+\fig{\file{figures}{romania2.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Greedy search}
+
+Evaluation function \mat{$h(n)$} (\emph{h}euristic)\nl
+= estimate of cost from \mat{$n$} to the closest goal
+
+E.g., \mat{$h_{{\rm SLD}}(n)$} = straight-line distance from \mat{$n$} to Bucharest
+
+Greedy search expands the node that \emph{appears} to be closest to goal
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Greedy search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{greedy-progress01.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Greedy search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{greedy-progress02.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Greedy search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{greedy-progress03.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Greedy search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{greedy-progress04.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of greedy search}
+
+\q{Complete}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of greedy search}
+
+\q{Complete} No--can get stuck in loops, e.g., with Oradea as goal,\nl
+Iasi $\rightarrow$ Neamt $\rightarrow$ Iasi $\rightarrow$ Neamt $\rightarrow$\\
+Complete in finite space with repeated-state checking
+
+\q{Time}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of greedy search}
+
+\q{Complete} No--can get stuck in loops, e.g.,\nl
+Iasi $\rightarrow$ Neamt $\rightarrow$ Iasi $\rightarrow$ Neamt $\rightarrow$\\
+Complete in finite space with repeated-state checking
+
+\q{Time} \mat{$O(b^m)$}, but a good heuristic can give dramatic improvement
+
+\q{Space}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of greedy search}
+
+\q{Complete} No--can get stuck in loops, e.g.,\nl
+Iasi $\rightarrow$ Neamt $\rightarrow$ Iasi $\rightarrow$ Neamt $\rightarrow$\\
+Complete in finite space with repeated-state checking
+
+\q{Time} \mat{$O(b^m)$}, but a good heuristic can give dramatic improvement
+
+\q{Space} \mat{$O(b^m)$}---keeps all nodes in memory
+
+\q{Optimal}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of greedy search}
+
+\q{Complete} No--can get stuck in loops, e.g.,\nl
+Iasi $\rightarrow$ Neamt $\rightarrow$ Iasi $\rightarrow$ Neamt $\rightarrow$\\
+Complete in finite space with repeated-state checking
+
+\q{Time} \mat{$O(b^m)$}, but a good heuristic can give dramatic improvement
+
+\q{Space} \mat{$O(b^m)$}---keeps all nodes in memory
+
+\q{Optimal} No
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{{\Astar} search}
+
+\note{Idea}: avoid expanding paths that are already expensive
+
+Evaluation function \mat{$f(n) = g(n) + h(n)$}
+
+\mat{$g(n)$} = cost so far to reach \mat{$n$}\\
+\mat{$h(n)$} = estimated cost to goal from \mat{$n$}\\
+\mat{$f(n)$} = estimated total cost of path through \mat{$n$} to goal
+
+{\Astar} search uses an \defn{admissible} heuristic\\
+i.e., \mat{$h(n) \leq h^*(n)$} where \mat{$h^*(n)$} is the \emph{true} cost from \mat{$n$}.\\
+(Also require \mat{$h(n)\geq 0$}, so \mat{$h(G)=0$} for any goal \mat{$G$}.)
+
+E.g., \mat{$h_{{\rm SLD}}(n)$} never overestimates the actual road distance
+
+\note{Theorem}: {\Astar} search is optimal
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{{\Astar} search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{astar-progress01.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{{\Astar} search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{astar-progress02.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{{\Astar} search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{astar-progress03.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{{\Astar} search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{astar-progress04.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{{\Astar} search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{astar-progress05.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{{\Astar} search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{astar-progress06.ps}}
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Optimality of {\Astar} (standard proof)}
+
+Suppose some suboptimal goal \mat{$G_2$} has been generated
+and is in the queue. Let \mat{$n$} be an unexpanded node
+on a shortest path to an optimal goal \mat{$G_1$}.
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{astar-proof.ps}}
+
+\begin{eqnarray*}
+f(G_2) & = &  g(G_2)\qquad {\rm since\ }h(G_2) = 0 \\
+       & > &  g(G_1)\qquad {\rm since\ }G_2 {\rm\ is\ suboptimal} \\
+      &\geq& f(n)   \qquad {\rm since\ }h {\rm\ is\ admissible} 
+\end{eqnarray*}
+
+Since \mat{$f(G_2) > f(n)$}, {\Astar} will never select \mat{$G_2$} for expansion
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Optimality of {\Astar} (more useful)}
+
+\note{Lemma}: {\Astar} expands nodes in order of increasing \mat{$f$} value$^*$
+
+Gradually adds ``\mat{$f$}-contours'' of nodes (cf. breadth-first adds layers)\\
+Contour \mat{$i$} has all nodes with \mat{$f=f_i$}, where \mat{$f_i < f_{i+1}$}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{f-circles.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of {\Astar}}
+
+\q{Complete}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of {\Astar}}
+
+\q{Complete} Yes, unless there are infinitely many nodes with \mat{$f \leq f(G)$}
+
+\q{Time}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of {\Astar}}
+
+\q{Complete} Yes, unless there are infinitely many nodes with \mat{$f \leq f(G)$}
+
+\q{Time} Exponential in [relative error in \mat{$h$} $\times$ length of soln.]
+
+\q{Space}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of {\Astar}}
+
+\q{Complete} Yes, unless there are infinitely many nodes with \mat{$f \leq f(G)$}
+
+\q{Time} Exponential in [relative error in \mat{$h$} $\times$ length of soln.]
+
+\q{Space} Keeps all nodes in memory
+
+\q{Optimal}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of {\Astar}}
+
+\q{Complete} Yes, unless there are infinitely many nodes with \mat{$f \leq f(G)$}
+
+\q{Time} Exponential in [relative error in \mat{$h$} $\times$ length of soln.]
+
+\q{Space} Keeps all nodes in memory
+
+\q{Optimal} Yes---cannot expand \mat{$f_{i+1}$} until \mat{$f_i$} is finished
+
+{\Astar} expands all nodes with \mat{$f(n) < C^*$}\\
+{\Astar} expands some nodes with \mat{$f(n) = C^*$}\\
+{\Astar} expands no nodes with \mat{$f(n) > C^*$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Proof of lemma: Consistency}
+
+A heuristic is \defn{consistent} if \hfill\raisebox{-0.35\textwidth}[0pt][0pt]{\epsfxsize=0.3\textwidth\epsffile{\file{figures}{consistency.ps}}}
+\[
+  h(n) \leq c(n,a,n') + h(n')
+\]
+If \mat{$h$} is consistent, we have\
+\mat{\begin{eqnarray*}
+f(n') &=& g(n') + h(n') \\
+      &=& g(n) + c(n,a,n') + h(n') \\
+      &\geq& g(n) + h(n) \\
+      &=& f(n)
+\end{eqnarray*}}
+I.e., \mat{$f(n)$} is nondecreasing along any path.
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Admissible heuristics}
+
+E.g., for the 8-puzzle:
+
+\mat{$h_1(n)$} = number of misplaced tiles\\
+\mat{$h_2(n)$} = total \defn{Manhattan} distance\nl
+(i.e., no. of squares from desired location of each tile)
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{8puzzle.ps}}
+
+\q{$h_1(S)$ =} \\
+\q{$h_2(S)$ =} 
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Admissible heuristics}
+
+E.g., for the 8-puzzle:
+
+\mat{$h_1(n)$} = number of misplaced tiles\\
+\mat{$h_2(n)$} = total \defn{Manhattan} distance\nl
+(i.e., no. of squares from desired location of each tile)
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{8puzzle.ps}}
+
+\q{$h_1(S)$ =} 6\\
+\q{$h_2(S)$ =} 4+0+3+3+1+0+2+1 = {14}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Dominance}
+
+If \mat{$h_2(n) \geq h_1(n)$} for all \mat{$n$} (both admissible)\\
+then \mat{$h_2$} \defn{dominates} \mat{$h_1$} and is better for search
+
+Typical search costs:
+
+\begin{tabular}{ll}
+$d=14$ & IDS = 3,473,941 nodes \\
+       & A$^*(h_1)$ = 539 nodes \\
+       & A$^*(h_2)$ = 113 nodes \\
+$d=24$ & IDS $\approx$ 54,000,000,000 nodes \\
+       & A$^*(h_1)$ = 39,135 nodes \\
+       & A$^*(h_2)$ = 1,641 nodes 
+\end{tabular}
+
+Given any admissible heuristics \mat{$h_a$}, \mat{$h_b$},
+\mat{\[
+  h(n) = \max(h_a(n),h_b(n))
+\]}
+is also admissible and dominates \mat{$h_a$}, \mat{$h_b$}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Relaxed problems}
+
+Admissible heuristics can be derived from the \emph{exact}\\
+solution cost of a \emph{relaxed} version of the problem
+
+If the rules of the 8-puzzle are relaxed so that a tile can move
+\emph{anywhere}, then \mat{$h_1(n)$} gives the shortest solution
+
+If the rules are relaxed so that a tile can move to \emph{any adjacent
+square}, then \mat{$h_2(n)$} gives the shortest solution
+
+Key point: the optimal solution cost of a relaxed problem \\
+is no greater than the optimal solution cost of the real problem
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Relaxed problems contd.}
+
+Well-known example: \defn{travelling salesperson problem} (TSP)\\
+Find the shortest tour visiting all cities exactly once
+
+\vspace*{0.3in}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{tsp-mst.ps}}
+
+\defn{Minimum spanning tree} can be computed in \mat{$O(n^2)$}\\
+and is a lower bound on the shortest (open) tour
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Heuristic functions estimate costs of shortest paths
+
+Good heuristics can dramatically reduce search cost 
+
+Greedy best-first search expands lowest \mat{$h$}\al
+  -- incomplete and not always optimal
+
+{\Astar} search expands lowest \mat{$g+h$}\al
+  -- complete and optimal\al
+  -- also optimally efficient (up to tie-breaks, for forward search)
+
+Admissible heuristics can be derived from exact solution of relaxed problems
+
+\end{huge}
+\end{document}
+
+
+
+
+
+
+

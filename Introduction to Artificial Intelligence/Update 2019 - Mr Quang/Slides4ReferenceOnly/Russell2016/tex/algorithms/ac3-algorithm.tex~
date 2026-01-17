@@ -1,0 +1,18 @@
+\code{
+\func{AC-3}{{\ts}\var{csp}}{the CSP, possibly with reduced domains}
+    \firstinputs{\var{csp}}{a binary CSP with variables \(\{X_{1}, X_{2}, \ldots, X_{n}\}\)}
+    \firstlocal{\var{queue}}{a queue of arcs, initially all the arcs in \var{csp}}
+\bodysep
+    \key{while} \var{queue} is not empty \key{do}
+        \setq{\((X_{i}, X_{j})\)}{\prog{Remove-First}(\var{queue})}
+        \key{if} \noprog{Remove-Inconsistent-Values}(\(X_{i}, X_{j}\)) \key{then} 
+            \key{for each} \(X_{k}\) \key{in} \prog{Neighbors}[\(X_{i}\)] \key{do}
+                add (\(X_{k}, X_{i}\)) to \var{queue}
+\fnsep
+\nofunc{Remove-Inconsistent-Values}{{\ts}\(X_{i}, X_{j}\)}{true iff we remove a value}
+    \setq{\var{removed}}{\var{false}}
+    \key{for each} \var{x} \key{in} \prog{Domain}[\(X_{i}\)] \key{do}
+        \key{if} no value \(y\) in \prog{Domain}[\(X_{j}\)] allows (\var{x},\var{y}) to satisfy the constraint between \(X_i\) and \(X_j\)
+            \key{then} delete \var{x} from \prog{Domain}[\(X_{i}\)];  \setq{\var{removed}}{\var{true}}
+    \key{return} \var{removed}
+}

@@ -1,0 +1,15 @@
+\code{
+\func{Backtracking-Search}{\var{csp}}{solution/failure}
+    \key{return} \prog{Recursive-Backtracking}(\(\{\,\}\){\ac}\var{csp})
+\bodysep
+\func{Recursive-Backtracking}{\var{assignment}{\ac}\var{csp}}{soln/failure}
+    \key{if} \var{assignment} is complete \key{then return} \var{assignment}
+    \setq{\var{var}}{\noprog{Select-Unassigned-Variable}(\noprog{Variables}[\var{csp}]{\ac}\var{assignment}{\ac}\var{csp})}
+    \key{for} \key{each} \var{value} \key{in} \noprog{Order-Domain-Values}(\var{var}{\ac}\var{assignment}{\ac}\var{csp}) \key{do}
+          \key{if} \var{value} is consistent with \var{assignment} given \noprog{Constraints}[\var{csp}] \key{then}
+                add \{\var{var} = \var{value}\} to \var{assignment}
+                \setq{\var{result}}{\prog{Recursive-Backtracking}(\var{assignment}{\ac}\var{csp})}
+                \key{if} \var{result} \(\neq\) \var{failure} \key{then} \key{return} \var{result}
+                remove \{\var{var} = \var{value}\} from \var{assignment}
+    \key{return} \var{failure}
+}

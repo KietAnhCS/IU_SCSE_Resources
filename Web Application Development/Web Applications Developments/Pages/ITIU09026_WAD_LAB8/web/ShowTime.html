@@ -1,0 +1,42 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Show Time</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <SCRIPT LANGUAGE="JavaScript">
+            var timerID = null
+            var timerRunning = false
+            function stopclock(){
+                if(timerRunning)
+                    clearInterval(timerID)
+                timerRunning = false
+            }
+            function startclock(){
+                // Make sure the clock is stopped
+                stopclock()
+                timerID = setInterval("showtime()",1000)
+                timerRunning = true
+            }
+            function showtime(){
+                var now = new Date()
+                var hours = now.getHours()
+                var minutes = now.getMinutes()
+                var seconds = now.getSeconds()
+                var timeValue = "" + ((hours > 12) ? hours - 12 : hours)
+                timeValue += ((minutes < 10) ? ":0" : ":") + minutes
+                timeValue += ((seconds < 10) ? ":0" : ":") + seconds
+                timeValue += (hours >= 12) ? " P.M." : " A.M."
+                document.clock.face.value = timeValue
+            }
+        </SCRIPT>
+    </head>
+    <body onLoad="startclock()">
+        <FORM NAME="clock" onSubmit="0">
+            <INPUT TYPE="text" NAME="face" SIZE=12 VALUE ="">
+        </FORM>
+    </body>
+</html>

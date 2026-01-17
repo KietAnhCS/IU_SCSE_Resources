@@ -1,0 +1,22 @@
+\code{
+\func{POP}{\var{initial{\ac}goal{\ac}operators}}{\var{plan}}
+\bodysep
+    \setq{\var{plan}}{\prog{Make-Minimal-Plan}(\var{initial{\ac}goal})}
+    \key{loop do}
+          \key{if} \prog{Solution?}({\ts}\var{plan}) \key{then return} \var{plan}
+          \setq{$S_{need}, c$}{\prog{Select-Subgoal}({\ts}\var{plan})}
+          \prog{Choose-Operator}({\ts}\var{plan{\ac}operators}{\ac}$S_{need}${\ac}\var{c})
+          \prog{Resolve-Threats}({\ts}\var{plan})
+    \key{end}
+\fnsep
+\func{Select-Subgoal}{{\ts}\var{plan}}{$S_{need}, c$}
+\bodysep
+    pick a plan step $S_{need}$ from \noprog{Steps}({\ts}\var{plan})
+          with a precondition $c$ that has not been achieved
+    \key{return} $S_{need}, c$
+}
+
+
+
+
+

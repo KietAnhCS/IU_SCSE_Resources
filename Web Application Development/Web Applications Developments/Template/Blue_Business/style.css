@@ -1,0 +1,58 @@
+/*CSS file for Business*/
+
+
+body {
+/*font-family taken from sitepoint.com :P */
+font-family: Corbel, "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", "Bitstream Vera Sans", "Liberation Sans", Verdana, "Verdana Ref", sans-serif;
+background-image: url("images/background.jpg");background-repeat: no-repeat;background-position: 50% 0%;width: 900px;height: 910px;margin: 0 auto;padding: 0 auto;}
+
+a:hover{color: #c0c0c0;}
+
+a {text-decoration: none;color: black;}
+
+#logo {margin-left:75px;font-size: 30px;}
+
+h1 {margin-left: 20px;}
+
+
+
+.whitey {color: white;}
+
+h1 {text-transform: uppercase;}
+
+#container {width: 890px;margin: 20px auto;}
+
+#nav {margin-left:30px;margin-bottom: 10px;width: 760px;height: 20px;}
+
+#nav  li{float: left;font-weight: bold;padding-left: 40px;list-style: none;font-size: 20px;}
+
+#nav a {color: c0c0c0;}
+
+#whitebox {float: left;margin-left: 78px;margin-top: 20px;margin-bottom: 20px;background-image: url("images/group.png");height: 458px;width: 509px;overflow: hidden;}
+#whitebox p {margin: 10px 20px 0px 20px; font-size:14px;}
+#phoneguy {float:left;}
+
+
+#sidebar {width: 290px;height: 500px;float:right;}
+
+#login {float:right;background-image: url("images/login.png");width: 281px;height: 183px;}
+
+#login p {margin-left: 20px;margin-top: 0px;font-weight: bold;}
+
+#input {width: 200px;margin-left: 20px;margin-top: 20px;}
+
+#input input {background-color: black;height: 26px;width: 192px;margin-bottom: 10px;border: none;color: white;}
+
+#box1 {float:right;background-image: url("images/box1.png");background-repeat: no-repeat;width: 275px;height: 170px;overflow: hidden;}
+#box1 p ,h4{padding: 0px 10px 0px 10px;}
+#box2 {float:right;background-image: url("images/box2.png");background-repeat: no-repeat;width: 275px;height: 178px;overflow: hidden;}
+#box2 p {padding: 0px 10px 0px 10px;}
+#box1 h3 {margin-left: 10px;}
+#box2  h3 {margin-left: 10px;}
+.box12 {float:left;}
+
+
+#last {margin-left: 80px ;width: 600px;height: 660px;}
+#graph {float:left;}
+
+#footer {color: #c0c0c0;text-align: center;width: 600px;font-size: 14px;padding-left: 150px;}

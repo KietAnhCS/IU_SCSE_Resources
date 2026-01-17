@@ -1,0 +1,9 @@
+latex chapter01
+dvips -o ../slides-ps/chapter01.ps -t landscape -Pcmz chapter01
+psnup -c -r -pletter -nup 6 ../slides-ps/chapter01.ps ../slides-ps/chapter01-6pp.ps
+ps2pdf ../slides-ps/chapter01.ps ../slides-pdf/chapter01.pdf
+ps2pdf ../slides-ps/chapter01-6pp.ps ../slides-pdf/chapter01-6pp.pdf
+chmod 644 ../slides-ps/chapter01*ps
+chmod 644 ../slides-pdf/chapter01*pdf
+rm chapter01.log chapter01.aux chapter01.dvi
+

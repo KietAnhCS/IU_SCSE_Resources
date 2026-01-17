@@ -1,0 +1,26 @@
+set ylabel 0.7
+set xtics nomirror
+set ytics nomirror
+set tics out
+set ticscale 0.6
+set border 3 lw 2
+#For portrait mode:
+#set size 0.41857144, 0.195 
+#For eps mode:
+#set size 0.586,0.55714285
+set size 0.8,0.8
+set term postscript eps enhanced color "Helvetica" 24
+
+
+
+set data style lines
+
+set xlabel "Number of epochs"
+set ylabel "Total error on training set" 
+set nokey
+
+
+
+set output "restaurant-back-prop-error.eps"
+
+plot 'restaurant-back-prop-error.data' using 1:2 title "Error" lw 6

@@ -1,0 +1,15 @@
+\code{
+\func{Depth-Limited-Search}{{\ts}\var{problem}{\ac}\var{limit}}{soln/fail/cutoff}
+    \prog{Recursive-DLS}(\prog{Make-Node}(\prog{Initial-State}[\var{problem}]){\ac}\var{problem}{\ac}\var{limit})
+\bodysep
+\func{Recursive-DLS}{\var{node}{\ac}\var{problem}{\ac}\var{limit}}{soln/fail/cutoff}
+    \setq{\var{cutoff-occurred?}}{false}
+    \key{if} \prog{Goal-Test}(\var{problem}{\ac}\prog{State}[\var{node}]) \key{then return} \var{node}
+    \key{else if} \prog{Depth}[\var{node}] = \var{limit} \key{then return} \var{cutoff}
+    \key{else} \key{for} \key{each} \var{successor} \key{in} \prog{Expand}(\var{node}{\ac}\var{problem}) \key{do}
+          \setq{\var{result}}{\prog{Recursive-DLS}(\var{successor}{\ac}\var{problem}{\ac}\var{limit})}
+          \key{if} \var{result} = \var{cutoff} \key{then} \setq{\var{cutoff-occurred?}}{true}
+          \key{else if} \var{result} $\neq$ \var{failure} \key{then} \key{return} \var{result}
+    \key{if} \var{cutoff-occurred?} \key{then return} \var{cutoff} \key{else return} \var{failure}
+}
+

@@ -1,0 +1,514 @@
+/* CSS Document */
+body {
+padding:0;
+margin:0;
+font:9px Arial, Helvetica, sans-serif;
+background:url(images/backBg.gif) repeat-x 0 0 #731001;
+color:inherit;
+}
+ h1, h2, h3, p, ul, form, input, select, textarea, label, div, li, a{
+padding:0;
+margin:0;
+}
+ul{
+list-style-type:none;
+	
+}
+a{
+outline:none;
+text-decoration:none;
+}
+img{
+padding:0;
+margin:0;
+border:none;
+}
+.spacer{
+padding:0;
+margin:0;
+font-size:0;
+line-height:0;
+clear:both;
+}
+
+#container{
+width:958px; 
+margin:0 auto;
+background:url(images/hdr_pic.jpg) no-repeat 0 0 #B6510D;
+color:inherit;
+}
+/*------------------------------------------Top Panel-----------------------------------------*/
+#main{
+width:920px;
+margin:0 auto;
+height:479px;
+position:relative;
+}
+.logo{
+position:absolute;
+left:20px;
+top:16px;
+}
+h1{
+font:normal 24px/24px Georgia, "Times New Roman", Times, serif;
+color:#D3CC64;
+background-color:inherit;
+position:absolute;
+left:278px;
+top:25px;
+}
+h1 span{
+font:normal 12px/15px Arial, Helvetica, sans-serif;
+color:#CEA013;
+background-color:inherit;
+display:block;
+padding:5px 0 0 0;
+}
+p.matTxt{
+line-height:10px;
+color:#F88B21;
+background-color:inherit;
+position:absolute;
+left:278px;
+top:99px;
+width:502px;
+}
+
+/*--------------------- navigation------------------------------------*/
+ul.navlink{
+padding:0;
+margin:0;
+width:872px;
+background-color:#141C10;
+color:inherit;
+position:absolute;
+left:25px;
+top:430px;
+height:25px;
+}
+ul.navlink li{
+float:left;
+font:normal 16px/25px Arial, Helvetica, sans-serif;
+}
+ul.navlink li.active{
+color:#EBE588;
+background-color:#AB2C05;
+width:93px;
+text-align:center;
+
+}
+
+ul.navlink li a{
+color:#B2AC58;
+background-color:inherit;
+padding:0 24px;
+display:block;
+}
+ul.navlink li a:hover{
+color:#EBE588;
+background-color:#AB2C05;
+}
+
+#logBlock{
+width:920px;
+margin:0 auto;
+
+}
+#topBlock{
+width:895px;
+margin:0 auto;
+background-color:#EBE588;
+color:inherit;
+padding-left:25px;
+height:100%;
+overflow:auto;
+
+}
+/*---------------------Log in Block--------------------------*/
+#userLog{
+width:544px;
+height:193px;
+border:solid 6px #C3BD66;
+background:url(images/flower.gif) no-repeat 0 bottom #DED879;
+padding:10px 0 0 10px;
+color:#3A3E24;
+float:left;
+}
+#userLog p.user{
+background:url(images/e16_img.gif) no-repeat 0 0;
+width:94px;
+height:82px;
+float:left;
+}
+
+/*--------------------------Form One----------------------------------*/
+form.one{
+width:428px;
+float:left;
+padding:0 0 0 14px;
+}
+form.one label{
+font-size:12px;
+line-height:16px;
+color:#A9B100;
+background-color:inherit;
+font-weight:bold;
+float:left;
+padding:5px 113px 10px 0;
+
+}
+form.one input.txtfield{
+width:165px;
+height:51px;
+font-size:40px;
+color:#A9B100;
+background-color:#EBE588;
+float:left;
+border:solid 1px #EBE589;
+margin:0 9px 0 0;
+
+}
+form.one input.logButt{
+background:url(images/login.gif) no-repeat 0 0;
+width:71px;
+height:53px;
+cursor:pointer;
+border:none;
+padding:53px 0 0 71px;
+float:left;
+}
+p.register{
+font-size:16px;
+line-height:18px;
+float:left;
+padding:18px 0 0 110px;
+width:410px;
+}
+p.register span{
+display:block;
+font-size:24px;
+line-height:24px;
+
+padding-top:13px;
+}
+p.register span a{
+color:#AB2C05;
+background-color:inherit;
+}
+
+p.register span a:hover{
+text-decoration:underline;
+}
+#fashionBlock{
+width:307px;
+float:left;
+}
+.fashion{
+background:url(images/fashionspot_bg.jpg) no-repeat 0 0;
+width:307px;
+height:105px;
+margin:3px 0 0 0;
+}
+h2.fashionPot{
+font:normal 24px/24px Georgia, "Times New Roman", Times, serif;
+color:#141C10;
+background-color:inherit;
+padding:16px 0 0 132px;
+}
+p.fashiontxt{
+color:#A6A04D;
+background-color:inherit;
+line-height:11px;
+padding:3px 0 0 132px;
+width:126px;
+}
+p.fashiontxt span{
+color:#AB2C05;
+background-color:inherit;
+}
+.teenwindow{
+background:url(images/teen_window.jpg) no-repeat 0 0;
+width:307px;
+height:106px;
+}
+/*---------------------Log in Block--------------------------*/
+#BotBlock{
+width:920px;
+margin:0 auto;
+background:url(images/bottom_roundBg.gif) no-repeat 0 bottom;
+height:24px;
+float:left;
+}
+
+
+/*------------------------------------------Top Panel-----------------------------------------*/
+
+/*---------------------------------Body---------------------------------------*/
+#BodyPan{
+width:920px;
+margin:0 auto;
+padding:20px 0 0 0;
+}
+
+/*-------------------------------left panel--------------------------------------------*/
+#leftPan{
+width:570px;
+float:left;
+
+}
+h2.trendy{
+font:normal 75px/80px Georgia, "Times New Roman", Times, serif;
+color:#D68615;
+background-color:inherit;
+padding-bottom:14px;
+display:block;
+}
+p.dashed{
+background:url(images/dashed.gif) repeat-x 0 0;
+height:16px;
+}
+h3{
+font-size:12px;
+line-height:14px;
+color:#EBE588;
+font-weight:bold;
+background-color:inherit;
+padding:16px 0 13px 0;
+}
+p.picture{
+background:url(images/pic1.jpg) no-repeat 0 0;
+width:114px;
+height:47px;
+float:left;
+}
+
+p.picture1{
+background:url(images/pic2.jpg) no-repeat 0 0;
+width:114px;
+height:47px;
+float:left;
+}
+p.labrumTxt{
+color:#CEA013;
+background-color:inherit;
+line-height:12px;
+float:left;
+width:413px;
+padding:0 0 0 11px;
+}
+#dashBlock{
+background:url(images/double_dash.gif) repeat-x 0 0;
+height:21px;
+width:204px;
+float:left;
+margin:15px 0 0 0;
+padding-left:366px;
+}
+#dashBlock a{
+color:#EBE588;
+background-color:inherit;
+}
+#dashBlock a:hover{
+text-decoration:underline;
+}
+p.special , p.comments{
+background:url(images/star_bullet.gif) no-repeat 0 50%;
+color:#EBE588;
+background-color:inherit;
+line-height:21px;
+padding:0 0 0 15px;
+float:left;
+}
+p.comments{
+background:url(images/comments_bullet.gif) no-repeat 0 50%;
+float:left;
+margin-left:13px;
+padding-left:21px;
+
+}
+/*-------------------------------left panel--------------------------------------------*/
+
+/*-------------------------------right panel--------------------------------------------*/
+#rghtPan{
+width:331px;
+float:right;
+}
+.magazineBlock{
+width:132px;
+background:url(images/fashionmag_bg.jpg) no-repeat 0 0;
+height:343px;
+float:left;
+padding:0 23px;
+}
+h2.fashionMag{
+color:#CEC758;
+background-color:inherit;
+font:normal 24px/26px Georgia, "Times New Roman", Times, serif;
+padding:30px 0 0 0;
+text-align:center;
+}
+h2.fashionMag span{
+text-align:center;
+width:131px;
+font:bold 11px/18px Arial, Helvetica, sans-serif;
+display:block;
+color:#7D771E;
+background-color:#141C10;
+margin-top:3px;
+}
+.newsBlock{
+width:134px;
+float:right;
+}
+p.news{
+background:url(images/e16News.jpg) no-repeat 0 0;
+height:84px;
+}
+ul.newsLink{
+padding:0;
+margin:0;
+background:url(images/dashed_two.gif) repeat-x 0 0;
+}
+ul.newsLink li{
+background:url(images/dashed_two.gif) repeat-x 0 bottom;
+height:17px;
+font-size:0;
+line-height:0;
+padding:0 0 0 3px;
+}
+ul.newsLink li a{
+font:normal 9px/17px Arial, Helvetica, sans-serif;
+color:#EBE588;
+background-color:inherit;
+}
+ul.newsLink li a:hover{
+color:#fff;
+background-color:inherit;
+}
+p.dates{
+background:url(images/e16_Dates.jpg) no-repeat 0 0;
+width:134px;
+height:83px;
+margin:21px 0 0 0;
+}
+p.datingTxt{
+color:#CEA013;
+background-color:inherit;
+line-height:11px;
+padding-top:12px;
+}
+p.datingTxt span{
+display:block;
+padding:12px 0 0 0;
+
+}
+p.datingTxt span a{
+color:#EBE588;
+background-color:inherit;
+}
+p.datingTxt span a:hover{
+text-decoration:underline;
+}
+/*-------------------------------right panel--------------------------------------------*/
+
+/*---------------------------------Body---------------------------------------*/
+
+
+/*==================================================ABOUT US===============================================*/
+#about_container{
+background:url(images/about_us_hdr.jpg) no-repeat 0 0 #B6510D;
+color:inherit;
+width:958px;
+margin:0 auto;
+height:100%;
+}
+#aboutbody{
+width:920px;
+margin:0 auto;
+padding-bottom:10px;
+}
+h2.about{
+font:normal 75px/82px Georgia, "Times New Roman", Times, serif;
+color:#D68615;
+background-color:inherit;
+padding:23px 0 6px 0;
+}
+p.aboutdash{
+background:url(images/dashed.gif) repeat-x 0 0;
+width:920px;
+height:16px;
+}
+h2.simlique{
+font:normal 18px/20px Arial, Helvetica, sans-serif;
+color:#141C10;
+background-color:inherit;
+padding:19px 0 0 13px;
+}
+p.veroTxt{
+font:normal 12px/18px Arial, Helvetica, sans-serif;
+color:#CEA013;
+background-color:inherit;
+padding:14px 0 12px 13px;
+}
+
+ul.identifyLink , ul.identifyLink1{
+float:left;
+padding:16px 31px 0 14px;
+
+}
+ul.identifyLink li , ul.identifyLink1 li{
+font-size:12px;
+line-height:18px;
+color:#CEA013;
+background-color:inherit;
+}
+ul.identifyLink1{
+float:left;
+padding-right:0;
+}
+
+/*--------------------------------------footer--------------------------------------*/
+#footer{
+width:920px;
+margin:0 auto;
+padding:20px 0 26px 0;
+}
+ul.footerlink{
+width:895px;
+color:#B2AC58;
+background-color:#141C10;
+height:25px;
+padding-left:25px;
+}
+ul.footerlink li{
+float:left;
+padding:0 23px;
+}
+ul.footerlink li a{
+font-size:16px;
+line-height:25px;
+color:#B2AC58;
+background-color:inherit;
+}
+ul.footerlink li a:hover{
+color:#EBE588;
+background-color:inherit;
+}
+p.copyright{
+font:normal 9px/17px Arial, Helvetica, sans-serif;
+color:#CEA013;
+background-color:inherit;
+text-align:center;
+padding-top:22px;
+}
+p.copyright span{
+display:block;
+}
+p.copyright span a{
+color:#EBE588;
+background-color:inherit;
+}
+p.copyright span a:hover{
+text-decoration:underline;
+}
+/*--------------------------------------footer--------------------------------------*/

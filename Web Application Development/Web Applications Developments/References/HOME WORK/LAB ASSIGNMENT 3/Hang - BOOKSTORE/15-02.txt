@@ -1,0 +1,40 @@
+<%@ page import="java.sql.*" %>
+<%!
+  public void jspInit() {
+    try {
+      Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+    }
+    catch (ClassNotFoundException e) {
+    }
+  }
+%>
+<FORM METHOD=POST ACTION=Search.jsp>
+Keyword: <INPUT TYPE=TEXT Name=Keyword><BR>
+Search In: <SELECT Name=Category>
+<%
+  //Open the Categories table
+  try {
+    String sql = "SELECT * FROM Categories";
+    Connection con = DriverManager.getConnection("jdbc:odbc:JavaWeb");
+    Statement s = con.createStatement();
+    ResultSet rs = s.executeQuery(sql);
+   while (rs.next()) {
+      out.print("<OPTION VALUE=");
+      out.print(rs.getString(1));
+      out.print(">");
+      out.print(rs.getString(2));
+      out.print("</OPTION>\n");
+    }
+    s.close();
+    con.close();
+  }
+  catch (SQLException e) {
+    out.println(e.toString());
+  }
+  catch (Exception e) {
+    out.println(e.toString());
+  }
+%>
+</SELECT>
+<INPUT TYPE=SUBMIT VALUE=Search>
+</FORM>

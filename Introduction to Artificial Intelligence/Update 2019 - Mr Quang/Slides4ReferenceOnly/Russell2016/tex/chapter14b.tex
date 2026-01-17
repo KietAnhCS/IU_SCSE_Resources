@@ -1,0 +1,582 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Inference in Bayesian networks}{Chapter 14.4--5}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Exact inference by enumeration
+
+\blob Exact inference by variable elimination
+
+\blob Approximate inference by stochastic simulation
+
+\blob Approximate inference by Markov chain Monte Carlo
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference tasks}
+
+\defn{Simple queries}: compute posterior marginal \mat{$\pv(X_i|\mbf{E}\eq \e)$}\al
+  e.g., \mat{$P(NoGas|Gauge\eq empty,Lights\eq on,Starts\eq false)$}
+
+\defn{Conjunctive queries}: \mat{$\pv(X_i,X_j|\mbf{E}\eq \e) = 
+    \pv(X_i|\mbf{E}\eq \e)  \pv(X_j|X_i,\mbf{E}\eq \e) $}
+
+\defn{Optimal decisions}: decision networks include utility information;\nl
+    probabilistic inference required for \mat{$P(outcome|action,evidence)$}
+
+\defn{Value of information}: which evidence to seek next?
+
+\defn{Sensitivity analysis}: which probability values are most critical?
+
+\defn{Explanation}: why do I need a new starter motor?
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference by enumeration}
+
+Slightly intelligent way to sum out variables from the joint
+without actually constructing its explicit representation
+
+Simple query on the burglary network:\hspace*{2.5in}\epsfxsize=1.5in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{burglary-small.ps}}}\\
+\mat{$\pv(B|j,m)$}\\
+\mat{$= \pv(B,j,m)/P(j,m)$}\\
+\mat{$= \alpha \pv(B,j,m)$}\\
+\mat{$= \alpha \ \mysum_e \ \mysum_a \ \pv(B,e,a,j,m)$}
+
+Rewrite full joint entries using product of CPT entries:\\
+\mat{$\pv(B|j,m)$}\\
+\mat{$= \alpha \ \mysum_e \ \mysum_a \ \pv(B)P(e)\pv(a|B,e)P(j|a)P(m|a) $}\\
+\mat{$= \alpha \pv(B)\ \mysum_e\ P(e)\ \mysum_a\ \pv(a|B,e)P(j|a)P(m|a)$}
+       
+Recursive depth-first enumeration: \mat{$O(n)$} space, \mat{$O(d^n)$} time
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Enumeration algorithm}
+
+\input{\file{algorithms}{enumeration-algorithm}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Evaluation tree}
+
+\epsfxsize=1.0\textwidth
+\fig{\file{figures}{enumeration-tree.ps}}
+
+Enumeration is inefficient: repeated computation\al
+  e.g., computes \mat{$P(j|a)P(m|a)$} for each value of \mat{$e$}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference by variable elimination}
+
+Variable elimination: carry out summations right-to-left,\\
+storing intermediate results (\defn{factors}) to avoid recomputation
+
+\mat{$\pv(B|j,m)$}\nl
+    \mat{$= \alpha \underbrace{\pv(B)}_B 
+             \mysum_e \underbrace{P(e)}_E
+             \mysum_a \underbrace{\pv(a|B,e)}_A
+             \underbrace{P(j|a)}_J
+             \underbrace{P(m|a)}_M$}\nl
+    \mat{$= \alpha \pv(B)\mysum_e P(e)\mysum_a \pv(a|B,e) P(j|a) f_M(a)$}\nl
+    \mat{$= \alpha \pv(B)\mysum_e P(e)\mysum_a \pv(a|B,e) f_J(a) f_M(a)$}\nl
+    \mat{$= \alpha \pv(B)\mysum_e P(e)\mysum_a f_A(a,b,e) f_J(a) f_M(a)$}\nl
+    \mat{$= \alpha \pv(B)\mysum_e P(e)f_{\bar{A}JM}(b,e) $} (sum out \mat{$A$})\nl
+    \mat{$= \alpha \pv(B)f_{\bar{E}\bar{A}JM}(b)$} (sum out \mat{$E$})\nl
+    \mat{$= \alpha f_B(b)\stimes f_{\bar{E}\bar{A}JM}(b)$} 
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Variable elimination: Basic operations}
+
+\defn{Summing out} a variable from a product of factors: \al
+  move any constant factors outside the summation\al
+  add up submatrices in pointwise product of remaining factors
+
+\mat{$\mysum_x f_1 \stimes \cdots \stimes f_k =
+f_1 \stimes \cdots \stimes f_i\  \mysum_x\; f_{i+1} \stimes \cdots \stimes
+f_k = f_1 \stimes \cdots \stimes f_i \stimes f_{\bar{X}}$}
+
+assuming \mat{$f_1,\ldots,f_i$} do not depend on \mat{$X$}
+
+
+\defn{Pointwise product} of factors \mat{$f_1$} and \mat{$f_2$}:\al
+  \mat{$f_1(x_1,\ldots,x_j,y_1,\ldots,y_k) \stimes
+     f_2(y_1,\ldots,y_k,z_1,\ldots,z_l)$}\nl
+  = \mat{$f(x_1,\ldots,x_j,y_1,\ldots,y_k,z_1,\ldots,z_l)$}\\
+E.g., \mat{$f_1(a,b) \stimes f_2(b,c) = f(a,b,c)$}
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Variable elimination algorithm}
+
+\input{\file{algorithms}{elimination-ask-algorithm}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Irrelevant variables}
+
+Consider the query \mat{$P(JohnCalls|Burglary\eq true)$}\hspace*{1.0in}\epsfxsize=1.5in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{burglary-small.ps}}}
+\mat{\[
+  P(J|b) = \alpha P(b) \sum_e P(e) \sum_a P(a|b,e) P(J|a) \sum_m P(m|a)
+\]}
+Sum over \mat{$m$} is identically 1; \mat{$M$} is \emph{irrelevant} to the query
+
+\vspace*{0.3in}
+
+Thm 1: \mat{$Y$} is irrelevant unless \mat{$Y\elt Ancestors(\{X\}\union \E)$}
+
+Here, \mat{$X\eq JohnCalls$}, \mat{$\E\eq\{Burglary\}$}, and\\
+\mat{$Ancestors(\{X\}\union \E) = \{Alarm,Earthquake\}$}\\
+so \mat{$MaryCalls$} is irrelevant
+
+(Compare this to backward chaining from the query in Horn clause KBs)
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Irrelevant variables contd.}
+
+Defn: \underline{moral graph} of Bayes net: marry all parents and drop arrows
+
+Defn: \mat{$\A$} is \underline{m-separated} from \mat{$\B$} by \mat{$\C$} iff separated by \mat{$\C$} in the moral graph
+
+Thm 2: \mat{$Y$} is irrelevant if m-separated from \mat{$X$} by \mat{$\E$}\hspace*{1.0in}\epsfxsize=1.5in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{burglary-moral.ps}}}
+
+\vspace*{0.3in}
+
+For \mat{$P(JohnCalls|Alarm\eq true)$}, both\\
+\mat{$Burglary$} and \mat{$Earthquake$} are irrelevant
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Complexity of exact inference}
+
+\defn{Singly connected} networks (or \defn{polytrees}):\al
+  -- any two nodes are connected by at most one (undirected) path\al
+  -- time and space cost of variable elimination are \mat{$O(d^k n)$}
+
+\defn{Multiply connected} networks:\al
+  -- can reduce 3SAT to exact inference \mat{$\implies$} NP-hard\al
+  -- equivalent to \emph{counting} 3SAT models \mat{$\implies$} \#P-complete
+
+\vspace*{0.2in}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{bn-3sat.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference by stochastic simulation}
+
+Basic idea:\al
+  1) Draw \mat{$N$} samples from a sampling distribution \mat{$S$}\hspace*{1.5in}\epsfxsize=1.0in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{coin-flip.ps}}}\al
+  2) Compute an approximate posterior probability \mat{$\hat P$}\al
+  3) Show this converges to the true probability \mat{$P$}
+
+Outline:\al
+  -- Sampling from an empty network\al
+  -- Rejection sampling: reject samples disagreeing with evidence\al
+  -- Likelihood weighting: use evidence to weight samples\al
+  -- Markov chain Monte Carlo (MCMC): sample from a stochastic process\nl
+      whose stationary distribution is the true posterior
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Sampling from an empty network}
+
+\input{\file{algorithms}{prior-sample-algorithm}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\epsfxsize=0.85\textwidth
+\fig{\sfile{figures}{rain-prior-sample1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\epsfxsize=0.85\textwidth
+\fig{\sfile{figures}{rain-prior-sample2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\epsfxsize=0.85\textwidth
+\fig{\sfile{figures}{rain-prior-sample3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\epsfxsize=0.85\textwidth
+\fig{\sfile{figures}{rain-prior-sample4.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\epsfxsize=0.85\textwidth
+\fig{\sfile{figures}{rain-prior-sample5.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\epsfxsize=0.85\textwidth
+\fig{\sfile{figures}{rain-prior-sample6.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\epsfxsize=0.85\textwidth
+\fig{\sfile{figures}{rain-prior-sample7.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Sampling from an empty network contd.}
+
+Probability that \prog{PriorSample} generates a particular event\al
+  \mat{$S_{PS}(x_1\ldots x_n) = \myprod_{i\eq 1}^n P(x_i | \parents(X_i))
+    = P(x_1\ldots x_n)$}\\
+i.e., the true prior probability
+
+E.g., \mat{$S_{PS}(t, f, t, t) = 0.5 \stimes 0.9 \stimes 0.8 \stimes 0.9 = 0.324 = P(t, f, t,t)$}
+
+Let \mat{$N_{PS}(x_1\ldots x_n)$} be the number of samples generated
+for event \mat{$x_1,\ldots, x_n$}
+
+Then we have
+\mat{\begin{eqnarray*}
+  \lim_{N\to\infty} \hat P(x_1,\ldots, x_n) 
+      & = & \lim_{N\to\infty} N_{PS}(x_1,\ldots, x_n)/N \\
+      & = & S_{PS}(x_1,\ldots,x_n) \\
+      & = & P(x_1\ldots x_n)
+\end{eqnarray*}}
+That is, estimates derived from \prog{PriorSample} are \defn{consistent}
+
+Shorthand: \mat{$\hat P(x_1,\ldots, x_n) \approx P(x_1\ldots x_n)$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Rejection sampling}
+
+\mat{$\hat{\pv}(X|\e)$} estimated from samples agreeing with \mat{$\e$}
+
+\input{\file{algorithms}{rejection-sampling-algorithm}}
+
+E.g., estimate \mat{$\pv(Rain|Sprinkler\eq true)$} using 100 samples\al
+  27 samples have \mat{$Sprinkler\eq true$}\nl
+    Of these, 8 have \mat{$Rain\eq true$} and 19 have \mat{$Rain\eq false$}.\\[0.2in]
+\mat{$\hat{\pv}(Rain|Sprinkler\eq true) = \noprog{Normalize}(\<8,19\>) =
+\<0.296,0.704\>$}
+
+Similar to a basic real-world empirical estimation procedure
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Analysis of rejection sampling}
+
+
+\mat{$\hat{\pv}(X|\e) = \alpha \mbf{N}_{PS}(X,\e) $} 
+   \qquad (algorithm defn.)\al
+\mat{$= \mbf{N}_{PS}(X,\e)/N_{PS}(\e)$} 
+   \qquad (normalized by \mat{$N_{PS}(\e)$})\al
+\mat{$\approx \pv(X,\e)/P(\e)$} 
+   \qquad (property of \prog{PriorSample})\al
+\mat{$= \pv(X|\e)$} 
+   \qquad (defn. of conditional probability)
+
+Hence rejection sampling returns consistent posterior estimates
+
+Problem: hopelessly expensive if \mat{$P(\e)$} is small
+
+\mat{$P(\e)$} drops off exponentially with number of evidence variables!
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting}
+
+Idea: fix evidence variables, sample only nonevidence variables,\\
+and weight each sample by the likelihood it accords the evidence
+
+\input{\file{algorithms}{likelihood-weighting-algorithm}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting example}
+
+\epsfxsize=0.7\textwidth
+\fig{\sfile{figures}{rain-lw-sample1.ps}}
+
+\mat{$w = 1.0$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting example}
+
+\epsfxsize=0.7\textwidth
+\fig{\sfile{figures}{rain-lw-sample2.ps}}
+
+\mat{$w = 1.0$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting example}
+
+\epsfxsize=0.7\textwidth
+\fig{\sfile{figures}{rain-lw-sample3.ps}}
+
+\mat{$w = 1.0$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting example}
+
+\epsfxsize=0.7\textwidth
+\fig{\sfile{figures}{rain-lw-sample3.ps}}
+
+\mat{$w = 1.0 \stimes 0.1$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting example}
+
+\epsfxsize=0.7\textwidth
+\fig{\sfile{figures}{rain-lw-sample4.ps}}
+
+\mat{$w = 1.0 \stimes 0.1$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting example}
+
+\epsfxsize=0.7\textwidth
+\fig{\sfile{figures}{rain-lw-sample5.ps}}
+
+\mat{$w = 1.0 \stimes 0.1$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting example}
+
+\epsfxsize=0.7\textwidth
+\fig{\sfile{figures}{rain-lw-sample5.ps}}
+
+\mat{$w = 1.0 \stimes 0.1 \stimes 0.99 = 0.099$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting analysis}
+
+Sampling probability for \prog{WeightedSample} is\al
+  \mat{$S_{WS}(\mbf{z},\e) = \myprod_{i\eq 1}^l P(z_i|\parents(Z_i))$}\\
+Note: pays attention to evidence in \emph{ancestors} only\hspace*{0.3in}\epsfxsize=2.1in\raisebox{-1.3in}[0pt][0pt]{\epsffile{\file{figures}{rain-lw2.ps}}}\nl
+    \mat{$\implies$} somewhere ``in between'' prior and\nl
+    posterior distribution
+
+Weight for a given sample \mat{$\mbf{z},\e$} is\al
+  \mat{$w(\mbf{z},\e) = \myprod_{i\eq 1}^m P(e_i | \parents(E_i))$}
+
+Weighted sampling probability is\al
+  \mat{$S_{WS}(\mbf{z},\e) w(\mbf{z},\e)$}\nl
+    \mat{$= \myprod_{i\eq 1}^l P(z_i|\parents(Z_i))\ \ 
+       \myprod_{i\eq 1}^m P(e_i|\parents(E_i))$}\nl
+    \mat{$= P(\mbf{z},\e)$} (by standard global semantics of network)
+
+Hence likelihood weighting returns consistent estimates\\
+but performance still degrades with many evidence variables\\
+because a few samples have nearly all the total weight
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Approximate inference using MCMC}
+
+``State'' of network = current assignment to all variables.
+
+Generate next state by sampling one variable given Markov blanket\\
+Sample each variable in turn, keeping evidence fixed
+
+\input{\file{algorithms}{mcmc-algorithm}}
+
+Can also choose a variable to sample at random each time
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{The Markov chain}
+
+With \mat{$Sprinkler\eq true,WetGrass\eq true$}, there are four states:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{figures}{rain-chain.ps}}
+
+Wander about for a while, average what you see
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{MCMC example contd.}
+
+Estimate \mat{$\pv(Rain|Sprinkler\eq true,WetGrass\eq true)$}
+
+Sample \mat{$Cloudy$} or \mat{$Rain$} given its Markov blanket, repeat.\\
+Count number of times \mat{$Rain$} is true and false in the samples.
+
+E.g., visit 100 states\al
+  31 have \mat{$Rain\eq true$}, 69 have \mat{$Rain\eq false$}
+
+\mat{$\hat{\pv}(Rain|Sprinkler\eq true,WetGrass\eq true)$}\al
+      \mat{$= \noprog{Normalize}(\<31,69\>) = \<0.31,0.69\>$}
+
+Theorem: chain approaches \defn{stationary distribution}: \al
+long-run fraction of time spent in each state is exactly\al
+proportional to its posterior probability
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Markov blanket sampling}
+
+Markov blanket of \mat{$Cloudy$} is\hspace*{2.3in}\epsfxsize=2.1in\raisebox{-1.3in}[0pt][0pt]{\epsffile{\file{figures}{rain-lw1.ps}}}\nl
+    \mat{$Sprinkler$} and \mat{$Rain$}\\
+Markov blanket of \mat{$Rain$} is\nl
+    \mat{$Cloudy$}, \mat{$Sprinkler$}, and \mat{$WetGrass$}
+
+Probability given the Markov blanket is calculated as follows:\al
+  \mat{$P(x_i'|\markovBlanket(X_i)) = P(x_i'|\parents(X_i)) 
+           \myprod_{Z_j\in Children(X_i)} P(z_j|\parents(Z_j))$}
+
+Easily implemented in message-passing parallel systems, brains
+
+Main computational problems:\al
+  1) Difficult to tell if convergence has been achieved\al
+  2) Can be wasteful if Markov blanket is large:\nl
+    \mat{$P(X_i|\markovBlanket(X_i))$} won't change much (law of large numbers)
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Exact inference by variable elimination:\al
+ -- polytime on polytrees, NP-hard on general graphs\al
+ -- space = time, very sensitive to topology
+
+Approximate inference by LW, MCMC:\al
+ -- LW does poorly when there is lots of (downstream) evidence\al
+ -- LW, MCMC generally insensitive to topology\al
+ -- Convergence can be very slow with probabilities close to 1 or 0\al
+ -- Can handle arbitrary combinations of discrete and continuous variables
+
+
+
+\end{huge} 
+\end{document}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{MCMC analysis: Outline}
+
+Transition probability \mat{$\transition{\x}{\x'}$}
+
+Occupancy probability \mat{$\pi_t(\x)$} at time \mat{$t$}
+
+Equilibrium condition on \mat{$\pi_t$} defines stationary distribution \mat{$\pi(\x)$}\nl
+Note: stationary distribution depends on choice of \mat{$\transition{\x}{\x'}$}
+
+Pairwise \defn{detailed balance} on states guarantees equilibrium
+
+\defn{Gibbs sampling} transition probability:\nl
+    sample each variable given current values of all others\\
+\mat{$\implies$} detailed balance with the true posterior
+
+For Bayesian networks, Gibbs sampling reduces to\\
+sampling conditioned on each variable's Markov blanket
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Stationary distribution}
+
+\mat{$\pi_t(\x)$} = probability in state \mat{$\x$} at time \mat{$t$}\\
+\mat{$\pi_{t+1}(\x')$} = probability in state \mat{$\x'$} at time \mat{$t+1$}
+
+\mat{$\pi_{t+1}$} in terms of \mat{$\pi_t$} and \mat{$\transition{\x}{\x'}$}
+\mat{\[
+  \pi_{t+1}(\x') = \mysum_{\smbf{x}} \pi_t(\x) \transition{\x}{\x'}
+\]}
+Stationary distribution: \mat{$\pi_t = \pi_{t+1} = \pi$}
+\mat{\[
+  \pi(\x') = \mysum_{\smbf{x}} \pi(\x) \transition{\x}{\x'}
+      \qquad\mbox{for all }\x'
+\]}
+If \mat{$\pi$} exists, it is unique (specific to \mat{$\transition{\x}{\x'}$})
+
+In equilibrium, expected ``outflow'' = expected ``inflow''
+  
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Detailed balance}
+
+``Outflow'' = ``inflow'' for each pair of states:
+\mat{\[
+  \pi(\x) \transition{\x}{\x'} 
+   = \pi(\x') \transition{\x'}{\x}
+      \qquad\mbox{for all }\x,\ \x'
+\]}
+Detailed balance \mat{$\implies$} stationarity:
+\mat{\begin{eqnarray*}
+\mysum_{\smbf{x}} \pi(\x) \transition{\x}{\x'} 
+   & = & \mysum_{\smbf{x}} \pi(\x') \transition{\x'}{\x} \\
+   & = & \pi(\x') \mysum_{\smbf{x}} \transition{\x'}{\x} \\
+   & = & \pi(\x')
+\end{eqnarray*}}
+
+MCMC algorithms typically constructed by designing a transition\\
+probability \mat{$q$} that is in detailed balance with desired \mat{$\pi$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Gibbs sampling}
+
+Sample each variable in turn, given \emph{all other variables}
+
+Sampling \mat{$X_i$}, let \mat{$\bar{\X_i}$} be all other nonevidence variables\\
+Current values are \mat{$x_i$} and \mat{$\bar{\x_i}$}; \mat{$\e$} is fixed\\
+Transition probability is given by
+\mat{\[
+\transition{\x}{\x'} =
+  \transition{x_i,\bar{\x_i}}{x_i',\bar{\x_i}} =
+    P(x_i'|\bar{\x_i},\e)
+\]}
+This gives detailed balance with true posterior \mat{$P(\x|\e)$}:
+\mat{\begin{eqnarray*}
+\pi(\x) \transition{\x}{\x'} 
+   &=& P(\x|\e) P(x_i'|\bar{\x_i},\e) 
+     =  P(x_i,\bar{\x_i}|\e)P(x_i'|\bar{\x_i},\e)  \\
+   &=& P(x_i|\bar{\x_i},\e)P(\bar{\x_i}|\e)
+       P(x_i'|\bar{\x_i},\e) \quad\mbox{(chain rule)} \\
+   &=& P(x_i|\bar{\x_i},\e)P(x_i',\bar{\x_i}|\e)
+      \qquad\mbox{(chain rule backwards)} \\
+   &=& \transition{\x'}{\x} \pi(\x') 
+       = \pi(\x') \transition{\x'}{\x} 
+\end{eqnarray*}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Performance of approximation algorithms}
+
+\defn{Absolute approximation}: 
+  \mat{$|P(X|\e) - \hat P(X|\e)| \leq \epsilon$}
+
+\defn{Relative approximation}: 
+  \mat{$\frac{|P(X|\smbf{e}) - \hat P(X|\smbf{e})|}{P(X|\smbf{e})} \leq \epsilon$}
+
+Relative \mat{$\implies$} absolute since \mat{$0\leq P \leq 1$} (may be \mat{$O(2^{-n})$})
+
+Randomized algorithms may fail with probability at most \mat{$\delta$}
+
+Polytime approximation: \mat{$\mbox{poly}(n,\epsilon^{-1},\log \delta^{-1})$}
+
+Theorem (Dagum and Luby, 1993): both absolute and relative\\
+approximation for either deterministic or randomized algorithms\\
+are NP-hard for any \mat{$\epsilon,\delta<0.5$}
+
+(Absolute approximation polytime with no evidence---Chernoff bounds)
+

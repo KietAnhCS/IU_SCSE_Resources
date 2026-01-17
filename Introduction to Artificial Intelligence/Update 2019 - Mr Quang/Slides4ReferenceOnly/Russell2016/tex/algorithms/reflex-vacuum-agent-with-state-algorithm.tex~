@@ -1,0 +1,7 @@
+\code{
+\func{Reflex-Vacuum-Agent}{{\ts}[\var{location},\var{status}]}{an action}
+\bodysep
+    \key{if} \var{status} = \var{Dirty} \key{then return} \var{Suck}
+    \key{else if} \var{location} = \var{A} \key{then return} \var{Right}
+    \key{else if} \var{location} = \var{B} \key{then return} \var{Left}
+}

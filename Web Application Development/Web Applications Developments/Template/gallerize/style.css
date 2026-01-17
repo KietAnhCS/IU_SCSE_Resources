@@ -1,0 +1,41 @@
+body {margin:0; font-family:Georgia, "Times New Roman", Times, serif; background:url(images/head_bckg.jpg) repeat-x center top #000000;}
+
+a {color:#FDC605; text-decoration:none;}
+a:hover {text-decoration:underline;}
+h1 {font-size:24px; font-weight:normal; color:#FFFFFF; margin:15px 0 10px 0;}
+h2 {font-size:20px; font-weight:normal; margin:10px 0;}
+img {border:none;}
+br {line-height:10px;}
+
+#container {width:1000px; margin:0 auto;}
+
+#logo {margin:39px 30px 0px 30px; height:40px;}
+#logo a {color:#EDECEC; text-decoration:none; font-size:24px; text-transform:uppercase; background:url(images/logo.gif) no-repeat; padding:4px 0 0 50px; float:left;}
+
+#menu {padding-right:30px; height:56px;}
+#menu ul {padding:0; margin:0; float:right;}
+#menu li {float:left; list-style:none;}
+#menu a {display:block; width:126px; height:50px; font-size:11px; text-decoration:none; color:#ABABAB; text-align:center; background:url(images/menu_deact.gif) no-repeat; padding-top:6px;}
+#menu a:hover, #menu a.active {background:url(images/menu_act.gif) no-repeat; color:#180202;}
+
+#main {color:#D6D6D6; font-size:11px; line-height:16px;}
+
+#main ul {padding:0; margin:10px 0;}
+#main li {margin-left:20px;}
+#main img {border:6px solid #FFFFFF; margin:0 5px;}
+#main img:hover {border-color:#D6D6D6;}
+
+#text_top {padding:0 30px 20px 30px; font-size:12px;}
+
+#text_bottom {background:url(images/main_bckg.jpg) repeat-x #919191; width:940px; float:left; padding:30px 30px;}
+
+#first_col {width:280px; float:left; margin-right:40px;}
+#first_col h2 {color:#ff6f08; border-bottom:1px solid #5d5d5d; padding-bottom:10px;}
+#second_col {width:280px; float:left; margin-right:40px;}
+#second_col h2 {color:#94d223; border-bottom:1px solid #5d5d5d; padding-bottom:10px;}
+#third_col {width:280px; float:left;}
+#third_col h2 {color:#23abd2; border-bottom:1px solid #5d5d5d; padding-bottom:10px;}
+
+#footer {clear:both; height:50px; background:url(images/footer_bckg.jpg) no-repeat; color:#ffffff; font-size:11px;}
+#footer_left {float:left; padding:16px 0 0 30px;}
+#footer_right {float:right; padding:16px 30px 0 0;}

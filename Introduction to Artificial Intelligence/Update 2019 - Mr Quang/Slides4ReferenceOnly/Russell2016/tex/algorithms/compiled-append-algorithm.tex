@@ -1,0 +1,11 @@
+\code{
+\proc{Append}{\v{ax{\ac}y{\ac}az{\ac}continuation}}
+\bodysep
+    \setq{\v{trail}}\prog{Global-Trail-Pointer}()
+    \key{if} \v{ax} = $\emptylist$ and \prog{Unify}(\v{y}{\ac}\v{az}) \key{then} \prog{Call}(\v{continuation})
+    \prog{Reset-Trail}(\v{trail})
+    \setq{\v{a}}{\prog{New-Variable}()}; \setq{\v{x}}{\prog{New-Variable}()}; \setq{\v{z}}{\prog{New-Variable}()}
+    \key{if} \prog{Unify}(\v{ax}{\ac}[\v{a} | \v{x}]) and \prog{Unify}(\v{az}{\ac}[\v{a} | \v{z}]) \key{then} \prog{Append}(\v{x}{\ac}\v{y}{\ac}\v{z}{\ac}\v{continuation})
+}
+
+ 

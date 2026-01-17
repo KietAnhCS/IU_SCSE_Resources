@@ -1,0 +1,30 @@
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+@WebServlet(name = "Example2", urlPatterns = "/example2")
+public class Example2 extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        Cookie cookie = new Cookie("MyCookie", "helloWorld");
+        cookie.setMaxAge(60*60);
+        cookie.setPath(request.getServletPath());
+        cookie.setDomain(request.getServerName());
+        response.addCookie(cookie);
+        out.println("Hello World Example 2 <br>");
+        out.println("Name: " + cookie.getName() + "<br>");
+        out.println("Value: " + cookie.getValue() + "<br>");
+        out.println("Path: " + cookie.getPath() + "<br>");
+        out.println("Domain: " + cookie.getDomain() + "<br>");
+    }
+}

@@ -1,0 +1,347 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Robotics}{Chapter 25}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+Robots, Effectors, and Sensors
+
+Localization and Mapping
+
+Motion Planning
+
+Motor Control
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Mobile Robots}
+
+\centerline{\epsffile{figures/Sojourner.eps}\qquad \epsffile{figures/honda_asimo_robot.eps}}
+
+\centerline{\epsffile{figures/raibert-1leg.eps}\qquad \epsffile{figures/robocup.eps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Manipulators}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.7\textwidth
+\fig{figures/stanford-arm.eps}
+
+Configuration of robot specified by 6 numbers\al
+$\implies$ 6 \defn{degrees of freedom} (DOF)
+
+6 is the minimum number required to position end-effector arbitrarily.\\
+For dynamical systems, add velocity for each DOF.
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Non-holonomic robots}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.4\textwidth
+\fig{figures/car-like.eps}
+
+A car has more DOF (3) than controls (2), so is \defn{non-holonomic};\\
+cannot generally transition between two infinitesimally close configurations
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Sensors}
+
+\defn{Range finders}: sonar (land, underwater), laser range finder, radar (aircraft),\\
+tactile sensors, GPS
+
+\vspace*{0.2in}
+
+\centerline{\epsffile{figures/sick.eps}\qquad\epsffile{figures/robot0124bw.eps}}
+
+\defn{Imaging sensors}: cameras (visual, infrared)\\
+\defn{Proprioceptive sensors}: shaft decoders (joints, wheels), inertial sensors,\\
+force sensors, torque sensors
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Localization---Where Am I?}
+
+Compute current location and orientation (\defn{pose}) given observations:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.7\textwidth
+\fig{figures/robotics-ddn.eps}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Localization contd.}
+
+\vspace*{0.2in}
+
+\twofig{figures/robotics-pic2.eps}{figures/range-scan-model.eps}
+
+Assume Gaussian noise in motion prediction, sensor range measurements
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Localization contd.}
+
+Can use particle filtering to produce approximate position estimate
+
+\vspace*{0.2in}
+
+\threefig{figures/first.ps}{figures/second.ps}{figures/third.ps}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Localization contd.}
+
+Can also use \defn{extended Kalman filter} for simple cases:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.75\textwidth
+\fig{figures/robotics-pic6.eps}
+
+Assumes that landmarks are {\em identifiable}---otherwise,
+posterior is multimodal
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Mapping}
+
+Localization: given map and observed landmarks, update pose distribution
+
+Mapping: given pose and observed landmarks, update map distribution
+
+SLAM: given observed landmarks, update pose and map distribution
+
+Probabilistic formulation of SLAM: \al
+ add landmark locations $L_1,\ldots,L_k$ to the state vector,\al
+ proceed as for localization
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Mapping contd.}
+
+\vspace*{0.2in}
+
+\centerline{\epsfysize=0.37\textheight\epsffile{figures/arena010.ps}\qquad\epsfysize=0.37\textheight\epsffile{figures/arena020.ps}}
+\centerline{\epsfysize=0.37\textheight\epsffile{figures/arena033.ps}\qquad\epsfysize=0.37\textheight\epsffile{figures/arena034.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{3D Mapping example}
+
+\vspace*{0.2in}
+
+\twofig{figures/mine-robot.eps}{figures/mine-data.eps}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Motion Planning}
+
+Idea: plan in \defn{configuration space} defined by the robot's DOFs
+
+\vspace*{0.2in}
+
+\centerline{\epsffile{figures/armExampleWorkSpace.eps}\qquad\epsffile{figures/armExampleConfSpace.eps}}
+
+Solution is a point trajectory in free C-space
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Configuration space planning}
+
+Basic problem: $\infty^d$ states! Convert to \emph{finite} state space.
+
+\defn{Cell decomposition}:\al
+  divide up space into simple \defn{cells}, \al
+  each of which can be traversed ``easily'' (e.g., convex)
+
+\defn{Skeletonization}:\al
+  identify finite number of easily connected points/lines\al
+  that form a graph such that any two points are connected\al
+  by a path on the graph
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Cell decomposition example}
+
+\vspace*{0.2in}
+
+\centerline{\epsffile{figures/armDPwithoutPotentialWorkspaceCoarse.eps}\qquad\epsffile{figures/armDPwithoutPotentialCoarse.eps}}
+
+Problem: may be no path in pure freespace cells\\
+Solution: recursive decomposition of mixed (free+obstacle) cells
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Skeletonization: Voronoi diagram}
+
+Voronoi diagram: locus of points equidistant from obstacles
+
+\vspace*{0.2in}
+
+\epsfxsize=0.44\textwidth
+\fig{figures/armVoronoi.eps}
+
+Problem: doesn't scale well to higher dimensions
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Skeletonization: Probabilistic Roadmap}
+
+A probabilistic roadmap is generated by generating random points in
+C-space and keeping those in freespace; create graph by joining
+pairs by straight lines
+
+\vspace*{0.2in}
+
+\epsfxsize=0.44\textwidth
+\fig{figures/armRoadmap.eps}
+
+Problem: need to generate enough points to ensure that every
+start/goal pair is connected through the graph
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Motor control}
+
+Can view the motor control problem as a search problem\\
+in the \note{dynamic} rather than \note{kinematic} state space:\al
+-- state space defined by $x_1,x_2,\ldots,\dot{x_1},\dot{x_2},\ldots$\al
+-- continuous, high-dimensional (Sarcos humanoid: 162 dimensions)
+
+Deterministic control: many problems are exactly solvable\\
+esp.~if linear, low-dimensional, exactly known, observable
+
+Simple \defn{regulatory control} laws are effective for specified motions
+
+Stochastic \defn{optimal control}: very few problems exactly solvable\al
+$\implies$ approximate/adaptive methods
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Biological motor control}
+
+Motor control systems are characterized by massive redundancy
+
+Infinitely many trajectories achieve any given task
+
+E.g., 3-link arm moving in plane throwing at a target\nl
+  simple 12-parameter controller, one degree of freedom at target\nl
+  11-dimensional continuous space of optimal controllers
+
+Idea: if the arm is noisy, only ``one'' optimal policy
+minimizes error at target
+
+I.e., noise-tolerance might explain actual motor behaviour
+
+Harris \& Wolpert ({\em Nature}, 1998):  signal-dependent noise\\
+explains eye saccade velocity profile perfectly
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Setup}
+
+Suppose a controller has ``intended'' control parameters $\theta_0$\\
+which are corrupted by noise, giving $\theta$ drawn from $P_{\theta_0}$
+
+Output (e.g., distance from target) $y = F(\theta)$; 
+
+
+\epsfxsize=0.7\maxfigwidth
+\fig{figures/arm-setup.ps}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Simple learning algorithm: Stochastic gradient}
+
+Minimize $E_{\theta}[y^2]$ by gradient descent:
+\begin{eqnarray*}
+\nabla_{\theta_0} E_{\theta}[y^2]
+  &=&  \nabla_{\theta_0} \int P_{\theta_0}(\theta)F(\theta)^2 d\theta \\
+  &=&  \int \frac{\nabla_{\theta_0} P_{\theta_0}(\theta)}{P_{\theta_0}(\theta)}
+            F(\theta)^2 P_{\theta_0}(\theta)d\theta \\
+  &=&  E_{\theta}[\frac{\nabla_{\theta_0} P_{\theta_0}(\theta)}
+                       {P_{\theta_0}(\theta)}
+                  y^2]
+\end{eqnarray*}
+Given samples $(\theta_j,y_j)$, $j=1,\ldots,N$, we have
+\[
+  \hat{\nabla_{\theta_0} E_{\theta}[y^2]} =
+  \frac{1}{N}\sum_{j=1}^N
+     \frac{\nabla_{\theta_0} P_{\theta_0}(\theta_j)}
+                       {P_{\theta_0}(\theta_j)}
+                  y_j^2
+\]
+For Gaussian noise with covariance $\Sigma$, i.e.,
+$P_{\theta_0}(\theta) = N(\theta_0,\Sigma)$, we obtain
+\[
+  \hat{\nabla_{\theta_0} E_{\theta}[y^2]} =
+  \frac{1}{N}\sum_{j=1}^N \Sigma^{-1}(\theta_j - \theta_0) y_j^2
+\]
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{What the algorithm is doing}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.7\maxfigwidth
+\fig{figures/control-noise-distort.ps}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Results for 2--D controller}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.75\textwidth
+\centerline{\epsffile{figures/progress3-theta.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Results for 2--D controller}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.75\textwidth
+\centerline{\epsffile{figures/progress3-theta-zoom.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Results for 2--D controller}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.75\textwidth
+\centerline{\epsffile{figures/progress3-score.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+The rubber hits the road
+
+Mobile robots and manipulators
+
+Degrees of freedom to define robot configuration
+
+Localization and mapping as probabilistic inference problems\al
+  (require good sensor and motion models)
+
+Motion planning in configuration space\al
+  requires some method for finitization
+
+
+
+\end{huge}
+\end{document}
+
+

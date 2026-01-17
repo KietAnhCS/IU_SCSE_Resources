@@ -1,0 +1,18 @@
+# gnuplot input file that produces window and .ps file
+
+set term X11 
+
+set data style linespoints
+
+set xlabel "Time step"
+set ylabel "Avg absolute error"
+set yrange [0.0:0.2]
+
+plot 'step-all-25.data' using 1:4 title "LW/ER 25", 'step-all-25.data' using 1:5 title "PF 25", 'step-all-25.data' using 1:6 title "PF/ER 25", 'step-all-1000.data' using 1:6 title "PF/ER 1000"
+
+pause -1 "return to continue"
+
+set size 1.0,0.5; set term postscript portrait "Times-Roman" 18
+set output "step-all-25.ps"
+replot
+

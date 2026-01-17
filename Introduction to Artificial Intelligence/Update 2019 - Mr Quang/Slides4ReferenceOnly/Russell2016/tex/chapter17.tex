@@ -1,0 +1,307 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Complex decisions}{Chapter 17, Sections 1--3}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Sequential decision problems
+
+\blob Value iteration
+
+\blob Policy iteration
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Sequential decision problems}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.06\textwidth
+\fig{\file{figures}{decision-problems.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example MDP}
+
+\vspace*{0.3in}
+
+\centerline{%
+\epsfxsize=0.4\textwidth
+\epsffile{\file{figures}{sequential-decision-world.ps}}\hspace*{1in}%
+\epsfxsize=0.2\textwidth
+\epsffile{\file{figures}{sequential-decision-model.ps}}}
+
+States $s \in S$, actions $a \in A$
+
+\u{Model} $T(s,a,s') \equiv P(s'|s,a)$ = probability that $a$ in $s$ leads to $s'$
+
+\u{Reward function} $R(s)$ (or $R(s,a)$, $R(s,a,s')$)\nl
+   = $\left\{\begin{array}{ll} -0.04 & \mbox{ (small penalty) for nonterminal states}\\
+                               \pm 1 & \mbox{ for terminal states}\end{array}\right.$
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Solving MDPs}
+
+In search problems, aim is to find an optimal {\em sequence}
+
+In MDPs, aim is to find an optimal {\em policy} $\pi(s)$\nl
+   i.e., best action for every possible state $s$\nl
+   (because can't predict where one will end up)\\
+The optimal policy maximizes (say) the {\em expected sum of rewards}
+
+Optimal policy when state penalty $R(s)$ is --0.04:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.45\textwidth
+\fig{\file{figures}{sequential-decision-policy.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Risk and reward}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{policy-flips4.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Utility of state sequences}
+
+Need to understand preferences between {\em sequences} of states
+
+Typically consider \u{stationary preferences} on reward sequences:
+\[
+  [r,r_0,r_1,r_2,\ldots]\pref [r,r'_0,r'_1,r'_2,\ldots]
+  \lequiv
+  [r_0,r_1,r_2,\ldots]\pref [r'_0,r'_1,r'_2,\ldots]
+\]  
+\u{Theorem}: there are only two ways to combine rewards over time.\al
+  1) {\em Additive} utility function:\nl
+   $U([s_0,s_1,s_2,\ldots]) = R(s_0) + R(s_1) + R(s_2) + \cdots $\al
+  2) {\em Discounted} utility function:\nl
+   $U([s_0,s_1,s_2,\ldots]) = R(s_0) + \gamma R(s_1) + \gamma^2 R(s_2) + \cdots $\nl
+   where $\gamma$ is the \u{discount factor}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Utility of states}
+
+Utility of a {\em state} (a.k.a. its {\em value}) is defined to be\nl
+$U(s) = {}$ \u{expected (discounted) sum of rewards (until termination)}\nl
+\phantom{$U(s) = {}$} \u{assuming optimal actions}
+
+Given the utilities of the states, choosing the best action is just MEU:\al
+  maximize the expected utility of the immediate successors 
+
+\vspace*{0.2in}
+
+\twofig{\file{figures}{sequential-decision-values.ps}}{\file{figures}{sequential-decision-policy.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Utilities contd.}
+
+Problem: infinite lifetimes $\implies$ additive utilities are infinite
+
+1) \u{Finite horizon}: termination at a {\em fixed time} $T$\al
+  $\implies$ \u{nonstationary} policy: $\pi(s)$ depends on time left
+
+2) \u{Absorbing state(s)}: w/ prob.~1, agent eventually ``dies'' for any $\pi$\al
+  $\implies$ expected utility of every state is finite
+
+3) Discounting: assuming $\gamma<1$, $R(s) \leq R_{{\rm max}}$,
+\[ U([s_0,\ldots s_{\infty}]) = \mysum_{t=0}^{\infty} \gamma^t R(s_t) \leq R_{{\rm max}}/(1-\gamma)\]
+Smaller $\gamma \Rightarrow {}$ shorter horizon
+
+4) Maximize \u{system gain} = average reward per time step\\
+Theorem: optimal policy has constant gain after initial transient\\
+E.g., taxi driver's daily scheme cruising for passengers
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Dynamic programming: the Bellman equation}
+
+Definition of utility of states leads to a simple relationship among
+utilities of neighboring states:
+
+\u{expected sum of rewards}\al
+= \u{current reward}\nl
++ $\gamma \stimes{}$\u{expected sum of rewards after taking best action}
+
+Bellman equation (1957):
+\[ U(s) = R(s) + \gamma\,\max_a \mysum_{s'} U(s') T(s,a,s')\]
+
+$U(1,1) = -0.04$\\
+\tab + $\gamma\,\max\{ 0.8 U(1,2) + 0.1 U(2,1) + 0.1 U(1,1),$\hfill{\em up}\\
+\tab \phantom{+ \mbox{$\max\{$}}$0.9 U(1,1) + 0.1 U(1,2) $\hfill{\em left}\\
+\tab \phantom{+ \mbox{$\max\{$}}$0.9 U(1,1) + 0.1 U(2,1) $\hfill{\em down}\\
+\tab \phantom{+ \mbox{$\max\{$}}$0.8 U(2,1) + 0.1 U(1,2) + 0.1 U(1,1) \}$\hfill{\em right}
+
+One equation per state = $n$ \u{nonlinear} equations in $n$ unknowns
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Value iteration algorithm}
+
+\u{Idea}: Start with arbitrary utility values\nl
+          Update to make them \u{locally consistent} with Bellman eqn.\nl
+          Everywhere locally consistent $\Rightarrow$ global optimality
+
+Repeat for every $s$ simultaneously until ``no change''
+\[ U(s) \leftarrow R(s) + \gamma\,\max_a \mysum_{s'} U(s') T(s,a,s') \qquad \mbox{for all } s\]
+
+\epsfxsize=0.6\textwidth
+\fig{\file{graphs}{4x3-vi-curve.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Convergence}
+
+Define the \u{max-norm} $||U|| = \max_s |U(s)|$,\\
+so $||U-V||$ = maximum difference between $U$ and $V$
+
+Let $U^t$ and $U^{t+1}$ be successive approximations to the true utility $U$
+
+\u{Theorem}: For any two approximations $U^t$ and $V^t$
+\[ ||U^{t+1}-V^{t+1}|| \leq \gamma\, ||U^{t}-V^{t}|| \]
+I.e., any distinct approximations must get closer to each other\\
+so, in particular, any approximation must get closer to the true $U$\\
+and value iteration converges to a unique, stable, optimal solution
+
+\u{Theorem}: if $||U^{t+1} - U^t||<\epsilon$, then $||U^{t+1} - U||<2\epsilon\gamma/(1-\gamma)$\\
+I.e., once the change in $U^t$ becomes small, we are almost done.
+
+MEU policy using $U^t$ may be optimal long before convergence of values
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Policy iteration}
+
+Howard, 1960: search for optimal policy and utility values simultaneously
+
+Algorithm:\al
+  $\pi \leftarrow {}$ an arbitrary initial policy\al
+  repeat until no change in $\pi$\nl
+    compute utilities given $\pi$\nl
+    update $\pi$ as if utilities were correct (i.e., local MEU)
+
+To compute utilities given a fixed $\pi$ (\u{value determination}):
+\[ U(s) = R(s) + \gamma\,\mysum_{s'} U(s') T(s,\pi(s),s')\qquad \mbox{for all } s \]
+i.e., $n$ simultaneous \u{linear} equations in $n$ unknowns,
+solve in $O(n^3)$
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Modified policy iteration}
+
+Policy iteration often converges in few iterations, but each is expensive
+
+Idea: use a few steps of value iteration (but with $\pi$ fixed)\\
+starting from the value function produced the last time\\
+to produce an approximate value determination step.
+
+Often converges much faster than pure VI or PI
+
+Leads to much more general algorithms where Bellman value updates
+and Howard policy updates can be performed locally in any order
+
+\u{Reinforcement learning} algorithms operate by performing such
+updates based on the observed transitions made in an initially unknown
+environment
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Partial observability}
+
+POMDP has an \u{observation model} $O(s,e)$ defining the probability that the
+agent obtains evidence $e$ when in state $s$
+
+Agent does not know which state it is in\nl
+$\implies$ makes no sense to talk about policy $\pi(s)$!!
+
+\u{Theorem} (Astrom, 1965): the optimal policy in a POMDP is a function\nl
+  $\pi(b)$ where $b$ is the \u{belief state} (probability distribution over states)
+
+Can convert a POMDP into an MDP in belief-state space, where\nl
+  $T(b,a,b')$ is the probability that the new belief state is $b'$\nl
+  given that the current belief state is $b$ and the agent does $a$.\nl
+  I.e., essentially a filtering update step
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Partial observability contd.}
+
+Solutions automatically include information-gathering behavior
+
+If there are $n$ states, $b$ is an $n$-dimensional real-valued vector\nl
+$\implies$ solving POMDPs is very (actually, PSPACE-) hard!
+
+The real world is a POMDP (with initially unknown $T$ and $O$)
+
+
+
+
+\end{huge}
+\end{document}
+
+
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Invariance transformations}
+
+Nonsequential behaviour invariant under linear transform:
+\[
+  U'(s) = k_1 U(s) + k_2 \quad\mbox{where } k_1 > 0
+\]
+Sequential behaviour with additive utility is invariant\\
+wrt addition of any \u{potential-based} reward:
+\[
+  R'(s,a,s') = R(s,a,s') + F(s,a,s')
+\]
+where the added reward must satisfy
+\[
+\gamma \Phi(s') - \Phi(s)
+\]
+for some \u{potential function} $\Phi$ on states
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Q-iteration}
+
+Define $Q(s,a)$ = expected value of doing action $a$ in state $s$\al
+  = $R(s) + \gamma\,\mysum_{s'} U(s') T(s,a,s')$\al
+  i.e., $U(s) = \max_a Q(s,a)$
+
+Q-iteration algorithm: like value iteration, but do
+\[
+Q(s,a) \leftarrow R(s) + \gamma\,\mysum_{s'} T(s,a,s') \max_{a'} Q(s',a') \qquad \mbox{for all } s,a
+\]
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Issues}
+
+Complexity: polytime in number of states (by linear programming)\al
+  but number of states is exponential in number of state variables\al
+  $\rightarrow$ Boutilier {\em et al}>:  use structure of states\al
+  $\rightarrow$ reinforcement learning: sample $S$, approximate $U$\al
+  $\rightarrow$ hierarchical methods for policy construction
+
+Partial observability: cannot assume perfect observation of state\al
+  $\implies$ maintain \u{belief state} (posterior over states)\nl
+  and reduce POMDP to MDP in belief state space (eek)\al
+  $\rightarrow$ Cassandra {\em et al}: POMDP value iteration\al
+  $\rightarrow$ Hansen: POMDP policies as DFAs\al
+

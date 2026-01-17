@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : authors.xml
+    Created on : December 16, 2011, 7:41 AM
+    Author     : Trong Tin
+    Description:
+        Purpose of the document follows.
+-->
+
+<authors>
+    <name>
+        <firstname>Larry</firstname>
+        <lastname>Brown</lastname>
+    </name>
+    <name>
+        <firstname>Marty</firstname>
+        <lastname>Hall</lastname>
+    </name>
+</authors>

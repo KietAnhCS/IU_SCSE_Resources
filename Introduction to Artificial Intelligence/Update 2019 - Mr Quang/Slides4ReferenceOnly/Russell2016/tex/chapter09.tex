@@ -1,0 +1,683 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Inference in first-order logic}{Chapter 9}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Reducing first-order inference to propositional inference
+
+\blob Unification
+
+\blob Generalized Modus Ponens
+
+\blob Forward and backward chaining
+
+\blob Logic programming
+
+\blob Resolution
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{A brief history of reasoning}
+
+\begin{tabular}{lll}
+\note{450{\sc b.c.}} &\txr{ Stoics      }& propositional logic, inference (maybe) \\
+\note{322{\sc b.c.} }&\txr{ Aristotle   }& ``syllogisms'' (inference rules), quantifiers \\
+\note{1565 }&\txr{ Cardano     }& probability theory (propositional logic + uncertainty) \\
+\note{1847 }&\txr{ Boole       }& propositional logic (again) \\
+\note{1879 }&\txr{ Frege       }& first-order logic \\
+\note{1922 }&\txr{ Wittgenstein}& proof by truth tables \\
+\note{1930 }&\txr{ G\"odel     }& $\exists$ complete algorithm for FOL \\
+\note{1930 }&\txr{ Herbrand    }& complete algorithm for FOL (reduce to propositional) \\
+\note{1931 }&\txr{ G\"odel     }& $\lnot\exists$ complete algorithm for arithmetic \\
+\note{1960 }&\txr{ Davis/Putnam}& ``practical'' algorithm for propositional logic \\
+\note{1965 }&\txr{ Robinson    }& ``practical'' algorithm for FOL---resolution
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Universal instantiation (UI)}
+
+Every instantiation of a universally quantified sentence is entailed by it:
+\mat{\[\frac{\All{v} \alpha}{\noprog{Subst}(\{v/g\},\alpha)}\]}
+for any variable \mat{$v$} and ground term \mat{$g$}
+
+E.g., \mat{$\All{x} King(x) \land Greedy(x) \implies Evil(x)$} yields
+\mat{\begin{formula}
+   King(John) \land Greedy(John)  \implies Evil(John)\\
+   King(Richard) \land Greedy(Richard)  \implies Evil(Richard)\\
+   King(Father(John)) \land Greedy(Father(John))  \implies Evil(Father(John))\\
+   \quad\vdots
+\end{formula}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Existential instantiation (EI)}
+
+For any sentence \mat{$\alpha$}, variable \mat{$v$}, and constant symbol \mat{$k$}\\
+\emph{that does not appear elsewhere in the knowledge base}:
+\mat{\[\frac{\Exi{v} \alpha}{\noprog{Subst}(\{v/k\},\alpha)}\]}
+
+E.g., \mat{$\Exi{x} Crown(x) \land OnHead(x,John)$} yields
+\mat{\[
+Crown(C_1) \land OnHead(C_1,John)
+\]}
+provided \mat{$C_1$} is a new constant symbol, called a \defn{Skolem constant}
+
+Another example: from \mat{$\Exi{x} {{d(x^y)}/{dy}} \eq  x^y$} we obtain
+\mat{\[
+{{d(e^y)}/{dy}} \eq  e^y
+\]}
+provided \mat{$e$} is a new constant symbol
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Existential instantiation contd.}
+
+UI can be applied several times to \emph{add} new sentences;\\
+the new KB is logically equivalent to the old
+
+EI can be applied once to \emph{replace} the existential sentence;\\
+the new KB is \emph{not} equivalent to the old,\\
+but is satisfiable iff the old KB was satisfiable
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Reduction to propositional inference}
+
+Suppose the KB contains just the following:
+\mat{\begin{formula}
+   \All{x} King(x) \land Greedy(x) \implies Evil(x)\\
+   King(John)\\
+   Greedy(John)\\
+   Brother(Richard,John)
+\end{formula}}
+Instantiating the universal sentence in \emph{all possible} ways, we have
+\mat{\begin{formula}
+   King(John) \land Greedy(John) \implies Evil(John)\\
+   King(Richard) \land Greedy(Richard) \implies Evil(Richard)\\
+   King(John)\\
+   Greedy(John)\\
+   Brother(Richard,John)
+\end{formula}}
+The new KB is \defn{propositionalized}: proposition symbols are
+\mat{\[
+  King(John),\ Greedy(John),\ Evil(John), King(Richard)\, \bbox{etc.}
+\]}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Reduction contd.}
+
+Claim: a ground sentence\mat{$^*$} is entailed by new KB iff entailed by original KB
+
+Claim: every FOL KB can be propositionalized so as to preserve entailment
+
+Idea: propositionalize KB and query, apply resolution, return result
+
+Problem: with function symbols, there are infinitely many ground terms,\al
+  e.g., \mat{$Father(Father(Father(John)))$}
+
+Theorem: Herbrand (1930). If a sentence \mat{$\alpha$} is entailed by an FOL KB,\nl
+  it is entailed by a \emph{finite} subset of the propositional KB
+
+Idea: For \mat{$n$} = \mat{$0$} to \mat{$\infty$} do\nl
+    create a propositional KB by instantiating with depth-\mat{$n$} terms\nl
+    see if \mat{$\alpha$} is entailed by this KB
+
+Problem: works if \mat{$\alpha$} is entailed, loops if \mat{$\alpha$} is not entailed
+
+Theorem: Turing (1936), Church (1936), entailment in FOL is \defn{semidecidable}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Problems with propositionalization}
+
+Propositionalization seems to generate lots of irrelevant sentences.\\
+E.g., from 
+\mat{\begin{formula}
+   \All{x} King(x) \land Greedy(x) \implies Evil(x)\\
+   King(John)\\
+   \All{y} Greedy(y)\\
+   Brother(Richard,John)
+\end{formula}}
+it seems obvious that \mat{$Evil(John)$}, but propositionalization produces
+lots of facts such as \mat{$Greedy(Richard)$} that are irrelevant
+
+With \mat{$p$} \mat{$k$}-ary predicates and \mat{$n$} constants, there are \mat{$p\cdot n^k$} instantiations
+
+With function symbols, it gets nuch much worse!
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Unification}
+
+We can get the inference immediately if we can find a substitution \mat{$\theta$}\\
+such that \mat{$King(x)$} and \mat{$Greedy(x)$} match \mat{$King(John)$} and \mat{$Greedy(y)$}
+
+\mat{$\theta = \{x/John,y/John\}$} works
+
+\mat{\noprog{Unify}}\mat{$(\alpha,\beta) = \theta$} if \mat{$\alpha\theta\eq \beta\theta$}
+
+\mat{\[\begin{array}{l|l|l}
+p & q & \theta \\
+\hline
+Knows(John,x) & Knows(John,Jane) & \\
+Knows(John,x) & Knows(y,OJ)      & \\
+Knows(John,x) & Knows(y,Mother(y))& \phantom{\{y/John,x/Mother(John)\}}\\
+Knows(John,x) & Knows(x,OJ)
+\end{array}\]}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Unification}
+
+We can get the inference immediately if we can find a substitution \mat{$\theta$}\\
+such that \mat{$King(x)$} and \mat{$Greedy(x)$} match \mat{$King(John)$} and \mat{$Greedy(y)$}
+
+\mat{$\theta = \{x/John,y/John\}$} works
+
+\mat{\noprog{Unify}}\mat{$(\alpha,\beta) = \theta$} if \mat{$\alpha\theta\eq \beta\theta$}
+
+\mat{\[\begin{array}{l|l|l}
+p & q & \theta \\
+\hline
+Knows(John,x) & Knows(John,Jane) & \hbox{\note{$\{x/Jane\}$}}\\
+Knows(John,x) & Knows(y,OJ)      & \\
+Knows(John,x) & Knows(y,Mother(y))& \phantom{\{y/John,x/Mother(John)\}}\\
+Knows(John,x) & Knows(x,OJ)
+\end{array}\]}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Unification}
+
+We can get the inference immediately if we can find a substitution \mat{$\theta$}\\
+such that \mat{$King(x)$} and \mat{$Greedy(x)$} match \mat{$King(John)$} and \mat{$Greedy(y)$}
+
+\mat{$\theta = \{x/John,y/John\}$} works
+
+\mat{\noprog{Unify}}\mat{$(\alpha,\beta) = \theta$} if \mat{$\alpha\theta\eq \beta\theta$}
+
+\mat{\[\begin{array}{l|l|l}
+p & q & \theta \\
+\hline
+Knows(John,x) & Knows(John,Jane) & \hbox{\note{$\{x/Jane\}$}}\\
+Knows(John,x) & Knows(y,OJ)      & \hbox{\note{$\{x/OJ,y/John\}$}}\\
+Knows(John,x) & Knows(y,Mother(y))& \phantom{\{y/John,x/Mother(John)\}}\\
+Knows(John,x) & Knows(x,OJ)
+\end{array}\]}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Unification}
+
+We can get the inference immediately if we can find a substitution \mat{$\theta$}\\
+such that \mat{$King(x)$} and \mat{$Greedy(x)$} match \mat{$King(John)$} and \mat{$Greedy(y)$}
+
+\mat{$\theta = \{x/John,y/John\}$} works
+
+\mat{\noprog{Unify}}\mat{$(\alpha,\beta) = \theta$} if \mat{$\alpha\theta\eq \beta\theta$}
+
+\mat{\[\begin{array}{l|l|l}
+p & q & \theta \\
+\hline
+Knows(John,x) & Knows(John,Jane) & \hbox{\note{$\{x/Jane\}$}}\\
+Knows(John,x) & Knows(y,OJ)      & \hbox{\note{$\{x/OJ,y/John\}$}}\\
+Knows(John,x) & Knows(y,Mother(y))& \hbox{\note{$\{y/John,x/Mother(John)\}$}}\\
+Knows(John,x) & Knows(x,OJ)
+\end{array}\]}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Unification}
+
+We can get the inference immediately if we can find a substitution \mat{$\theta$}\\
+such that \mat{$King(x)$} and \mat{$Greedy(x)$} match \mat{$King(John)$} and \mat{$Greedy(y)$}
+
+\mat{$\theta = \{x/John,y/John\}$} works
+
+\mat{\noprog{Unify}}\mat{$(\alpha,\beta) = \theta$} if \mat{$\alpha\theta\eq \beta\theta$}
+
+\mat{\[\begin{array}{l|l|l}
+p & q & \theta \\
+\hline
+Knows(John,x) & Knows(John,Jane) & \hbox{\note{$\{x/Jane\}$}}\\
+Knows(John,x) & Knows(y,OJ)      & \hbox{\note{$\{x/OJ,y/John\}$}}\\
+Knows(John,x) & Knows(y,Mother(y))& \hbox{\note{$\{y/John,x/Mother(John)\}$}}\\
+Knows(John,x) & Knows(x,OJ) & \hbox{\note{$fail$}}
+\end{array}\]}
+\defn{Standardizing apart} eliminates overlap of variables, e.g., \mat{$Knows(z_{17},OJ)$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Generalized Modus Ponens (GMP)}
+
+
+\mat{\[\frac{{p_1}', \;\; {p_2}', \; \ldots, \; {p_n}', \;\;
+( p_1 \land p_2 \land \ldots \land p_n \Rightarrow q)}{q\theta}
+\qquad \bbox{where }{p_i}'\theta \eq p_i\theta\bbox{ for all } i
+\]}
+\mat{\begin{formula}
+{p_1}'  \bbox{ is }  King(John)  & p_1 \bbox{ is }  King(x) \\
+{p_2}' \bbox{ is }  Greedy(y)  & p_2  \bbox{ is }  Greedy(x) \\
+\theta  \bbox{ is }  \{x/John,y/John\} & q \bbox{ is } Evil(x) \\
+q\theta \bbox{ is } Evil(John)
+\end{formula}}
+
+GMP used with KB of \defn{definite clauses} (\emph{exactly} one positive literal)\\
+All variables assumed universally quantified
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Soundness of GMP}
+
+Need to show that 
+\mat{\[{p_1}', \; \ldots, \; {p_n}', \;\;
+( p_1 \land \ldots \land p_n \Rightarrow q) \models q\theta\]}
+provided that \mat{${p_i}'\theta \eq p_i\theta$} for all \mat{$i$}
+
+Lemma: For any definite clause \mat{$p$}, we have \mat{$p \models p\theta$} by UI
+
+1. \mat{$( p_1 \land \ldots \land p_n \Rightarrow q) \models 
+    ( p_1 \land \ldots \land p_n \Rightarrow q)\theta \eq
+    ( p_1\theta \land \ldots \land p_n\theta \Rightarrow q\theta)$}
+
+2. \mat{$ {p_1}', \; \ldots, \; {p_n}' \models
+     {p_1}' \land \ldots \land {p_n}' \models
+     {p_1}'\theta \land \ldots \land {p_n}'\theta $}
+
+3. From 1 and 2, \mat{$q\theta$} follows by ordinary Modus Ponens
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example knowledge base}
+
+The law says that it is a crime for an American to sell weapons to
+hostile nations.  The country Nono\index{Nono}, an enemy of America,
+has some missiles, and all of its missiles were sold to it by Colonel
+West, who is American.
+
+Prove that Col.~West is a criminal
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example knowledge base contd.}
+
+$\ldots$ it is a crime for an American to sell weapons to hostile nations:
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example knowledge base contd.}
+
+$\ldots$ it is a crime for an American to sell weapons to hostile nations:\al
+  \mat{$American(x) \land  Weapon(y)\land Sells(x,y,z) \land  Hostile(z) \implies Criminal(x)$}\\
+Nono $\ldots$ has some missiles
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example knowledge base contd.}
+
+$\ldots$ it is a crime for an American to sell weapons to hostile nations:\al
+  \mat{$American(x) \land  Weapon(y)\land Sells(x,y,z) \land  Hostile(z) \implies Criminal(x)$}\\
+Nono $\ldots$ has some missiles, i.e., $\exists\,x\ Owns(Nono,x)\land Missile(x)$:\al
+  \mat{$Owns(Nono,M_1)$} and \mat{$Missile(M_1)$}\\
+$\ldots$ all of its missiles were sold to it by Colonel West
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example knowledge base contd.}
+
+$\ldots$ it is a crime for an American to sell weapons to hostile nations:\al
+  \mat{$American(x) \land  Weapon(y)\land Sells(x,y,z) \land  Hostile(z) \implies Criminal(x)$}\\
+Nono $\ldots$ has some missiles, i.e., $\exists\,x\ Owns(Nono,x)\land Missile(x)$:\al
+  \mat{$Owns(Nono,M_1)$} and \mat{$Missile(M_1)$}\\
+$\ldots$ all of its missiles were sold to it by Colonel West\al
+  \mat{$\All{x} Missile(x) \land Owns(Nono,x) \implies Sells(West,x,Nono)$}\\
+Missiles are weapons:
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example knowledge base contd.}
+
+$\ldots$ it is a crime for an American to sell weapons to hostile nations:\al
+  \mat{$American(x) \land  Weapon(y)\land Sells(x,y,z) \land  Hostile(z) \implies Criminal(x)$}\\
+Nono $\ldots$ has some missiles, i.e., $\exists\,x\ Owns(Nono,x)\land Missile(x)$:\al
+  \mat{$Owns(Nono,M_1)$} and \mat{$Missile(M_1)$}\\
+$\ldots$ all of its missiles were sold to it by Colonel West\al
+  \mat{$\All{x} Missile(x) \land Owns(Nono,x) \implies Sells(West,x,Nono)$}\\
+Missiles are weapons:\al
+  \mat{$Missile(x)\Rightarrow Weapon(x)$}\\
+An enemy of America counts as ``hostile'':
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example knowledge base contd.}
+
+$\ldots$ it is a crime for an American to sell weapons to hostile nations:\al
+  \mat{$American(x) \land  Weapon(y)\land Sells(x,y,z) \land  Hostile(z) \implies Criminal(x)$}\\
+Nono $\ldots$ has some missiles, i.e., $\exists\,x\ Owns(Nono,x)\land Missile(x)$:\al
+  \mat{$Owns(Nono,M_1)$} and \mat{$Missile(M_1)$}\\
+$\ldots$ all of its missiles were sold to it by Colonel West\al
+  \mat{$\All{x} Missile(x) \land Owns(Nono,x) \implies Sells(West,x,Nono)$}\\
+Missiles are weapons:\al
+  \mat{$Missile(x)\Rightarrow Weapon(x)$}\\
+An enemy of America counts as ``hostile'':\al
+  \mat{$Enemy(x,America)\implies Hostile(x)$}\\
+West, who is American $\ldots$\al
+  \mat{$American(West)$}\\
+The country Nono, an enemy of America $\ldots$\al
+  \mat{$Enemy(Nono,America)$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining algorithm}
+
+\input{algorithms/forward-chaining-algorithm}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining proof}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.08\maxfigwidth
+\fig{\file{figures}{crime-fc1c.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining proof}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.08\maxfigwidth
+\fig{\file{figures}{crime-fc2c.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining proof}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.08\maxfigwidth
+\fig{\file{figures}{crime-fc3c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of forward chaining}
+
+Sound and complete for first-order definite clauses\\
+(proof similar to propositional proof)
+
+\defn{Datalog} = first-order definite clauses + \emph{no functions} (e.g., crime KB)\\
+FC terminates for Datalog in poly iterations: at most \mat{$p\cdot n^k$} literals
+
+May not terminate in general if \mat{$\alpha$} is not entailed
+
+This is unavoidable: entailment with definite clauses is semidecidable
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Efficiency of forward chaining}
+
+Simple observation: no need to match a rule on iteration \mat{$k$}\\
+if a premise wasn't added on iteration \mat{$k-1$}\nl
+$\implies$ match each rule whose premise contains a newly added literal
+
+Matching itself can be expensive
+
+\defn{Database indexing} allows \mat{$O(1)$} retrieval of known facts\al
+e.g., query \mat{$Missile(x)$} retrieves \mat{$Missile(M_1)$}
+
+Matching conjunctive premises against known facts is NP-hard
+
+Forward chaining is widely used in \defn{deductive databases}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hard matching example}
+
+\begin{minipage}[c]{0.42\maxfigwidth}
+\epsfxsize=0.4\maxfigwidth
+\centerline{\epsffile{figures/australia-csp.ps}}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.58\maxfigwidth}
+\noindent 
+\tab\mat{$\Diff(wa,nt)\land \Diff(wa,sa)\land{}$}
+\\[4pt]
+\tab\tab\tab\mat{$\Diff(nt,q) \Diff(nt,sa)\land {}$}
+\\[4pt]
+\tab\tab\tab\mat{$\Diff(q,nsw)\land \Diff(q,sa)\land {}$}
+\\[4pt]
+\tab\tab\tab\mat{$\Diff(nsw,v)\land \Diff(nsw,sa)\land {}$}
+\\[4pt]
+\tab\tab\tab\mat{$\Diff(v,sa) \implies Colorable()$}
+\\[8pt]
+\tab\mat{$\Diff(Red,Blue) \quad \Diff(Red,Green)$}
+\\[4pt]
+\tab\mat{$\Diff(Green,Red)\quad \Diff(Green,Blue)$}
+\\[4pt]
+\tab\mat{$\Diff(Blue,Red) \quad \Diff(Blue,Green)$}
+\end{minipage}
+
+\mat{$Colorable()$} is inferred iff the CSP has a solution\\
+CSPs include 3SAT as a special case, hence matching is NP-hard
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining algorithm}
+
+\input{algorithms/backward-chaining-algorithm}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.06\textwidth
+\fig{\file{figures}{crime-bc01c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.06\textwidth
+\fig{\file{figures}{crime-bc02c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.06\textwidth
+\fig{\file{figures}{crime-bc03c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.06\textwidth
+\fig{\file{figures}{crime-bc04c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.06\textwidth
+\fig{\file{figures}{crime-bc05c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.06\textwidth
+\fig{\file{figures}{crime-bc06c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.06\textwidth
+\fig{\file{figures}{crime-bc07c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of backward chaining}
+
+Depth-first recursive proof search: space is linear in size of proof
+
+Incomplete due to infinite loops\al
+$\implies$ fix by checking current goal against every goal on stack
+
+Inefficient due to repeated subgoals (both success and failure)\al
+$\implies$ fix using caching of previous results (extra space!)
+
+Widely used (without improvements!) for \defn{logic programming}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Logic programming}
+
+Sound bite: computation as inference on logical KBs
+
+\begin{tabular}{lll}
+    & \note{Logic programming}        & \note{Ordinary programming}     \\
+1.  & Identify problem             & Identify problem             \\
+2.  & Assemble information         & Assemble information         \\
+3.  & Tea break                    & Figure out solution          \\
+4.  & Encode information in KB     & Program solution             \\
+5.  & Encode problem instance as facts & Encode problem instance as data  \\
+6.  & Ask queries                  & Apply program to data \\
+7.  & Find false facts             & Debug procedural errors \\
+\end{tabular}
+
+Should be easier to debug \mat{$Capital(NewYork,US)$} than \mat{$x:= x+2$} !
+
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Prolog systems}
+
+Basis: backward chaining with Horn clauses + bells \& whistles\\
+Widely used in Europe, Japan (basis of 5th Generation project)\\
+Compilation techniques $\Rightarrow$ approaching a billion LIPS
+
+Program = set of clauses = {\tt head :- literal$_1$, $\ldots$ literal$_n$.}
+\begin{LARGE}\begin{verbatim}
+   criminal(X) :- american(X), weapon(Y), sells(X,Y,Z), hostile(Z).
+\end{verbatim}\end{LARGE}
+
+Efficient unification by \defn{open coding}\\
+Efficient retrieval of matching clauses by direct linking\\
+Depth-first, left-to-right backward chaining\\
+Built-in predicates for arithmetic etc., e.g., {\tt X is Y*Z+3}\\
+Closed-world assumption (``negation as failure'')\al
+   e.g., given {\tt alive(X) :- not dead(X).}\al
+   {\tt alive(joe)} succeeds if {\tt dead(joe)} fails
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Prolog examples}
+
+Depth-first search from a start state {\tt X}:
+\begin{verbatim}
+dfs(X) :- goal(X).
+dfs(X) :- successor(X,S),dfs(S).
+\end{verbatim}
+No need to loop over {\tt S}: {\tt successor} succeeds for each
+
+Appending two lists to produce a third:
+\begin{verbatim}
+append([],Y,Y).                         
+append([X|L],Y,[X|Z]) :- append(L,Y,Z). 
+                                        
+query:   append(A,B,[1,2]) ?            
+answers: A=[]    B=[1,2]
+         A=[1]   B=[2]
+         A=[1,2] B=[]
+\end{verbatim}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Resolution: brief summary}
+
+Full first-order version:
+\mat{\[\frac {\ell_1 \lor \cdots\lor \ell_k,\qquad m_1 \lor \cdots\lor m_n}
+        {(\ell_1 \lor \cdots\lor \ell_{i-1}\lor \ell_{i+1}\lor\cdots\lor \ell_k
+        \lor m_1 \lor \cdots \lor m_{j-1}\lor m_{j+1}\lor\cdots\lor m_n)\theta}
+\]}
+where \mat{$\noprog{Unify}(\ell_i,\lnot m_j) \eq \theta$}.
+
+For example,
+\mat{\begin{formula}
+{\begin{array}{l} \lnot Rich(x) \lor Unhappy(x) \\
+                  Rich(Ken)
+ \end{array}}
+\over
+{\begin{array}{l} Unhappy(Ken)
+ \end{array}}
+\end{formula}}
+with \mat{$\theta = \{x/Ken\}$}
+
+Apply resolution steps to \mat{$CNF(KB\land \lnot \alpha)$}; complete for FOL
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conversion to CNF}
+
+Everyone who loves all animals is loved by someone:\al 
+  \mat{$\All{x} [\All{y} Animal(y) \implies Loves(x,y)] \implies [\Exi{y} Loves(y,x)]$}
+
+1. Eliminate biconditionals and implications
+\mat{\[
+ \All{x} [\lnot \All{y} \lnot Animal(y) \lor Loves(x,y)] \lor [\Exi{y} Loves(y,x)]
+\]}
+2. Move \mat{$\lnot$} inwards: \mat{$\lnot \All{x,p} \equiv \Exi{x} \lnot p$},\quad
+                         \mat{$\lnot \Exi{x,p} \equiv \All{x} \lnot p$}:
+\mat{\begin{formula}
+ \All{x} [\Exi{y} \lnot(\lnot Animal(y) \lor Loves(x,y))] \lor [\Exi{y} Loves(y,x)] \\
+ \All{x} [\Exi{y} \lnot\lnot Animal(y) \land \lnot Loves(x,y)] \lor [\Exi{y} Loves(y,x)] \\
+ \All{x} [\Exi{y} Animal(y) \land \lnot Loves(x,y)] \lor [\Exi{y} Loves(y,x)] 
+\end{formula}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conversion to CNF contd.}
+
+3. Standardize variables: each quantifier should use a different one
+\mat{\[
+ \All{x} [\Exi{y} Animal(y) \land \lnot Loves(x,y)] \lor [\Exi{z} Loves(z,x)] 
+\]}
+4. Skolemize: a more general form of existential instantiation.\nl
+   Each existential variable is replaced by a \defn{Skolem function}\nl
+   of the enclosing universally quantified variables:
+\mat{\[
+ \All{x} [Animal(F(x)) \land \lnot Loves(x,F(x))] \lor Loves(G(x),x)
+\]}
+5. Drop universal quantifiers:
+\mat{\[
+ [Animal(F(x)) \land \lnot Loves(x,F(x))] \lor Loves(G(x),x)
+\]}
+6. Distribute \mat{$\land$} over \mat{$\lor$}:
+\mat{\[
+ [Animal(F(x)) \lor Loves(G(x),x)] \land [\lnot Loves(x,F(x)) \lor Loves(G(x),x)]
+\]}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Resolution proof: definite clauses}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.08\textwidth
+\fig{\file{figures}{crime-resolution.ps}}
+
+
+
+\end{huge} 
+\end{document}
+

@@ -1,0 +1,101 @@
+<%@ page import="java.sql.*" %>
+<%@ page import="java.util.HashMap" %>
+<%!
+  HashMap products = new HashMap(50);
+
+  public void jspInit() {
+    try {
+      Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+      Connection con = DriverManager.getConnection("jdbc:odbc:JavaWeb");
+      Statement s = con.createStatement();
+      String sql = "SELECT ProductId, ProductName, Description, Price" +
+        " FROM Products" +
+        " WHERE Hot=True";
+      ResultSet rs = s.executeQuery(sql);
+      while (rs.next()) {
+        Product product = new Product();
+        String productId = rs.getString("ProductId");
+        product.productId = productId;
+        product.productName = rs.getString("ProductName");
+        product.description = rs.getString("Description");
+        product.price = rs.getFloat("Price");
+        products.put(productId, product);
+      }
+      con.close();
+    }
+    catch (ClassNotFoundException e) {
+    }
+    catch (Exception e) {
+    }
+  }
+
+  class Product {
+    String productId;
+    String productName;
+    String description;
+    float price;
+  }
+%>
+<%
+  long t1 = System.currentTimeMillis();
+%>
+<HTML>
+<HEAD>
+<TITLE>Product Details</TITLE>
+</HEAD>
+<BODY>
+<%
+  String productId = request.getParameter("id");
+  //productId="2";
+  if (productId==null) {
+    out.println("The request did not carry a product identifier");
+    return;
+  }
+  String productName = null;
+  String description = null;
+  float price = 0;
+
+  Product product = (Product) products.get(productId);
+  if (product!=null) {
+    productName = product.productName;
+    description = product.description;
+    price = product.price;
+  }
+  else {
+    // not found in the cache, grab from the database
+    try {
+      Connection con = DriverManager.getConnection("jdbc:odbc:JavaWeb");
+      Statement s = con.createStatement();
+      String sql = "SELECT ProductName, Description, Price" +
+        " FROM Products" +
+        " WHERE ProductId=" + productId;
+      ResultSet rs = s.executeQuery(sql);
+      if (rs.next()) {
+        productName = rs.getString("ProductName");
+        description = rs.getString("Description");
+        price = rs.getFloat("Price");
+      }
+      rs.close();
+
+      s.close();
+      con.close();
+    }
+    catch (SQLException e) {
+      out.println(e.toString());
+    }
+    catch (Exception e) {
+      out.println(e.toString());
+    }
+  }
+%>
+<BR>Product Id: <%=productId%>
+<BR>Product Name: <%=productName%>
+<BR>Description: <%=description%>
+<BR>Price: <%=price%>
+<BR>
+<%
+  long t2 = System.currentTimeMillis();
+  out.println("Processing time: " + (t2 - t1));
+%>
+</BODY>
+</HTML>

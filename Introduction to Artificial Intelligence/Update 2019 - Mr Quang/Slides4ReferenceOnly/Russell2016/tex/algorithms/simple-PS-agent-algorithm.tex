@@ -1,0 +1,16 @@
+\code{
+\func{Simple-Problem-Solving-Agent}{{\ts}\var{percept}}{an action}
+    \firststatic{seq}{an action sequence, initially empty}
+    \static{state}{some description of the current world state}
+    \static{goal}{a goal, initially null}
+    \static{problem}{a problem formulation}
+\bodysep
+    \setq{\var{state}}{\prog{Update-State}(\var{state{\ac}percept})}
+    \key{if} \var{seq} is empty \key{then} 
+          \setq{\var{goal}}{\prog{Formulate-Goal}(\var{state})}
+          \setq{\var{problem}}{\prog{Formulate-Problem}(\var{state{\ac}goal})}
+          \setq{\var{seq}}{\prog{Search}({\ts}\var{problem})}
+    \setq{\var{action}}{\prog{Recommendation}(\var{seq{\ac}state})}
+    \setq{\var{seq}}{\prog{Remainder}(\var{seq{\ac}state})}
+    \key{return} \var{action}
+}

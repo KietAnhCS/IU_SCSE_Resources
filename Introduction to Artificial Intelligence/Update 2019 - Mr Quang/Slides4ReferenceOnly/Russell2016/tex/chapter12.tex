@@ -1,0 +1,237 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\newcommand{\condstep}[3]{\mbf{if}~#1~\mbf{then}~#2~\mbf{else}~#3}
+\newcommand{\whilestep}[2]{\mbf{while}~#1~\mbf{do}~#2}
+\newcommand{\noplan}{\emptylist}
+\begin{document}
+
+\begin{huge}
+\titleslide{Planning and Acting}{Chapter 13}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob The real world
+
+\blob Conditional planning
+
+\blob Monitoring and replanning
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{The real world}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{flat-tire-picture.ps}}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{flat-tire-model.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Things go wrong}
+
+\txr{\em Incomplete information}\al
+  Unknown preconditions, e.g., $Intact(Spare)$?\al
+  Disjunctive effects, e.g., $Inflate(x)$ causes\nl
+    $Inflated(x) \lor SlowHiss(x) \lor Burst(x) \lor BrokenPump \lor \ldots$
+
+\txr{\em Incorrect information}\al
+  Current state incorrect, e.g., spare NOT intact\al
+  Missing/incorrect postconditions in operators
+
+\txb{Qualification problem}:\nl
+   can never finish listing all the required preconditions and\nl
+   possible conditional outcomes of actions
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Solutions}
+
+\txb{Conformant} or \txb{sensorless planning}\nl
+   Devise a plan that works regardless of state or outcome\\
+\txr{\em Such plans may not exist}
+
+\txb{Conditional planning}\nl
+    Plan to obtain information ({\bf observation actions})\nl
+    Subplan for each contingency, e.g.,\nl
+    $[Check(Tire1),\condstep{Intact(Tire1)}{Inflate(Tire1)}{CallAAA}$\\
+\txr{\em Expensive because it plans for many unlikely cases}
+
+\txb{Monitoring/Replanning}\nl
+    Assume normal states, outcomes\nl
+    Check progress \txr{\em during execution}, replan if necessary\\
+\txr{\em Unanticipated outcomes may lead to failure (e.g., no AAA card)}
+
+(Really need a combination; plan for likely/serious eventualities,\\
+deal with others when they arise, as they must eventually)
+
+
+       
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conformant planning}
+
+Search in space of \txb{belief states} (sets of possible actual states)
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{vacuum2-sets.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conditional planning}
+
+If the world is nondeterministic or partially observable\al
+  then percepts usually \txr{\em provide information}, \al
+  i.e., \txr{\em split up} the belief state
+
+\vspace*{0.2in}
+
+\epsfxsize=1.0\textwidth
+\fig{\file{figures}{contingent-percepts.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conditional planning contd.}
+
+Conditional plans check (any consequence of KB +) percept
+
+$[\ldots,\condstep{C}{Plan_A}{Plan_B},\ldots]$
+
+Execution: check $C$ against current KB, execute ``then'' or ``else''
+
+Need \txr{\em some} plan for \txr{\em every} possible percept
+
+(Cf. game playing: \txr{\em some} response for \txr{\em every} opponent move)\\
+(Cf. backward chaining: \txr{\em some} rule such that \txr{\em every} premise satisfied
+
+AND--OR tree search (very similar to backward chaining algorithm)
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+Double Murphy: sucking or arriving may dirty a clean square
+
+\vspace*{0.2in}
+
+\epsfxsize=1.0\textwidth
+\fig{\file{figures}{vacuum-cond-plan.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+Triple Murphy: also sometimes stays put instead of moving
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{vacuum-loop-plan.ps}}
+
+$[L_1:\ Left, \condstep{AtR}{L_1}{[\condstep{CleanL}{\noplan}{Suck}]}]$
+
+or $[\whilestep{AtR}{[Left]}, \condstep{CleanL}{\noplan}{Suck}]$
+
+``Infinite loop'' but will eventually work unless action always fails
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Execution Monitoring}
+
+``Failure'' = preconditions of \txr{\em remaining plan} not met
+
+Preconditions of remaining plan\nl
+= all preconditions of remaining steps not achieved by remaining steps\nl
+= all causal links \txr{\em crossing} current time point
+
+On failure, resume POP to achieve open conditions from current state
+
+IPEM (Integrated Planning, Execution, and Monitoring):\nl
+  keep updating $Start$ to match current state\nl
+  links from actions replaced by links from $Start$ when done
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\centerline{\raisebox{-0.9\textheight}[0pt][0pt]{\epsfysize=0.95\textheight\epsffile{\file{figures}{plan-preconditions1.ps}}}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\centerline{\raisebox{-0.9\textheight}[0pt][0pt]{\epsfysize=0.95\textheight\epsffile{\file{figures}{plan-preconditions2.ps}}}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\centerline{\raisebox{-0.9\textheight}[0pt][0pt]{\epsfysize=0.95\textheight\epsffile{\file{figures}{plan-preconditions3.ps}}}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\centerline{\raisebox{-0.9\textheight}[0pt][0pt]{\epsfysize=0.95\textheight\epsffile{\file{figures}{plan-preconditions4.ps}}}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\centerline{\raisebox{-0.9\textheight}[0pt][0pt]{\epsfysize=0.95\textheight\epsffile{\file{figures}{plan-preconditions5.ps}}}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\centerline{\raisebox{-0.9\textheight}[0pt][0pt]{\epsfysize=0.95\textheight\epsffile{\file{figures}{plan-preconditions6.ps}}}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Emergent behavior}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.05\textwidth
+\fig{\file{figures}{replanning-paint2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Emergent behavior}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.05\textwidth
+\fig{\file{figures}{replanning-paint3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Emergent behavior}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.05\textwidth
+\fig{\file{figures}{replanning-paint3.ps}}
+
+``Loop until success'' behavior \txr{\em emerges} from interaction between 
+monitor/replan agent design and uncooperative environment
+
+
+\end{huge} 
+\end{document}

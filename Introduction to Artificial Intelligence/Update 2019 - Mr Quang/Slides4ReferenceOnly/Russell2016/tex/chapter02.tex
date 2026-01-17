@@ -1,0 +1,439 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Intelligent Agents}{Chapter 2}
+
+\special{landscape}
+%\special{papersize=11in, 8.5in}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Reminders}
+
+
+\emph{Assignment 0 (lisp refresher) due 1/28}
+
+\emph{Lisp/emacs/AIMA tutorial}: 11-1 today and Monday, 271 Soda
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Agents and environments
+
+\blob Rationality
+
+\blob PEAS (Performance measure, Environment, Actuators, Sensors)
+
+\blob Environment types
+
+\blob Agent types
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Agents and environments}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{agent-environment.ps}}
+
+\defn{Agents} include humans, robots, softbots, thermostats, etc.
+
+The \defn{agent function} maps from percept histories to actions:
+\[f: {\cal P}^* \rightarrow {\cal A}\]
+The \defn{agent program} runs on the physical \defn{architecture} to produce $f$
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Vacuum-cleaner world}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{vacuum2-environment.ps}}
+
+Percepts: location and contents, e.g., $[A,Dirty]$
+
+Actions: $Left$, $Right$, $Suck$, $NoOp$
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{A vacuum-cleaner agent}
+
+\input{tables/vacuum-agent-function-table}%
+
+\medskip
+
+\input{algorithms/reflex-vacuum-agent-algorithm}
+
+What is the \emph{right} function? \\
+Can it be implemented in a small agent program?
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Rationality}
+
+Fixed \defn{performance measure} evaluates the \note{environment sequence}\al
+-- one point per square cleaned up in time $T$?\al
+-- one point per clean square per time step, minus one per move?\al
+-- penalize for ${}> k$ dirty squares?
+
+A \txr{rational agent} chooses whichever action maximizes the \txr{expected} value of
+the performance measure \txr{given the percept sequence to date}
+
+Rational $\neq$ omniscient\nl
+   -- percepts may not supply all relevant information\\
+Rational $\neq$ clairvoyant\nl
+   -- action outcomes may not be as expected\\
+Hence, rational $\neq$ successful
+
+Rational $\implies$ exploration, learning, autonomy
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{PEAS}
+
+To design a rational agent, we must specify the \txr{task environment}
+
+Consider, e.g., the task of designing an automated taxi:
+
+\q{Performance measure}
+
+\q{Environment}
+
+\q{Actuators}
+
+\q{Sensors}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{PEAS}
+
+To design a rational agent, we must specify the \txr{task environment}
+
+Consider, e.g., the task of designing an automated taxi:
+
+\q{Performance measure} safety, destination, profits, legality, comfort, $\ldots$
+
+\q{Environment} US streets/freeways, traffic, pedestrians, weather, $\ldots$
+
+\q{Actuators} steering, accelerator, brake, horn, speaker/display, $\ldots$
+
+\q{Sensors} video, accelerometers, gauges, engine sensors, keyboard, GPS, $\ldots$
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Internet shopping agent}
+
+\q{Performance measure}
+
+\q{Environment}
+
+\q{Actuators}
+
+\q{Sensors}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Internet shopping agent}
+
+\q{Performance measure} price, quality, appropriateness, efficiency
+
+\q{Environment} current and future WWW sites, vendors, shippers
+
+\q{Actuators} display to user, follow URL, fill in form
+
+\q{Sensors} HTML pages (text, graphics, scripts)
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Environment types}
+
+\begin{mytabular}{@{\extracolsep\fill}|@{\squad}l@{\quad}|cccc@{\squad}|}
+\hline
+\tabhead & {Solitaire} & {Backgammon} & {Internet shopping} & {Taxi} \\
+\hline
+\tabtop 
+\q{Observable}   &   &   &   &  \\
+\q{Deterministic} &   &   &   &  \\
+\q{Episodic}      &   &   &   &  \\
+\q{Static}       &   &   &   &  \\
+\q{Discrete}       &   &   &   &  \\
+\tabbot 
+\q{Single-agent}     &   &   &   &  \\
+\hline
+\end{mytabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Environment types}
+
+\begin{mytabular}{@{\extracolsep\fill}|@{\squad}l@{\quad}|cccc@{\squad}|}
+\hline
+\tabhead & {Solitaire} & {Backgammon} & {Internet shopping} & {Taxi} \\
+\hline
+\tabtop 
+\q{Observable}   & Yes  & Yes  & No  & No \\
+\q{Deterministic}  &   &   &   &  \\
+\q{Episodic}     &   &   &   &  \\
+\q{Static}           &   &   &   &  \\
+\q{Discrete}     &   &   &   &  \\
+\tabbot 
+\q{Single-agent} &   &   &    &  \\
+\hline
+\end{mytabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Environment types}
+
+\begin{mytabular}{@{\extracolsep\fill}|@{\squad}l@{\quad}|cccc@{\squad}|}
+\hline
+\tabhead & {Solitaire} & {Backgammon} & {Internet shopping} & {Taxi} \\
+\hline
+\tabtop 
+\q{Observable}   & Yes  & Yes  & No  & No \\
+\q{Deterministic}  & Yes  & No  & Partly  & No \\
+\q{Episodic}     &   &   &   &  \\
+\q{Static}           &   &   &   &  \\
+\q{Discrete}     &   &   &   &  \\
+\tabbot 
+\q{Single-agent} &   &   &   &  \\
+\hline
+\end{mytabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Environment types}
+
+\begin{mytabular}{@{\extracolsep\fill}|@{\squad}l@{\quad}|cccc@{\squad}|}
+\hline
+\tabhead & {Solitaire} & {Backgammon} & {Internet shopping} & {Taxi} \\
+\hline
+\tabtop 
+\q{Observable}   & Yes  & Yes  & No  & No \\
+\q{Deterministic}  & Yes  & No  & Partly  & No \\
+\q{Episodic}     & No  & No  & No  & No \\
+\q{Static}           &   &   &   &  \\
+\q{Discrete}     &   &   &   &  \\
+\tabbot 
+\q{Single-agent} &   &   &   &  \\
+\hline
+\end{mytabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Environment types}
+
+\begin{mytabular}{@{\extracolsep\fill}|@{\squad}l@{\quad}|cccc@{\squad}|}
+\hline
+\tabhead & {Solitaire} & {Backgammon} & {Internet shopping} & {Taxi} \\
+\hline
+\tabtop 
+\q{Observable}   & Yes  & Yes  & No  & No \\
+\q{Deterministic}  & Yes  & No  & Partly  & No \\
+\q{Episodic}     & No  & No  & No  & No \\
+\q{Static}           & Yes  & Semi  & Semi  & No \\
+\q{Discrete}     &   &   &   &  \\
+\tabbot 
+\q{Single-agent} &   &   &   &  \\
+\hline
+\end{mytabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Environment types}
+
+\begin{mytabular}{@{\extracolsep\fill}|@{\squad}l@{\quad}|cccc@{\squad}|}
+\hline
+\tabhead & {Solitaire} & {Backgammon} & {Internet shopping} & {Taxi} \\
+\hline
+\tabtop 
+\q{Observable}   & Yes  & Yes  & No  & No \\
+\q{Deterministic}  & Yes  & No  & Partly  & No \\
+\q{Episodic}     & No  & No  & No  & No \\
+\q{Static}           & Yes  & Semi  & Semi  & No \\
+\q{Discrete}     & Yes  & Yes  & Yes  & No \\
+\tabbot 
+\q{Single-agent} &   &   &   &  \\
+\hline
+\end{mytabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Environment types}
+
+\begin{mytabular}{@{\extracolsep\fill}|@{\squad}l@{\quad}|cccc@{\squad}|}
+\hline
+\tabhead & {Solitaire} & {Backgammon} & {Internet shopping} & {Taxi} \\
+\hline
+\tabtop 
+\q{Observable}   & Yes  & Yes  & No  & No \\
+\q{Deterministic}  & Yes  & No  & Partly  & No \\
+\q{Episodic}     & No  & No  & No  & No \\
+\q{Static}           & Yes  & Semi  & Semi  & No \\
+\q{Discrete}     & Yes  & Yes  & Yes  & No \\
+\tabbot 
+\q{Single-agent} & Yes  & No  & Yes (except auctions)  & No \\
+\hline
+\end{mytabular}
+
+\bigskip
+
+\emph{The environment type largely determines the agent design}
+
+The real world is (of course) partially observable, stochastic, sequential,
+dynamic,  continuous, multi-agent
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Agent types}
+
+Four basic types in order of increasing generality:\al
+-- simple reflex agents\al
+-- reflex agents with state\al
+-- goal-based agents\al
+-- utility-based agents
+
+All these can be turned into learning agents
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Simple reflex agents}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{simple-reflex-agent.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\medskip
+
+\input{algorithms/reflex-vacuum-agent-algorithm}
+
+\bigskip
+
+\begin{verbatim}
+(setq joe (make-agent :name 'joe :body (make-agent-body)
+                      :program (make-reflex-vacuum-agent-program)))
+
+(defun make-reflex-vacuum-agent-program ()
+  #'(lambda (percept)
+      (let ((location (first percept)) (status (second percept)))
+        (cond ((eq status 'dirty) 'Suck)
+              ((eq location 'A) 'Right)
+              ((eq location 'B) 'Left)))))
+\end{verbatim}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Reflex agents with state}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{reflex+state-agent.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\medskip
+
+\input{algorithms/reflex-vacuum-agent-with-state-algorithm}
+
+\bigskip
+
+\begin{verbatim}
+(defun make-reflex-vacuum-agent-with-state-program ()
+  (let ((last-A infinity) (last-B infinity))
+  #'(lambda (percept)
+      (let ((location (first percept)) (status (second percept)))
+        (incf last-A) (incf last-B)
+        (cond 
+         ((eq status 'dirty) 
+          (if (eq location 'A) (setq last-A 0) (setq last-B 0))
+          'Suck)
+         ((eq location 'A) (if (> last-B 3) 'Right 'NoOp))
+         ((eq location 'B) (if (> last-A 3) 'Left 'NoOp)))))))
+\end{verbatim}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Goal-based agents}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{goal-based-agent.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Utility-based agents}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{utility-based-agent.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Learning agents}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{learning-agent.ps}}
+
+
+%%%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\heading{AIMA code}
+%%
+%%The code for each topic is divided into four directories:\al
+%%-- {\tt agents}: code defining agent types and programs\al
+%%-- {\tt algorithms}: code for the methods used by the agent programs\al
+%%-- {\tt environments}: code defining environment types, simulations\al
+%%-- {\tt domains}: problem types and instances for input to algorithms\\
+%%(Often run algorithms on domains rather than agents in environments.)
+%%
+%%\begin{verbatim}
+%%(setq joe (make-agent :name 'joe :body (make-agent-body)
+%%                      :program (make-dumb-agent-program)))
+%%
+%%(defun make-dumb-agent-program ()
+%%  (let ((memory nil))
+%%    #'(lambda (percept)
+%%        (push percept memory)
+%%        'no-op)))
+%%\end{verbatim}
+%%
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+\defn{Agents} interact with \defn{environments} through
+\defn{actuators} and \defn{sensors}
+
+The \defn{agent function} describes what the agent does in all circumstances
+
+The \defn{performance measure} evaluates the environment sequence
+
+A \defn{perfectly rational} agent maximizes expected performance 
+
+\defn{Agent programs} implement (some) agent functions
+
+\defn{PEAS} descriptions define task environments
+
+Environments are categorized along several dimensions:\nl
+  \defn{observable}? \defn{deterministic}? \defn{episodic}? \defn{static}? 
+  \defn{discrete}? \defn{single-agent}?
+
+Several basic agent architectures exist:\nl
+  \defn{reflex}, \defn{reflex with state}, \defn{goal-based}, 
+  \defn{utility-based}
+
+\end{huge}
+\end{document}
+
+
+
+
+
+
+

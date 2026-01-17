@@ -1,0 +1,26 @@
+\code{
+\func{Unify-Internal}{\var{x}{\ac}\var{y}{\ac}\var{$\theta$}}{a substitution to make \var{x} and \var{y} identical (given \var{$\theta$})}
+    \firstinputs{x}{a variable, constant, list, or compound}
+    \inputs{y}{a variable, constant, list, or compound}
+    \inputs{$\theta$}{the substitution built up so far, initially empty}
+\bodysep
+    \key{if} \var{$\theta$} = failure \key{then return} failure
+    \key{else if} \var{x} = \var{y} \key{then} \key{return} \var{$\theta$}
+    \key{else if} \prog{Variable?}(\var{x}) \key{then return} \prog{Unify-Var}(\var{x}{\ac}\var{y}{\ac}\var{$\theta$})
+    \key{else if} \prog{Variable?}(\var{y}) \key{then return} \prog{Unify-Var}(\var{y}{\ac}\var{x}{\ac}\var{$\theta$})
+    \key{else if} \prog{Compound?}(\var{x}) \key{and} \prog{Compound?}(\var{y}) \key{then}
+          \key{return} \prog{Unify}(\prog{Args}[\var{x}]{\ac}\prog{Args}[\var{y}]{\ac}\prog{Unify}(\prog{Op}[\var{x}]\ac\prog{Op}[\var{y}]\ac\var{$\theta$}))
+    \key{else if} \prog{List?}(\var{x}) \key{and} \prog{List?}(\var{y}) \key{then}
+          \key{return} \prog{Unify}(\prog{Rest}[\var{x}]{\ac}\prog{Rest}[\var{y}]{\ac}\prog{Unify}(\prog{First}[\var{x}]{\ac}\prog{First}[\var{y}]{\ac}\var{$\theta$}))
+    \key{else return} failure
+\fnsep
+\func{Unify-Var}{\var{var{\ac}x}{\ac}\var{$\theta$}}{a substitution}
+    \firstinputs{var}{a variable}
+    \inputs{x}{any expression}
+    \inputs{$\theta$}{the substitution built up so far}
+\bodysep
+    \key{if} $\mbox{\{}var/val\mbox{\}} \elt \theta$ \key{then return} \prog{Unify}(\var{val}\ac\var{x}\ac\var{$\theta$})
+    \key{else if} $\mbox{\{}x/val\mbox{\}} \elt \theta$ \key{then return} \prog{Unify}(\var{var}\ac\var{val}\ac\var{$\theta$})
+    \key{else if} \prog{Occur-Check?}(\var{var}{\ac}\var{x}) \key{then return} failure 
+    \key{else return} add \{\var{var}/\var{x}\} to \var{$\theta$}
+}

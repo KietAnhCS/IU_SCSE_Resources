@@ -1,0 +1,20 @@
+\code{
+\func{Alpha-Beta-Search}{\var{state}{\ac}\var{game}}{an action}
+    \setq{\var{action}, \var{state}}{the \var{a}, \var{s} \key{in} \prog{Successors}[\var{game}](\var{state})
+                such that {\prog{Min-Value}(\var{s}{\ac}\var{game}{\ac}$-\infty${\ac}$+\infty$)} is maximized}
+    \key{return} \var{action}
+\fnsep
+\func{Max-Value}{\var{state{\ac}game{\ac}$\alpha${\ac}$\beta$}}{the minimax value of \var{state}}
+    \key{if} \prog{Cutoff-Test}(\var{state}) \key{then return} \prog{Eval}(\var{state})
+    \key{for each} \var{s} \key{in} \prog{Successors}(\var{state}) \key{do}
+          \setq{$\alpha$}{max($\alpha${\ac}\prog{Min-Value}(\var{s}{\ac}\var{game}{\ac}$\alpha${\ac}$\beta$))}
+          \key{if} $\alpha \geq \beta$ \key{then return} $\beta$ 
+    \key{return} $\alpha$
+\fnsep
+\func{Min-Value}{\var{state{\ac}game{\ac}$\alpha${\ac}$\beta$}}{the minimax value of \var{state}}
+    \key{if} \prog{Cutoff-Test}(\var{state}) \key{then return} \prog{Eval}(\var{state})
+    \key{for each} \var{s} \key{in} \prog{Successors}(\var{state}) \key{do}
+          \setq{$\beta$}{min({\ts}$\beta${\ac}\prog{Max-Value}(\var{s}{\ac}\var{game}{\ac}$\alpha${\ac}$\beta$))}
+          \key{if} $\beta \leq \alpha$ \key{then return} $\alpha$ 
+    \key{return} $\beta$ 
+}

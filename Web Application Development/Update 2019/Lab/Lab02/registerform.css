@@ -1,0 +1,10 @@
+table tr th {
+    color: black;
+    font-size: 25px;
+    font-family: 'Indie Flower', cursive;
+};
+
+table tr td{
+    padding: 10px;
+}
+

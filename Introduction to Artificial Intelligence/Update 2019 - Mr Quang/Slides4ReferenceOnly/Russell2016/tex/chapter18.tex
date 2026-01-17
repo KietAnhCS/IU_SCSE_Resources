@@ -1,0 +1,467 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Learning from Observations}{Chapter 18, Sections 1--3}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Learning agents
+
+\blob Inductive learning
+
+\blob Decision tree learning
+
+\blob Measuring learning performance
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Learning}
+
+Learning is essential for unknown environments,\\
+i.e., when designer lacks omniscience
+
+Learning is useful as a system construction method,\\
+i.e., expose the agent to reality rather than trying to write it down
+
+Learning modifies the agent's decision mechanisms to improve performance
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Learning agents}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{learning-model.ps}}
+
+% Points to make:
+% 1) Performance element is what we have called ``agent'' up to now
+% 2) Critic/LearningElement/ProblemGenerator do the ``improving''
+% 3) Performance standard is fixed; 
+%    a) can't adjust performance standard to flatter own behaviour
+%    b) no standard *in the environment*: ordinary chess and
+%       suicide chess LOOK identical. Essentially, certain kinds of percepts
+%       are ``hardwired'' as good/bad (e.g., pain, hunger)
+% 4) Learning element may use knowledge already acquired in the perf. element
+% 5) Learning may require experimentation - actions an agent might not
+%    normally consider such as dropping rocks for the Tower of Pisa
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Learning element}
+
+Design of learning element is dictated by\al
+\blob what type of performance element is used\al
+\blob which functional component is to be learned\al
+\blob how that functional compoent is represented\al
+\blob what kind of feedback is available\\
+Example scenarios:
+
+\vspace*{0.1in}
+
+\epsfxsize=1.07\textwidth
+\fig{\file{figures}{learning-elements.ps}}
+
+\defn{Supervised learning}: correct answers for each instance\\
+\defn{Reinforcement learning}: occasional rewards
+
+% Points to make:
+% 1) Learning transition model is ``supervised'' if observable
+% 2) Supervised learning of correct actions requires ``teacher''
+% 3) Reinforcement learning is harder, but requires no teacher
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inductive learning (a.k.a.~Science)}
+
+Simplest form: learn a function from examples (\emph{tabula rasa})
+
+\mat{$f$} is the \defn{target function}
+
+An \defn{example} is a pair \mat{$x$}, \mat{$f(x)$}, e.g., 
+\mat{$\begin{array}{c|c|c}O&O&X \\
+                     \hline
+                      &X&  \\
+                     \hline
+                     X& &  \end{array}\ \ ,\ \ +1$}
+
+Problem: find a(n) \defn{hypothesis} \mat{$h$}\nl
+   such that \mat{$h \approx f$}\nl
+   given a \defn{training set} of examples
+
+(\emph{This is a highly simplified model of real learning:\al
+  -- Ignores prior knowledge\al
+  -- Assumes a deterministic, observable ``environment''\al
+  -- Assumes examples are \emph{given}\al
+  -- Assumes that the agent \emph{wants} to learn \mat{$f$}---why?})
+
+% Points to make:
+% 1) For Science, the ``agent'' is the whole human race over all time
+% 2) tabula rasa = ``blank slate'' (lit. erased writing tablet)
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inductive learning method}
+
+Construct/adjust \mat{$h$} to agree with \mat{$f$} on training set\\
+(\mat{$h$} is \defn{consistent} if it agrees with \mat{$f$} on all examples)
+
+E.g., curve fitting:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{curve-fitting1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inductive learning method}
+
+Construct/adjust \mat{$h$} to agree with \mat{$f$} on training set\\
+(\mat{$h$} is \defn{consistent} if it agrees with \mat{$f$} on all examples)
+
+E.g., curve fitting:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{curve-fitting2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inductive learning method}
+
+Construct/adjust \mat{$h$} to agree with \mat{$f$} on training set\\
+(\mat{$h$} is \defn{consistent} if it agrees with \mat{$f$} on all examples)
+
+E.g., curve fitting:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{curve-fitting3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inductive learning method}
+
+Construct/adjust \mat{$h$} to agree with \mat{$f$} on training set\\
+(\mat{$h$} is \defn{consistent} if it agrees with \mat{$f$} on all examples)
+
+E.g., curve fitting:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{curve-fitting4.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inductive learning method}
+
+Construct/adjust \mat{$h$} to agree with \mat{$f$} on training set\\
+(\mat{$h$} is \defn{consistent} if it agrees with \mat{$f$} on all examples)
+
+E.g., curve fitting:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{curve-fitting5.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inductive learning method}
+
+Construct/adjust \mat{$h$} to agree with \mat{$f$} on training set\\
+(\mat{$h$} is \defn{consistent} if it agrees with \mat{$f$} on all examples)
+
+E.g., curve fitting:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{curve-fitting5.ps}}
+
+\defn{Ockham's razor}: maximize a combination of consistency and simplicity
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Attribute-based representations}
+
+Examples described by \defn{attribute values} (Boolean, discrete, continuous, etc.)\\
+E.g., situations where I will/won't wait for a table:
+
+\input{\file{tables}{restaurant-example-table}}%
+
+\defn{Classification} of examples is \defn{positive} (T) or \defn{negative} (F)
+
+% Points to make:
+% 1) Give detailed attribute definitions (on p.532)
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Decision trees}
+
+One possible representation for hypotheses\\
+E.g., here is the ``true'' tree for deciding whether to wait:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{restaurant-tree.ps}}
+
+% Points to make:
+% 1) Explain how the decision tree evaluates an example, e.g., \mat{$X_3$}
+% 2) Some of the original set of attributes are irrelevant
+% 3) This case is REALIZABLE - i.e., target definable in hypothesis class
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Expressiveness}
+
+Decision trees can express any function of the input attributes.\\
+E.g., for Boolean functions, truth table row \mat{$\rightarrow$} path to leaf:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{xor-decision-tree.ps}}
+
+Trivially, there is a consistent decision tree for any training set\\
+w/ one path to leaf for each example (unless \mat{$f$} nondeterministic in \mat{$x$})\\
+but it probably won't generalize to new examples
+
+Prefer to find more \emph{compact} decision trees
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hypothesis spaces}
+
+\q{How many distinct decision trees with \mat{$n$} Boolean attributes}
+
+% Points to make: get students to think about question before
+% going on to next slides which have the answer
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hypothesis spaces}
+
+\q{How many distinct decision trees with \mat{$n$} Boolean attributes}
+
+= number of Boolean functions
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hypothesis spaces}
+
+\q{How many distinct decision trees with \mat{$n$} Boolean attributes}
+
+= number of Boolean functions\\
+= number of distinct truth tables with \mat{$2^n$} rows
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hypothesis spaces}
+
+\q{How many distinct decision trees with \mat{$n$} Boolean attributes}
+
+= number of Boolean functions\\
+= number of distinct truth tables with \mat{$2^n$} rows = \mat{$2^{2^n}$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hypothesis spaces}
+
+\q{How many distinct decision trees with \mat{$n$} Boolean attributes}
+
+= number of Boolean functions\\
+= number of distinct truth tables with \mat{$2^n$} rows = \mat{$2^{2^n}$}
+
+E.g., with 6 Boolean attributes, there are 18,446,744,073,709,551,616 trees
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hypothesis spaces}
+
+\q{How many distinct decision trees with \mat{$n$} Boolean attributes}
+
+= number of Boolean functions\\
+= number of distinct truth tables with \mat{$2^n$} rows = \mat{$2^{2^n}$}
+
+E.g., with 6 Boolean attributes, there are 18,446,744,073,709,551,616 trees
+
+\q{How many purely conjunctive hypotheses (e.g., \mat{$Hungry\land\lnot Rain$})}
+
+% Points to make: get students to think about question before
+% going on to next slides which have the answer
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hypothesis spaces}
+
+\q{How many distinct decision trees with \mat{$n$} Boolean attributes}
+
+= number of Boolean functions\\
+= number of distinct truth tables with \mat{$2^n$} rows = \mat{$2^{2^n}$}
+
+E.g., with 6 Boolean attributes, there are 18,446,744,073,709,551,616 trees
+
+\q{How many purely conjunctive hypotheses (e.g., \mat{$Hungry\land\lnot Rain$})}
+
+Each attribute can be in (positive), in (negative), or out\nl
+\mat{$\implies$} \mat{$3^n$} distinct conjunctive hypotheses
+
+More expressive hypothesis space\al
+ -- increases chance that target function can be expressed \quad\smiley\al
+ -- increases number of hypotheses consistent w/ training set\nl
+    \mat{$\implies$} may get worse predictions\quad\frowny
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Decision tree learning}
+
+Aim: find a small tree consistent with the training examples
+
+Idea: (recursively) choose ``most significant'' attribute as root of (sub)tree
+
+\input{algorithms/DTL-algorithm}
+
+% Points to make:
+% 1) Explain inputs
+% 2) Explain recursive step -- pick attribute, subdivide examples
+% 3) Explain base cases: 
+%    a) empty examples - arises for empty branches of non-Boolean parent attribute
+%    b) uniform example classification - this is ``normal'' leaf
+%    c) empty attributes - target is not deterministic in input attributes
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Choosing an attribute}
+
+Idea: a good attribute splits the examples into subsets that are
+(ideally) ``all positive'' or ``all negative''
+
+\vspace*{0.5in}
+
+\epsfxsize=1.0\textwidth
+\fig{\file{figures}{restaurant-roots.ps}}
+
+\mat{$Patrons?$} is a better choice---gives \emph{information} about the classification
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Information}
+
+Information answers questions
+
+The more clueless I am about the answer initially, the more
+information is contained in the answer
+
+Scale: 1 bit = answer to Boolean question with prior \mat{$\<0.5,0.5\>$}
+
+Information in an answer when prior is \mat{$\<P_1,\ldots,P_n\>$} is
+\mat{\[
+  H(\<P_1,\ldots,P_n\>) = \mysum_{i\eq 1}^n - P_i \log_2 P_i
+\]}
+(also called \defn{entropy} of the prior)
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Information contd.}
+
+Suppose we have \mat{$p$} positive and \mat{$n$} negative examples at the root\nl
+\mat{$\implies$} \mat{$H(\<p/(p+n),n/(p+n)\>)$} bits needed to classify a new example\\
+E.g., for 12 restaurant examples, \mat{$p\eq n\eq 6$} so we need 1 bit
+
+An attribute splits the examples \mat{$E$} into subsets \mat{$E_i$}, each of which
+(we hope) needs less information to complete the classification
+
+Let \mat{$E_i$} have \mat{$p_i$} positive and \mat{$n_i$} negative examples\al
+\mat{$\implies$} \mat{$H(\<p_i/(p_i+n_i),n_i/(p_i+n_i)\>)$} bits needed to classify a new example\al
+\mat{$\implies$} \emph{expected} number of bits per example over all branches is
+\mat{\[
+  \mysum_i \ \ \frac{p_i+n_i}{p+n} \ H(\<p_i/(p_i+n_i),n_i/(p_i+n_i)\>)
+\]}
+For \mat{$Patrons?$}, this is 0.459 bits, for \mat{$Type$} this is (still) 1 bit
+
+\mat{$\implies$} choose the attribute that minimizes the remaining information needed
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example contd.}
+
+Decision tree learned from the 12 examples:
+
+\vspace*{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{induced-restaurant-tree.ps}}
+
+Substantially simpler than ``true'' tree---a more complex hypothesis
+isn't justified by small amount of data
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Performance measurement}
+
+How do we know that \mat{$h\approx f$}? (Hume's \emph{Problem of Induction})
+
+1) Use theorems of computational/statistical learning theory
+
+2) Try \mat{$h$} on a new \defn{test set} of examples \al
+  (use \emph{same distribution over example space} as training set)
+
+\defn{Learning curve} = \% correct on test set as a function of training set size
+
+\vspace*{-0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{graphs}{restaurant-dtl-curve.ps}}
+
+
+
+
+% Points to make:
+% 1) Restaurant data; graph averaged over 20 trials
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Performance measurement contd.}
+
+Learning curve depends on\al
+ -- \defn{realizable} (can express target function) vs. \defn{non-realizable}\nl
+     non-realizability can be due to missing attributes \nl
+     or restricted hypothesis class (e.g., thresholded linear function)\al
+ -- redundant expressiveness (e.g., loads of irrelevant attributes)
+
+\vspace*{0.2in}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{learning-curves.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Learning needed for unknown environments, lazy designers
+
+Learning agent = performance element + learning element
+
+Learning method depends on type of performance element, available\\
+feedback, type of component to be improved, and its representation
+
+For supervised learning, the aim is to find a simple hypothesis\\
+that is approximately consistent with training examples
+
+Decision tree learning using information gain 
+
+Learning performance = prediction accuracy measured on test set
+
+\end{huge}
+\end{document}
+
+
+

@@ -1,0 +1,49 @@
+# gnuplot input file that produces window and .ps file
+# currently produces an output file called "error.ps"
+# to change the output file name, edit the penultimate line
+
+set data style linespoints
+
+############################### data from h_5
+
+set term x11 
+set xlabel "Number of samples"
+set ylabel "P(h_i|e_1...e_t)"
+set title "Posteriors given data generated from h_5"
+set yrange [0.0:1.0]
+set key 2,0.95
+
+plot 'h_5-bayes-post.data' using 1:2 title "P(h_1|E)", 'h_5-bayes-post.data' using 1:3 title "P(h_2|E)", 'h_5-bayes-post.data' using 1:4 title "P(h_3|E)", 'h_5-bayes-post.data' using 1:5 title "P(h_4|E)", 'h_5-bayes-post.data' using 1:6 title "P(h_5|E)"
+
+pause -1 "Output will be written to h_5-bayes-post.ps"#
+
+set size 1.0,0.5; set term postscript portrait color "Times-Roman" 18
+set output "h_5-bayes-post.ps" 
+set linestyle 1 lw 3
+set linestyle 2 lw 3
+set linestyle 3 lw 3
+set linestyle 4 lw 3
+set linestyle 5 lw 3
+replot
+
+##### Predictions
+set size 1.0,1.0; set term X11 
+set xlabel "Number of samples"
+set ylabel "P(red|e_1...e_t)
+set title "Bayes predictions with data generated from h_5"
+set yrange [0.4:1.0]
+set nokey
+
+
+plot 'h_5-bayes-pred.data' using 1:2 title "P(Red)"
+pause -1 "Output will be written to h_5-bayes-pred.ps"#
+
+set size 1.0,0.5; set term postscript portrait color "Times-Roman" 18
+set output "h_5-bayes-pred.ps" 
+set linestyle 1 lw 3
+set linestyle 2 lw 3
+set linestyle 3 lw 3
+set linestyle 4 lw 3
+set linestyle 5 lw 3
+replot
+

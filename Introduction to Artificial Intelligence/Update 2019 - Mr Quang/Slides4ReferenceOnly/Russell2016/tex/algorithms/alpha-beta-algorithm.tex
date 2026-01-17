@@ -1,0 +1,20 @@
+\code{
+\func{Alpha-Beta-Decision}{\var{state}}{an action}
+    \key{return} the \var{a} in \prog{Actions}(\var{state}) maximizing \prog{Min-Value}(\prog{Result}(\var{a}{\ac}\var{state}))
+\fnsep
+\func{Max-Value}{\var{state}{\ac}\(\alpha\){\ac}\(\beta\)}{\var{a utility value}}
+    \firstinputs{\var{state}}{current state in game}
+    \inputs{\(\alpha\)}{the value of the best alternative for {\sc max} along the path to \var{state}}
+    \inputs{\(\beta\)}{the value of the best alternative for {\sc min} along the path to \var{state}}
+\bodysep
+    \key{if} \prog{Terminal-Test}(\var{state}) \key{then} \key{return} \prog{Utility}(\var{state})
+    \setq{\var{v}}{\(-\infty\)}
+    \key{for} \var{a, s} in \prog{Successors}(\var{state}) \key{do}
+        \setq{\var{v}}{\prog{Max}(\var{v}, \prog{Min-Value}(\var{s}{\ac}\(\alpha\){\ac}\(\beta\)))}
+        \key{if} \(\var{v} \ge \beta\) \key{then return} \var{v}
+        \setq{\(\alpha\)}{\prog{Max}(\(\alpha\), \var{v})}
+    \key{return} \var{v}
+\fnsep
+\func{Min-Value}{\var{state}{\ac}\(\alpha\){\ac}\(\beta\)}{\var{a utility value}}
+    same as \prog{Max-Value} but with roles of \(\alpha\){\ac}\(\beta\) reversed
+}

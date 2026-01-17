@@ -1,0 +1,11 @@
+table, th, td {
+    /* border: 1px solid black; */
+    border-collapse: collapse;
+    align-items: center;
+  }
+  
+
+.avatar{
+    width: 150px;
+    border-radius: 10%;
+}

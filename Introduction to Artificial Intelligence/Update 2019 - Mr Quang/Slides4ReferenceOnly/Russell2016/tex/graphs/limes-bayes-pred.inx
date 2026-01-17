@@ -1,0 +1,27 @@
+set ylabel 0.7
+set xtics nomirror
+set ytics nomirror
+set tics out
+set ticscale 0.6
+set border 3 lw 2
+#For portrait mode:
+#set size 0.41857144, 0.195 
+#For eps mode:
+#set size 0.586,0.55714285
+set size 1,1
+set term postscript eps enhanced color "Helvetica" 24
+
+############################### data from limes
+
+set data style linespoints
+set xlabel "Number of samples in {/Times-Bold d}"
+set ylabel "{/Times-Italic P}(next candy is lime | {/Times-Bold d})
+set yrange [0.4:1.0]
+set nokey
+
+
+
+set output "limes-bayes-pred.eps" 
+plot 'limes-bayes-pred.data' using 1:2 lw 6
+
+

@@ -1,0 +1,426 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Artificial Intelligence}{Chapter 1}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob What is AI?
+
+\blob A brief history
+
+\blob The state of the art
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{What is AI?}
+
+\vspace*{1in}
+
+\centerline{\input{tables/ai-is-table}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Acting humanly: The Turing test}
+
+Turing (1950) ``Computing machinery and intelligence'':\\
+\blob ``\txm{Can machines think}?'' $\longrightarrow$ ``\txg{Can machines behave intelligently}?''\\
+\blob Operational test for intelligent behavior: the \defn{Imitation Game}
+
+\vspace*{0.05in}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{figures}{turing.ps}}
+
+\vspace*{-0.2in}
+
+\blob Predicted that by 2000, a machine might have a 30\% chance of\al
+     fooling a lay person for 5 minutes\\
+\blob Anticipated all major arguments against AI in following 50 years\\
+\blob Suggested major components of AI: knowledge, reasoning, language\al
+     understanding, learning\\[0.1in]
+Problem: Turing test is not \emph{reproducible}, \emph{constructive}, or\\
+amenable to \emph{mathematical analysis}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Thinking humanly: Cognitive Science}	
+
+1960s ``\defn{cognitive revolution}'': information-processing psychology replaced\\
+prevailing orthodoxy of \defn{behaviorism}
+
+Requires scientific theories of internal activities of the brain\al
+ -- What level of abstraction? ``\note{Knowledge}'' or ``\note{circuits}''?\al
+ -- How to validate? Requires \nl
+    1) Predicting and testing behavior of human subjects (top-down)\nl
+    or 2) Direct identification from neurological data (bottom-up)
+
+Both approaches (roughly, \txm{Cognitive Science} and \txb{Cognitive Neuroscience}) \\
+are now distinct from AI
+
+Both share with AI the following characteristic:\al
+   \emph{the available theories do not explain (or engender)\al
+   anything resembling human-level general intelligence}
+
+Hence, all three fields share one principal direction!
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Thinking rationally: Laws of Thought}
+
+\defn{Normative} (or \defn{prescriptive}) rather than \note{descriptive}
+
+Aristotle: what are correct arguments/thought processes?
+
+Several Greek schools developed various forms of \defn{logic}:\al
+   \emph{notation} and \emph{rules of derivation} for thoughts;\\
+may or may not have proceeded to the idea of mechanization
+
+Direct line through mathematics and philosophy to modern AI
+
+Problems: \\
+1) Not all intelligent behavior is mediated by logical deliberation\\
+2) \note{What is the purpose of thinking}? What thoughts \emph{should} I have\al
+   out of all the thoughts (logical or otherwise) that I \emph{could} have?
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Acting rationally}
+
+\defn{Rational} behavior: doing the right thing
+
+The right thing: that which is expected to maximize goal achievement,\\
+given the available information
+
+Doesn't necessarily involve thinking---e.g., blinking reflex---but\\
+thinking should be in the service of rational action
+
+Aristotle (Nicomachean Ethics):\al
+  \emph{Every art and every inquiry, and similarly every  \al
+       action and pursuit, is thought to aim at some good}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Rational agents}
+
+An \defn{agent} is an entity that perceives and acts
+
+This course is about designing \defn{rational agents}
+
+Abstractly, an agent is a function from percept histories to actions:
+\[f: {\cal P}^* \rightarrow {\cal A}\]
+For any given class of environments and tasks, we seek the\\
+agent (or class of agents) with the best performance
+
+Caveat: \emph{computational limitations make \nl
+\ \ perfect rationality unachievable}\\
+$\rightarrow$ design best \note{program} for given machine resources
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{AI prehistory}
+
+\begin{tabular}{ll}
+\defn{Philosophy} & logic, methods of reasoning\\
+           & mind as physical system\\
+\tabbot    & foundations of learning, language, rationality\\
+\defn{Mathematics}& formal representation and proof\\
+           & algorithms, computation, (un)decidability, (in)tractability\\
+\tabbot    & probability\\
+\defn{Psychology} & adaptation\\
+           & phenomena of perception and motor control\\
+\tabbot    & experimental techniques (psychophysics, etc.)\\
+\defn{Economics}  & formal theory of rational decisions\\
+\defn{Linguistics}& knowledge representation\\
+\tabbot    & grammar\\
+\defn{Neuroscience}& plastic physical substrate for mental activity\\
+\defn{Control theory}& homeostatic systems, stability\\
+           & simple optimal agent designs
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Potted history of AI}
+
+\vspace*{-0.1in}
+
+\begin{tabular}{ll}
+\note{1943}       & McCulloch \& Pitts: Boolean circuit model of brain\\
+\note{1950}       & Turing's ``Computing Machinery and Intelligence''\\
+\note{1952--69}   & Look, Ma, no hands! \\
+\note{1950s}      & Early AI programs, including Samuel's checkers program,\\
+           & Newell \& Simon's Logic Theorist, Gelernter's Geometry Engine\\
+\note{1956}       & Dartmouth meeting: ``Artificial Intelligence'' adopted\\
+\note{1965}       & Robinson's complete algorithm for logical reasoning\\
+\note{1966--74}   & AI discovers computational complexity\\
+           & Neural network research almost disappears\\
+\note{1969--79}   & Early development of knowledge-based systems\\
+\note{1980--88}   & Expert systems industry booms\\
+\note{1988--93}   & Expert systems industry busts: ``AI Winter''\\
+\note{1985--95}   & Neural networks return to popularity\\
+\note{1988}--     & Resurgence of probability; general increase in technical depth\\
+           & ``Nouvelle AI'': ALife, GAs, soft computing\\
+\note{1995}--     & Agents, agents, everywhere $\ldots$\\
+\note{2003}--     & Human-level AI back on the agenda
+\end{tabular}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob {Play a decent game of table tennis} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob {Drive safely along a curving mountain road} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob {Drive safely along Telegraph Avenue} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob {Buy a week's worth of groceries on the web} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob {Buy a week's worth of groceries at Berkeley Bowl} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob {Play a decent game of bridge} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob \txg{Play a decent game of bridge} \\
+\blob {Discover and prove a new mathematical theorem} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob \txg{Play a decent game of bridge} \\
+\blob \txm{Discover and prove a new mathematical theorem} \\
+\blob {Design and execute a research program in molecular biology}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob \txg{Play a decent game of bridge} \\
+\blob \txm{Discover and prove a new mathematical theorem} \\
+\blob \txm{Design and execute a research program in molecular biology}\\
+\blob {Write an intentionally funny story} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob \txg{Play a decent game of bridge} \\
+\blob \txm{Discover and prove a new mathematical theorem} \\
+\blob \txm{Design and execute a research program in molecular biology}\\
+\blob \txr{Write an intentionally funny story} \\
+\blob {Give competent legal advice in a specialized area of law}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob \txg{Play a decent game of bridge} \\
+\blob \txm{Discover and prove a new mathematical theorem} \\
+\blob \txm{Design and execute a research program in molecular biology}\\
+\blob \txr{Write an intentionally funny story} \\
+\blob \txg{Give competent legal advice in a specialized area of law}\\
+\blob {Translate spoken English into spoken Swedish in real time}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob \txg{Play a decent game of bridge} \\
+\blob \txm{Discover and prove a new mathematical theorem} \\
+\blob \txm{Design and execute a research program in molecular biology}\\
+\blob \txr{Write an intentionally funny story} \\
+\blob \txg{Give competent legal advice in a specialized area of law}\\
+\blob \txg{Translate spoken English into spoken Swedish in real time}\\
+\blob {Converse successfully with another person for an hour}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob \txg{Play a decent game of bridge} \\
+\blob \txm{Discover and prove a new mathematical theorem} \\
+\blob \txm{Design and execute a research program in molecular biology}\\
+\blob \txr{Write an intentionally funny story} \\
+\blob \txg{Give competent legal advice in a specialized area of law}\\
+\blob \txg{Translate spoken English into spoken Swedish in real time}\\
+\blob \txr{Converse successfully with another person for an hour}\\
+\blob {Perform a complex surgical operation}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob \txg{Play a decent game of bridge} \\
+\blob \txm{Discover and prove a new mathematical theorem} \\
+\blob \txm{Design and execute a research program in molecular biology}\\
+\blob \txr{Write an intentionally funny story} \\
+\blob \txg{Give competent legal advice in a specialized area of law}\\
+\blob \txg{Translate spoken English into spoken Swedish in real time}\\
+\blob \txr{Converse successfully with another person for an hour}\\
+\blob \txm{Perform a complex surgical operation}\\
+\blob {Unload any dishwasher and put everything away}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{State of the art}
+
+Which of the following can be done at present?
+
+\blob \txg{Play a decent game of table tennis} \\
+\blob \txg{Drive safely along a curving mountain road} \\
+\blob \txr{Drive safely along Telegraph Avenue} \\
+\blob \txg{Buy a week's worth of groceries on the web} \\
+\blob \txr{Buy a week's worth of groceries at Berkeley Bowl} \\
+\blob \txg{Play a decent game of bridge} \\
+\blob \txm{Discover and prove a new mathematical theorem} \\
+\blob \txm{Design and execute a research program in molecular biology}\\
+\blob \txr{Write an intentionally funny story} \\
+\blob \txg{Give competent legal advice in a specialized area of law}\\
+\blob \txg{Translate spoken English into spoken Swedish in real time}\\
+\blob \txr{Converse successfully with another person for an hour}\\
+\blob \txm{Perform a complex surgical operation}\\
+\blob \txr{Unload any dishwasher and put everything away}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Unintentionally funny stories}
+
+
+One day Joe Bear was hungry. He asked his friend Irving Bird where some
+honey was. Irving told him there was a beehive in the oak tree. Joe threatened
+to hit Irving if he didn't tell him where some honey was. The End.
+
+Henry Squirrel was thirsty. He walked over to the river bank where his
+good friend Bill Bird was sitting. Henry slipped and fell in the
+river. Gravity drowned. The End.
+
+Once upon a time there was a dishonest fox and a vain crow. One day the
+crow was sitting in his tree, holding a piece of cheese in his mouth. He
+noticed that he was holding the piece of cheese. He became hungry, and
+swallowed the cheese. The fox walked over to the crow. The End.
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Unintentionally funny stories}
+
+Joe Bear was hungry. He asked Irving Bird where some honey was. Irving
+refused to tell him, so Joe offered to bring him a worm if he'd tell
+him where some honey was.  Irving agreed. But Joe didn't know where
+any worms were, so he asked Irving, who refused to say. So Joe offered
+to bring him a worm if he'd tell him where a worm was.  Irving
+agreed. But Joe didn't know where any worms were, so he asked Irving,
+who refused to say. So Joe offered to bring him a worm if he'd tell
+him where a worm was $\ldots$ 
+
+
+\end{huge}
+\end{document}
+
+
+
+
+
+
+

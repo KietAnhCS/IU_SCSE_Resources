@@ -1,0 +1,9 @@
+\code{
+\func{Prior-Sample}{\v{bn}}{an event sampled from \v{bn}}
+    \firstinputs{bn}{a belief network specifying joint distribution $\pv(X_1,\ldots,X_n)$}
+\bodysep
+    \setq{\mbf{x}}{an event with $n$ elements}
+    \k{for} $i = 1$ \k{to} $n$ \k{do}
+          \setq{$x_i$}{a random sample from $\pv(X_i | Parents(X_i))$}
+    \k{return} \mbf{x}
+}

@@ -1,0 +1,18 @@
+\code{
+\func{MCMC-Ask}{\v{X}{\ac}\v{\e}{\ac}\v{bn}{\ac}\v{N}}{an estimate of $P(\v{X}|\v{\e})$}
+    \firstlocal{$\v{\mbf{N}}[\v{X}]$}{a vector of counts over \v{X}, initially zero}
+    \local{\mbf{Z}}{the nonevidence variables in \v{bn}}
+    \local{\v{\x}}{the current state of the network, initially copied from \v{\e}}
+\bodysep
+    initialize \v{\x} with random values for the variables in \v{\mbf{Y}}
+    \k{for} \v{j} = 1 to \v{N} \k{do}
+          \k{for each} $\v{Z_i}$ in \v{\mbf{Z}} \k{do}
+                sample the value of $\v{Z_i}$ in \v{\x} from $\pv(\v{Z_i}|\markovBlanket(\v{Z_i}))$ 
+                      given the values of $\MarkovBlanket(\v{Z_i})$ in \v{\x}
+                \setq{$\v{\mbf{N}}[\v{x}]$}{$\v{\mbf{N}}[\v{x}]+1$} where \v{x} is the value of \v{X} in \v{\x}
+    \k{return} \prog{Normalize}($\v{\mbf{N}}[\v{X}]$)
+}
+
+
+
+

@@ -1,0 +1,19 @@
+# generic commands for twographbox output size
+load "twographbox.in"
+
+
+
+set data style points
+
+set xlabel "x"
+set ylabel "y"
+
+set yrange [0:1]
+
+set nokey 
+
+
+
+set output "regression-sample.eps"
+
+plot 'regression-sample.data' using 1:2 lw 2, -0.5*x + 0.8 lw 2

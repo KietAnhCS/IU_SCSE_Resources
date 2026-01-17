@@ -1,0 +1,19 @@
+\code{
+\func{Simulated-Annealing}{{\ts}\var{problem{\ac}schedule}}{a solution state}
+    \firstinputs{problem}{a problem}
+    \inputs{schedule}{a mapping from time to ``temperature''}
+    \firstlocal{current}{a node}
+    \local{next}{a node}
+    \local{T}{a ``temperature'' controlling prob.~of downward steps}
+\bodysep
+    \setq{\var{current}}{\prog{Make-Node}(\prog{Initial-State}[\var{problem}])}
+    \key{for} \setq{\var{t}} 1 \key{to} $\infty$ \key{do}
+          \setq{\var{T}}{\var{schedule}[\var{t}]}
+          \key{if} \var{T} = 0 \key{then return} \var{current}
+          \setq{\var{next}}{a randomly selected successor of \var{current}}
+          \setq{\var{$\Delta$E}}{\prog{Value}[\var{next}] -- \prog{Value}[\var{current}]}
+          \key{if} \var{$\Delta$E} $>$ 0 \key{then} \setq{\var{current}}{\var{next}}
+          \key{else} \setq{\var{current}}{\var{next}} only with probability $e^{\Delta E/T}$
+}
+
+

@@ -1,0 +1,25 @@
+\code{
+\func{PL-FC-Entails?}{\v{KB}{\ac}\v{q}}{\v{true} or \v{false}}
+    \firstinputs{\v{KB}}{the knowledge base, a set of propositional Horn clauses}
+    \inputs{\v{q}}{the query, a proposition symbol}
+    \firstlocal{\v{count}}{a table, indexed by clause, initially the number of premises}
+    \local{\v{inferred}}{a table, indexed by symbol, each entry initially \v{false}}
+    \local{\v{agenda}}{a list of symbols, initially the symbols known in \v{KB}}
+\bodysep
+    \k{while} \v{agenda} is not empty \k{do}
+          \setq{\v{p}}{\noprog{Pop}(\v{agenda})}
+          \k{unless} \v{inferred}[\v{p}] \k{do}
+                \setq{\v{inferred}[\v{p}]}{\v{true}}
+                \k{for each} Horn clause \v{c} in whose premise \v{p} appears \k{do}
+                      decrement \v{count}[\v{c}]
+                      \k{if} \v{count}[\v{c}] = 0 \k{then do} 
+                            \k{if} \noprog{Head}[\v{c}] = \v{q} \k{then return} \v{true}
+                            \noprog{Push}(\noprog{Head}[\v{c}]{\ac}\v{agenda})
+    \k{return} \v{false}
+}
+
+
+
+
+
+

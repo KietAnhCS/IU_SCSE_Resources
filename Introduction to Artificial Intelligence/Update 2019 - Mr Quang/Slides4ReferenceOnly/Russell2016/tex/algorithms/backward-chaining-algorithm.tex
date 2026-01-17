@@ -1,0 +1,16 @@
+\code{
+\func{FOL-BC-Ask}{\var{KB}{\ac}\var{goals}{\ac}\(\theta\)}{a set of substitutions}
+    \firstinputs{\var{KB}}{a knowledge base}
+    \inputs{\var{goals}}{a list of conjuncts forming a query (\(\theta\) already applied)}
+    \inputs{\(\theta\)}{the current substitution, initially the empty substitution \(\emptyset\)}
+    \firstlocal{\var{answers}}{a set of substitutions, initially empty}
+\bodysep
+    \key{if} \var{goals} is empty \key{then return} \(\{\theta\}\)
+    \setq{\(\var{q}'\)}{\prog{Subst}(\(\theta\){\ac}\prog{First}(\var{goals}))}
+    \key{for each} sentence \var{r} \key{in} \var{KB} 
+                where \noprog{Standardize-Apart}(\var{r}) = \(({\ts}\var{p}_1 \land \ldots \land \var{p}_n \Rightarrow q)\)
+                and \setq{\(\theta'\)}{\prog{Unify}(\var{q}{\ac}\(\var{q}'\))} succeeds
+          \setq{\var{new\_goals}}{\([{\ts}\var{p}_1,\ldots,\var{p}_n|\)\prog{Rest}(\var{goals})\(]\)}
+          \setq{\var{answers}}{\mbox{\prog{FOL-BC-Ask}}(\var{KB}{\ac}\var{new\_goals}{\ac}\prog{Compose}(\(\theta'\){\ac}\(\theta\))) \(\cup\) \var{answers}}
+    \key{return} \var{answers}
+}

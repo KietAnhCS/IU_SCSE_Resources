@@ -1,0 +1,240 @@
+@charset "utf-8";
+/*
+
+	This document is created by Jasper 'amygdela' van der Meer for Open Source WebDesign @ http://oswd.org.
+	You are free to alter, build upon or delete parts of the code used in this free opensource template.
+	You are free to remove the copyrights from this template, but it would be cool if you left it there.
+	If you use this template and you like it, drop by my site sometimes @ http://www.amygdela.com ... 
+
+	This is my second template for OSWD. I've created this template again with no images.
+	The charset used is utf-8, for easily translating or implementing this template in a file in any language.
+	The HTML is XHTML 1.0 Strict valid, and the CSS valids as CSS2. Please be aware that some hacks were made 
+	to display this template correct on the infamous Internet Explorer. How I hate the darn thing... Enjoy!!!
+	
+	All HTML and CSS is well commented, so you won't get stuck when editing the template. All divs have logical
+	names and semantics were kept in mind when designing this template. | August 15th, 2005 Jasper van der Meer.
+	Because I talk so much this CSS is 10k. Sorry about that dear 56k users :-)
+
+*/
+
+html,body {
+	height: 96%; /* Stay a bit off top and bottom and stop a scrollbar in IE. */
+}
+body {
+	margin-top: 2%; /* get of that top! */
+	margin-bottom: 2%; /* And stay of the bottom as well! */
+	background-color: #FFFFFF; /* Fresh and white! */
+	font-family: Georgia, Geneva, "Trebuchet MS", Monaco, Calibri, sans-serif; /* Monaco = iMac, Calibri = Windows Vista */
+	font-size: small/100%; /* This makes sure IE users can increase fontsize with their browser.  */
+	color: #6d6d6d; /* A nice grey color. */
+}
+
+/* ************************* END GENERAL STYLING ************************* */
+
+
+/* *************************  START DIV STYLING  ************************* */
+
+#container { /* <DIV #1> */
+	width: 680px; /* Edit this to change the width of your site. Set it to 100% for some fun :-) */
+	margin-left: auto;  /* This keeps the template centered. */
+	margin-right: auto; /* This keeps the template centered. */
+	border: 1px solid #F4F4F4; /* Crazy about dotted and dashed borders! */
+}
+#header { /* <DIV #2> */
+	width: auto; /* Just as wide as the container, ofcourse. */
+	height: auto; /* No need to set height, just some padding around the headers is enough to get height. */
+	text-align: right; /* The text in this header should align right in my humble opinion... */
+	padding: 3% 4%; /* padding top is 3% and padding right is 4%. This creates the height of the header. */
+	background: url(diags.jpg) top left repeat-x; /* Couldn't resist. Used an image */
+}
+	#header h1 { /* The first line of text in the header, the big orange one. */
+		font-size: 150%; /* Big font! 150% of the font-size of the body! */
+		color: #DD8200; /* Orange color for textline one. */
+		display: inline; /* This trick will display the both lines of text next to eachother instead of under eachother* */
+		letter-spacing: 4px; /* A thick amount of spacing between the letters, to create a nice effect on the text. */
+	}
+	#header h2 {
+		position: relative; /* All sizes, paddings and margins are measured relative to #header h1. */
+		display: inline; /* The trick will only work if you add display: inline here as well, and add a <br /> between them in the HTML code. */
+		vertical-align: center; /* Appear in the center of the #header. */
+		font-size: 70%; /* 70% of the size of the font-size from the body. */
+		font-weight: 100; /* a very sleek and lightweight font. 600 for big font. */
+		text-transform: uppercase; /* ALL CAPS ON THIS LINE OF TEXT */
+		color: #00ACF4; /* Ocean blue color... */
+		letter-spacing: 1px; /* spread those letters over your screen a bit more */
+		font-family: "Trebuchet MS", Verdana, sans-serif; /* I love Trebuchet, should've been the standard font! ;-) */
+	}
+	
+#core_container { /* <DIV #3> */
+/* This div will hold all textual contents in the core of your page, hence core_container... */
+	width: 100%; /* Just as wide as the #container, since it's still in there. */
+	background-color: #FFFFFF; /* Good ol' white. */
+}
+
+#core_left { /* <DIV #4> */
+	width: 180px; /* A fixed width to display the images correctly below eachother. */
+	float: left; /* Always stay on the left side of the #core_container. */
+	padding: 12px; /* 12px space inside this div before anything happens. */
+	_padding: 6px; /* IE HACK. 6px space for IE, because of the boxmodel error. Remove this and check the page in IE... :( */
+	height: auto; /* Height is automaticlly calculated. No need to set it. */
+	background-color: #FFFFFF;
+}
+	#core_left img { 
+		border: 0; /* The images on the left may not have a border. */
+	}
+	#core_left p {
+		font-size: 70%; /* The fontsize is 70% of the fontsize of the body tag. */
+	}
+	#core_left a, #core_left a:link, #core_left a:visited {
+		color: #000000; /* All links, visited or not are black. */
+		text-decoration: none; /* with no line under it. */
+	}
+	#core_left a:hover {
+		color: #00ACF4; /* Oceanblue linktext on hover. */
+	}
+	#core_left h3, #core_left h4 {
+		position: relative; /* All sizes, paddings and margins are measured relative to #header h1. */
+		display: inline; 
+		vertical-align: center; /* Appear in the center of the #header. */
+		font-size: 90%; /* 90% of the size of the font-size from the body. */
+		font-weight: 500; /* a bolder font. 600 for even bolder, 100 for very sleek. */
+		text-transform: uppercase; /* ALL CAPS ON THIS LINE OF TEXT */
+		color: #00ACF4; /* Ocean blue color... */
+		letter-spacing: 1px; /* spread those letters over your screen a bit more */
+		font-family: "Trebuchet MS", Verdana, sans-serif; /* I love Trebuchet, should've been the standard font! ;-) */
+	}
+	#core_left li { /* The contents of core_left is presented in an unordered list. Here it is. */
+		font-size: 10px; /* Fontsize and styling. */
+		font-family: Verdana, Arial, Helvetica, sans-serif;
+	}
+	.litxt { /* This is the text in the unordered list within core_left, with 5% space on the left. */
+		padding-bottom: 10px;
+		width: 95%;
+		padding-left: 5%;
+	}
+	#core_left ul { /* this is the ul styles for core_left. */
+		list-style: none; /* No dot in the list please. */
+		padding-left: 0px; /* Get yourself to the left of the page. */
+		margin-left: 0; /* IE needs this to do the same as stated above... */
+	}
+	
+/* THIS NAVIGATIONBAR IS COURTESY OF MAXDESIGN > http://css.maxdesign.com.au/listamatic */
+
+#navcontainer {
+text-align: right;
+margin-top: 3px;
+}
+
+ul#navlist {
+	margin-left: 0;
+	padding-left: 0;
+	white-space: nowrap;
+}
+
+#navlist li {
+	display: inline;
+	list-style-type: none;
+}
+#current {
+	border-top: 1px dashed #DD8200;
+}
+#navlist a { 
+	padding: 3px 10px; 
+	font-size: 11px;
+	font: Verdana, Arial, Helvetica, sans-serif;
+}
+
+#navlist a:link, #navlist a:visited {
+	color: #007CB0;
+	background-color: #FFFFFF;
+	text-decoration: none;
+}
+
+#navlist a:hover {
+	color: #fff;
+	background-color: #DD8200;
+	text-decoration: none;
+}
+
+#navlist a:active {
+	color: #fff;
+	background-color: #00ACF4;
+	text-decoration: none;
+}
+
+/* THIS NAVIGATIONBAR IS COURTESY OF MAXDESIGN > http://css.maxdesign.com.au/listamatic */
+
+	
+#core_right { /* <DIV #5> */
+	width: 466px; /* this div is 476px wide and contains all contents on the right of the page. */
+	float: left; /* Always show up on the rightside of the screen, even when width is changed of the #container. */
+	margin: 0; /* No margins, no paddings. */
+	padding: 0;
+	background-color: #FFFFFF; /* Fresh white! */
+}
+	#core_right h5, #core_right h6 { /* The headers in #core_right */
+		position: relative; /* All sizes, paddings and margins are measured relative to #header h1. */
+		vertical-align: center; /* Appear in the center of the #header. */
+		font-size: 90%; /* 90% of the size of the font-size from the body. */
+		font-weight: 500; /* a bolder font. 600 for even bolder, 100 for very sleek. */
+		text-transform: uppercase; /* ALL CAPS ON THIS LINE OF TEXT */
+		color: #00ACF4; /* Ocean blue color... */
+		letter-spacing: 1px; /* spread those letters over your screen a bit more */
+		font-family: "Trebuchet MS", Verdana, sans-serif; /* I love Trebuchet, should've been the standard font! ;-) */
+	}
+	#core_right p, #core_right h5, #core_right h6  {
+		padding-left: 5%; /* The headers and paragraphs in core_right should stay 5% off the edge of div #core_right. */
+		
+	}
+	#core_right p { /* The paragraphs in #core_right should have this styling: */
+		font-family: "Trebuchet MS", Verdana, sans-serif; /* Font... */
+		font-size: 80%; /* 80% of the font-size from the body tag. */
+		line-height: 20px; /* The whitespace between the lines. */
+	}
+	
+.bottom_ul { /* The small list of links on the bottom of the page. */
+	list-style: none; /* no dot next to the list. */
+	padding-left: 20px; /* 20px of the leftside of #core_right. */
+	width: 420px; /* Always be 420px wide, to get that cool hover effect. */
+	height: 12px; /* 10px fontsize, 12px height. Seems enough. */
+	margin: 0; /* No extra margins anywhere. It's tight enough */
+}
+	.bottom_ul li { /* The actual list on the bottom. */
+		padding: 0px 10px; /* 0px space above, but 10px space on the right of this list. */
+		background-color:#FFFFFF; /* Fresh white! */
+	}
+	.bottom_ul a { /* The links in the list stated above. */
+		font-size: 70%; /* small fontsize. */
+		display: block; /* Get that hover effect, display your links in a block with fixed height and width... */
+		padding: 3px; /* 3px whitespace everywhere. */
+		width: 420px; /* Hey, there's that 420px again! */
+		color: #AAAAAA; /* Lightgrey fontcolor. */
+		font-family: Verdana, Arial, Helvetica, sans-serif; /* Font. */
+	}
+	.bottom_ul a:hover { /* Mouseover that list and you'll see... */
+		color: #00ACF4; /* Oceanblue fontcolors. */
+		width: 420px; /* Hey, there it is again! */
+		background: #F8F8F8 url(arrow_right.jpg) 98% 50% no-repeat; /* And an even lightergrey background! */
+	}
+
+#footer { /* The bottom, with the copyright notice. */
+	clear: both; /* Appear UNDER core_right, not next to it. Not even with changed width on #container. */
+	width: 680px; /* 680px? Yep, the same width as #container. */
+	height: 20px; /* Give it some height! */
+	text-align: right; /* The text should appear on the rightside of the footer. */
+	margin: 0;
+}
+	#footer p { /* The <p> within the footer is styled here. */
+		text-transform: uppercase; /* ALL CAPS ON THIS LINE OF TEXT */
+		background: #FFFFFF url(diags.jpg)  0% 30% repeat-x; /* Those cool diagonal lines in the back. */
+		font-size: 60%; /* An even smaller font then the list we just did. */
+		color: #000000; /* Ocean blue color... */
+		letter-spacing: 1px; /* spread those letters over your screen a bit more */
+		font-family: "Trebuchet MS", Verdana, sans-serif; /* I love Trebuchet, should've been the standard font! ;-) */
+	}
+	#footer a { /* The <a href="... tags in the footer are styled here. */
+		text-decoration: none; /* No lines under the text. */
+		color: #000000; /* Black beauty. */
+	}
+	
+/* Can't seem to fix something? Do not hesitate to email me on my Gmail account at amy2k5@gmail.com */

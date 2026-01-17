@@ -1,0 +1,14 @@
+\code{
+\func{Graph-Search}{{\ts}\var{problem{\ac}\var{fringe}}}{a solution, or failure}
+\bodysep
+    \setq{\var{closed}}{an empty set}
+    \setq{\var{fringe}}{\prog{Insert}(\prog{Make-Node}(\prog{Initial-State}[\var{problem}]){\ac}\var{fringe})}
+    \key{loop} \key{do}
+          \key{if} \var{fringe} is empty \key{then} \key{return} failure
+          \setq{\var{node}}{\prog{Remove-Front}(\var{fringe})}
+          \key{if} \prog{Goal-Test}[\var{problem}](\noprog{State}[\var{node}]) \key{then} \key{return} \var{node}       
+          \key{if} \prog{State}[\var{node}] is not in \var{closed} \key{then}
+                add \prog{State}[\var{node}] to \var{closed}
+                \setq{\var{fringe}}{\fnvar{InsertAll}(\prog{Expand}(\var{node}{\ac}\var{problem}){\ac}\var{fringe})}
+    \key{end}
+}

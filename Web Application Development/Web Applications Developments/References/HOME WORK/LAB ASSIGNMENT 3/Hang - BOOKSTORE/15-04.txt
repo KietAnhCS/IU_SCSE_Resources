@@ -1,0 +1,9 @@
+<FORM METHOD=POST ACTION=Search.jsp>
+Keyword: <INPUT TYPE=TEXT Name=Keyword><BR>
+Search In: <SELECT Name=Category>
+
+<%@ include file="Categories.txt" %>
+
+</SELECT>
+<INPUT TYPE=SUBMIT VALUE=Search>
+</FORM>

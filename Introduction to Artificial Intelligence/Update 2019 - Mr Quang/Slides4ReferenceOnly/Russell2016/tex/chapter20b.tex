@@ -1,0 +1,359 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Neural networks}{Chapter 20, Section 5}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Brains
+
+\blob Neural networks
+
+\blob Perceptrons
+
+\blob Multilayer perceptrons
+
+\blob Applications of neural networks
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Brains}
+
+\mat{$10^{11}$} neurons of \mat{${}> 20$} types, \mat{$10^{14}$} synapses, 1ms--10ms cycle time\\
+Signals are noisy ``spike trains'' of electrical potential
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{neuron.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{McCulloch--Pitts ``unit''}
+
+Output is a ``squashed'' linear function of the inputs:
+\mat{\[
+a_i \leftarrow g(in_i) = g\left(\mysum_j \w{j}{i} a_j\right)
+\]}
+
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{neuron-unit.eps}}
+
+A gross oversimplification of real neurons, but its purpose is\\
+to develop understanding of what networks of simple units can do
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Activation functions}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{activation-fns.eps}}
+
+(a) is a \defn{step function} or \defn{threshold function}
+
+(b) is a \defn{sigmoid} function \mat{$1/(1+e^{-x})$}
+
+Changing the bias weight \mat{$\w{0}{i}$} moves the threshold location
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Implementing logical functions}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{nn-logical.eps}}
+
+McCulloch and Pitts: every Boolean function can be implemented
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Network structures}
+
+\defn{Feed-forward networks}:\al
+-- \note{single-layer perceptrons}\al
+-- \note{multi-layer perceptrons}
+
+Feed-forward networks implement functions, have no internal state
+
+\defn{Recurrent networks}:\al
+-- \note{Hopfield networks} have symmetric weights (\mat{$\w{i}{j} = \w{j}{i}$})\nl
+   \mat{$g(x)\eq \mbox{sign}(x)$}, \mat{$a_i\eq \pm 1$}; \emph{holographic associative memory}\al
+-- \note{Boltzmann machines} use stochastic activation functions, \nl
+   $\approx$ MCMC in Bayes nets\al
+-- recurrent neural nets have directed cycles with delays\nl
+  $\implies$ have internal state (like flip-flops), can oscillate etc.
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Feed-forward example}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{figures}{neural-net.ps}}
+
+Feed-forward network = a parameterized family of nonlinear functions:
+\mat{\begin{eqnarray*}
+a_5 & = & g(\w{3}{5}\cdot a_3 + \w{4}{5}\cdot a_4) \nonumber \\
+    & = & g(\w{3}{5}\cdot g(\w{1}{3}\cdot a_1 + \w{2}{3}\cdot a_2) + 
+              \w{4}{5}\cdot g(\w{1}{4}\cdot a_1 + \w{2}{4}\cdot a_2)) 
+\end{eqnarray*}}
+Adjusting weights changes the function: do learning this way!
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Single-layer perceptrons}
+
+\twofig{\file{figures}{perceptron.ps}}{\file{graphs}{perceptron-model.eps}}
+
+Output units all operate separately---no shared weights
+
+Adjusting weights moves the location, orientation, and steepness of cliff
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Expressiveness of perceptrons}
+
+Consider a perceptron with \mat{$g$} = step function (Rosenblatt, 1957, 1960)
+
+%%Point: Rosenblatt built a physical device, the Memistor, and used
+%%to give dramatic talks holding up the Memistor and describing it as
+%%the ``key to the future of mankind'' etc.
+
+Can represent AND, OR, NOT, majority, etc., but not XOR
+
+Represents a \defn{linear separator} in input space:
+\mat{\[
+\mysum_j W_j x_j > 0 \quad\mbox{or}\quad \mbf{W} \cdot \mbf{x} > 0
+\]}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.9\textwidth
+\fig{\file{figures}{perceptron-linear.eps}}
+
+Minsky \& Papert (1969) pricked the neural network balloon
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Perceptron learning}
+
+Learn by adjusting weights to reduce \defn{error} on training set
+
+The \defn{squared error} for an example with input \(\x\) and
+true output \(y\) is 
+\mat{\[
+  E = \frac{1}{2}\J{Err}^2  \equiv \frac{1}{2}(y-h_{\smbf{W}}(\x))^2\ ,
+\]}
+Perform optimization search by gradient descent:
+\mat{\begin{eqnarray*}
+\frac{\partial E}{\partial W_j} 
+   &=& \J{Err} \stimes \frac{\partial \J{Err}}{\partial W_j} 
+   = \J{Err} \stimes \frac{\partial}{\partial W_j}
+           \left(y - g(\mysum_{j\eq 0}^n W_j x_j) \right)\\
+   &=& - \J{Err} \stimes g'(\J{in}) \stimes x_j 
+\end{eqnarray*}}
+Simple weight update rule:
+\mat{\[
+W_j \leftarrow W_j + \alpha \stimes \J{Err} \stimes g'(\J{in}) \stimes x_j
+\]}
+E.g., +ve error \mat{$\implies$} increase network output\\
+\mat{$\implies$} increase weights on +ve inputs, decrease on -ve inputs
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Perceptron learning contd.}
+
+Perceptron learning rule converges to a consistent function\\
+\emph{for any linearly separable data set}
+
+\vspace*{0.5in}
+
+\twofig{\file{graphs}{majority-perceptron+dtl-curve.eps}}{\file{graphs}{restaurant-perceptron+dtl-curve.eps}}
+
+Perceptron learns majority function easily, DTL is hopeless
+
+%%Point: majority is representable, but only as a very large DT
+%%and DTL won't learn that without a very large data set
+
+DTL learns restaurant function easily, perceptron cannot represent it
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Multilayer perceptrons}
+
+Layers are usually fully connected;\\
+numbers of \defn{hidden units} typically chosen by hand
+
+\vspace*{0.2in}
+
+\epsfxsize=0.9\textwidth
+\fig{\file{figures}{restaurant-nn.eps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Expressiveness of MLPs}
+
+All continuous functions w/ 2 layers, all functions w/ 3 layers
+
+\vspace*{0.2in}
+
+\twofig{\file{graphs}{nn-ridge.eps}}{\file{graphs}{nn-bump.eps}}
+
+Combine two opposite-facing threshold functions to make a ridge
+
+Combine two perpendicular ridges to make a bump
+
+Add bumps of various sizes and locations to fit any surface
+
+Proof requires exponentially many hidden units (cf DTL proof)
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Back-propagation learning}
+
+Output layer: same as for single-layer perceptron,
+\mat{\[
+  \w{j}{i} \leftarrow \w{j}{i} + \alpha \times a_j \times \Delta_i
+\]}
+where \mat{$\Delta_i \eq \J{Err}{}_i \times g'(\J{in}{}_i)$}
+
+Hidden layer: \emph{back-propagate} the error from the output layer:
+\mat{\[
+   \Delta_j = g'(\J{in}{}_j) \sum_i \w{j}{i} \Delta_i\ .
+\]}
+Update rule for weights in hidden layer:
+\mat{\[ \w{k}{j} \leftarrow \w{k}{j} +
+ \alpha \times a_k \times \Delta_j\ .
+\]}
+(Most neuroscientists deny that back-propagation occurs in the brain)
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Back-propagation derivation}
+
+The squared error on a single example is defined as
+\mat{\[ E = \frac{1}{2} \sum_i (y_i - a_i)^2\ , \]}
+where the sum is over the nodes in the output layer.
+\mat{\begin{eqnarray*}
+\frac{\partial E}{\partial \w{j}{i}} 
+  & = & - (y_i - a_i) \frac{\partial a_i}{\partial \w{j}{i}} 
+      = - (y_i - a_i) \frac{\partial g(\J{in}{}_i)}{\partial \w{j}{i}} \\
+  & = & - (y_i - a_i) g'(\J{in}{}_i)\frac{\partial \J{in}{}_i}{\partial \w{j}{i}}
+      = - (y_i - a_i) g'(\J{in}{}_i)\frac{\partial}{\partial\w{j}{i}}\left(\sum_j\w{j}{i} a_j \right) \\
+  & = & - (y_i - a_i) g'(\J{in}{}_i) a_j = - a_j \Delta_i
+\end{eqnarray*}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Back-propagation derivation contd.}
+
+\mat{\begin{eqnarray*}
+\frac{\partial E}{\partial \w{k}{j}} 
+  & = & - \sum_i (y_i - a_i) \frac{\partial a_i}{\partial \w{k}{j}} 
+      = - \sum_i (y_i - a_i) \frac{\partial g(\J{in}{}_i)}{\partial \w{k}{j}} \\
+  & = & - \sum_i (y_i - a_i) g'(\J{in}{}_i)\frac{\partial \J{in}{}_i}{\partial \w{k}{j}}
+      = - \sum_i \Delta_i\frac{\partial}{\partial\w{k}{j}}\left(\sum_j\w{j}{i} a_j \right) \\
+  & = & - \sum_i \Delta_i \w{j}{i} \frac{\partial a_j}{\partial\w{k}{j}}
+      = - \sum_i \Delta_i \w{j}{i} \frac{\partial g(\J{in}{}_j)}{\partial\w{k}{j}} \\
+  & = & - \sum_i \Delta_i \w{j}{i} g'(\J{in}{}_j)\frac{\partial \J{in}{}_j}{\partial \w{k}{j}}\\
+  & = & - \sum_i \Delta_i \w{j}{i} g'(\J{in}{}_j)\frac{\partial}{\partial \w{k}{j}}\left(\sum_k\w{k}{j} a_k \right) \\
+  & = & - \sum_i \Delta_i \w{j}{i} g'(\J{in}{}_j) a_k = - a_k \Delta_j
+\end{eqnarray*}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Back-propagation learning contd.}
+
+At each \defn{epoch}, sum gradient updates for all examples and apply
+
+\defn{Training curve} for 100 restaurant examples: finds exact fit
+
+\epsfxsize=0.6\textwidth
+\fig{\file{graphs}{restaurant-back-prop-error.eps}}
+
+Typical problems: slow convergence, local minima
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Back-propagation learning contd.}
+
+Learning curve for MLP with 4 hidden units:
+
+\vspace*{0.1in}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{graphs}{restaurant-back-prop+dtl-curve.eps}}
+
+MLPs are quite good for complex pattern recognition tasks,\\
+but resulting hypotheses cannot be understood easily
+
+%%Point: makes MLPs ineligible for some tasks, such as credit card and
+%%loan approvals, where law requires clear unbiased criteria
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Handwritten digit recognition}
+
+\noindent\framebox[\textwidth]{%
+\begin{minipage}{\maxfigwidth}%
+\noindent{\fboxsep=0.4pt
+\framebox{\epsfflex{0.095}{\file{figures}{easy21c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{easy23c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{easy16c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{easy12c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{easy20c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{easy35c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{easy13c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{easy29c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{easy17c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{easy19c.eps}}}\\[6pt]
+\framebox{\epsfflex{0.095}{\file{figures}{hard53c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{hard04c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{hard20c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{hard13c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{hard01c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{hard10c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{hard34c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{hard52c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{hard05c.eps}}}\hfill
+\framebox{\epsfflex{0.095}{\file{figures}{hard14c.eps}}}}
+\end{minipage}}
+
+3-nearest-neighbor = 2.4\% error\\
+400--300--10 unit MLP = 1.6\% error\\
+LeNet: 768--192--30--10 unit MLP = 0.9\% error
+
+Current best (kernel machines, vision algorithms) $\approx$ 0.6\% error
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Most brains have lots of neurons; each neuron $\approx$ linear--threshold unit (?)
+
+Perceptrons (one-layer networks) insufficiently expressive
+
+Multi-layer networks are sufficiently expressive; can be trained by 
+gradient descent, i.e., error back-propagation
+
+Many applications: speech, driving, handwriting, fraud detection, etc.
+
+Engineering, cognitive modelling, and neural system modelling\\
+subfields have largely diverged
+
+\end{huge}
+\end{document}
+
+

@@ -1,0 +1,618 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Constraint Satisfaction Problems}{Chapter 5}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob CSP examples
+
+\blob Backtracking search for CSPs
+
+\blob Problem structure and problem decomposition
+
+\blob Local search for CSPs
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Constraint satisfaction problems (CSPs)}
+
+Standard search problem:\al
+\note{state} is a ``black box''---any old data structure\nl
+that supports goal test, eval, successor
+
+CSP:\al
+\note{state} is defined by \defn{variables} \mat{$X_i$}
+   with \defn{values} from \defn{domain} \mat{$D_i$}\al
+\ \al
+\note{goal test} is a set of \defn{constraints} specifying\nl
+   allowable combinations of values for subsets of variables
+
+Simple example of a \emph{formal representation language}
+
+Allows useful \emph{general-purpose} algorithms with more power\\
+than standard search algorithms
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: Map-Coloring}
+
+\vspace*{-0.0in}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{australia.ps}}
+
+\vspace*{-0.6in}
+
+\note{Variables} \mat{$WA$}, \mat{$NT$}, \mat{$Q$}, \mat{$NSW$}, \mat{$V$}, \mat{$SA$}, \mat{$T$} \\
+\note{Domains} \mat{$D_i = \{red,green,blue\}$}\\
+\note{Constraints}: adjacent regions must have different colors\al
+e.g., \mat{$WA\neq NT$} (if the language allows this), or\al
+\mat{$(WA,NT) \in \{(red,green),(red,blue),(green,red),(green,blue),\ldots\}$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: Map-Coloring contd.}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{australia-solution.ps}}
+
+\note{Solutions} are assignments satisfying all constraints, e.g.,\\
+\mat{$\{WA\eq red,NT\eq green,Q\eq red,NSW\eq green,V\eq red,SA\eq blue,T\eq green\}$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Constraint graph}
+
+\defn{Binary CSP}: each constraint relates at most two variables
+
+\defn{Constraint graph}: nodes are variables, arcs show constraints
+
+\vspace*{-0.5in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{australia-csp.ps}}
+
+General-purpose CSP algorithms use the graph structure\\
+to speed up search. E.g., Tasmania is an independent subproblem!
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Varieties of CSPs}
+
+Discrete variables\al
+  finite domains; size \mat{$d$} $\implies$ \mat{$O(d^n)$} complete assignments\nl
+    \blob e.g., Boolean CSPs, incl.~Boolean satisfiability (NP-complete)\al
+  infinite domains (integers, strings, etc.)\nl
+    \blob e.g., job scheduling, variables are start/end days for each job\nl
+    \blob need a \defn{constraint language}, e.g., \mat{$StartJob_1 + 5 \leq StartJob_3$}\nl
+    \blob \note{linear} constraints solvable, \note{nonlinear} undecidable
+
+Continuous variables\al
+    \blob e.g., start/end times for Hubble Telescope observations\al
+    \blob linear constraints solvable in poly time by LP methods
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Varieties of constraints}
+
+\defn{Unary} constraints involve a single variable, \al
+   e.g., \mat{$SA\neq green$}
+
+\defn{Binary} constraints involve pairs of variables, \al
+   e.g., \mat{$SA\neq WA$}
+
+\defn{Higher-order} constraints involve 3 or more variables,\al
+   e.g., cryptarithmetic column constraints
+
+\defn{Preferences} (soft constraints), e.g., \mat{$red$} is better than \mat{$green$}\\
+often representable by a cost for each variable assignment\al
+$\rightarrow$ constrained optimization problems
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: Cryptarithmetic}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.85\textwidth
+\fig{\file{figures}{cryptarithmetic.ps}}
+
+\note{Variables}: \mat{$F\ T\ U\ W\ R\ O\ X_1\ X_2\ X_3$}\\
+\note{Domains}: \mat{$\{0,1,2,3,4,5,6,7,8,9\}$}\\
+\note{Constraints}\al
+\mat{$\alldiff(F,T,U,W,R,O)$}\al
+\mat{$O + O = R + 10\cdot X_1$}, etc.
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Real-world CSPs}
+
+Assignment problems\al
+    e.g., who teaches what class
+
+Timetabling problems\al
+    e.g., which class is offered when and where?
+
+Hardware configuration
+
+Spreadsheets
+
+Transportation scheduling
+
+Factory scheduling
+
+Floorplanning
+
+\vspace*{0.3in}
+
+Notice that many real-world problems involve real-valued variables
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Standard search formulation (incremental)}
+
+Let's start with the straightforward, dumb approach, then fix it
+
+States are defined by the values assigned so far
+
+\blob \note{Initial state}: the empty assignment, \mat{$\emptyset$}
+
+\blob \note{Successor function}: assign a value to an unassigned variable\nl
+that does not conflict with current assignment.\nl
+$\implies$ fail if no legal assignments (not fixable!)
+
+\blob \note{Goal test}: the current assignment is complete
+
+\vspace*{0.3in}
+
+1) This is the same for all CSPs! \smiley\\
+2) Every solution appears at depth \mat{$n$} with \mat{$n$} variables\nl
+   $\implies$ use depth-first search\\
+3) Path is irrelevant, so can also use complete-state formulation\\
+4) \mat{$b\eq (n-\ell)d$} at depth \mat{$\ell$}, hence \mat{$n!d^n$} leaves!!!! \frowny
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backtracking search}
+
+Variable assignments are \defn{commutative}, i.e.,\nl
+ [\mat{$WA\eq red$} then \mat{$NT\eq green$}]\ \ same as \ \ [\mat{$NT\eq green$} then \mat{$WA\eq red$}]
+
+Only need to consider assignments to a single variable at each node\nl
+   $\implies$ \mat{$b \eq d$} and there are \mat{$d^n$} leaves\nl
+
+Depth-first search for CSPs with single-variable assignments\\
+is called \defn{backtracking} search
+
+Backtracking search is the basic uninformed algorithm for CSPs
+
+Can solve \mat{$n$}-queens for \mat{$n \approx 25$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backtracking search}
+
+\input{algorithms/backtracking-search-algorithm}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backtracking example}
+
+\epsfxsize=0.95\maxfigwidth
+\fig{\sfile{figures}{backtrack-progress1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backtracking example}
+
+\epsfxsize=0.95\maxfigwidth
+\fig{\sfile{figures}{backtrack-progress2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backtracking example}
+
+\epsfxsize=0.95\maxfigwidth
+\fig{\sfile{figures}{backtrack-progress3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backtracking example}
+
+\epsfxsize=0.95\maxfigwidth
+\fig{\sfile{figures}{backtrack-progress4.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Improving backtracking efficiency}
+
+\emph{General-purpose} methods can give huge gains in speed:
+\begin{enumerate}
+\item Which variable should be assigned next?
+\item In what order should its values be tried?
+\item Can we detect inevitable failure early?
+\item Can we take advantage of problem structure?
+\end{enumerate}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Minimum remaining values}
+
+Minimum remaining values (MRV):\al
+   choose the variable with the fewest legal values
+
+\vspace*{0.3in}
+
+\epsfxsize=1.0\maxfigwidth
+\fig{\file{figures}{australia-most-constrained-variable.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Degree heuristic}
+
+Tie-breaker among MRV variables
+
+Degree heuristic:\al
+   choose the variable with the most constraints on remaining variables
+
+\vspace*{0.3in}
+
+\epsfxsize=1.0\maxfigwidth
+\fig{\file{figures}{australia-most-constraining-variable.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Least constraining value}
+
+Given a variable, choose the least constraining value:\al
+   the one that rules out the fewest values in the remaining variables
+
+\vspace*{0.3in}
+
+\epsfxsize=1.05\maxfigwidth
+\fig{\file{figures}{australia-least-constraining-value.ps}}
+
+Combining these heuristics makes 1000 queens feasible
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward checking}
+
+\note{Idea}: Keep track of remaining legal values for unassigned variables\\
+\phantom{\note{Idea}: }Terminate search when any variable has no legal values
+
+\vspace*{0.1in}
+
+\epsfxsize=1.0\maxfigwidth
+\fig{\sfile{figures}{forward-checking-progress1.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward checking}
+
+\note{Idea}: Keep track of remaining legal values for unassigned variables\\
+\phantom{\note{Idea}: }Terminate search when any variable has no legal values
+
+\vspace*{0.1in}
+
+\epsfxsize=1.0\maxfigwidth
+\fig{\sfile{figures}{forward-checking-progress2.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward checking}
+
+\note{Idea}: Keep track of remaining legal values for unassigned variables\\
+\phantom{\note{Idea}: }Terminate search when any variable has no legal values
+
+\vspace*{0.1in}
+
+\epsfxsize=1.0\maxfigwidth
+\fig{\sfile{figures}{forward-checking-progress3.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward checking}
+
+\note{Idea}: Keep track of remaining legal values for unassigned variables\\
+\phantom{\note{Idea}: }Terminate search when any variable has no legal values
+
+\vspace*{0.1in}
+
+\epsfxsize=1.0\maxfigwidth
+\fig{\sfile{figures}{forward-checking-progress4.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Constraint propagation}
+
+Forward checking propagates information from assigned to unassigned variables,
+but doesn't provide early detection for all failures:
+
+\vspace*{0.1in}
+
+\epsfxsize=0.8\maxfigwidth
+\fig{\sfile{figures}{forward-checking-progress3.ps}}
+
+\mat{$NT$} and \mat{$SA$} cannot both be blue!
+
+\defn{Constraint propagation} repeatedly enforces constraints locally
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Arc consistency}
+
+Simplest form of propagation makes each arc \defn{consistent}
+
+\mat{$X\rightarrow Y$} is consistent iff\al
+  for \emph{every} value \mat{$x$} of \mat{$X$} there is \emph{some} allowed \mat{$y$}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.8\maxfigwidth
+\fig{\sfile{figures}{ac-example1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Arc consistency}
+
+Simplest form of propagation makes each arc \defn{consistent}
+
+\mat{$X\rightarrow Y$} is consistent iff\al
+  for \emph{every} value \mat{$x$} of \mat{$X$} there is \emph{some} allowed \mat{$y$}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.8\maxfigwidth
+\fig{\sfile{figures}{ac-example2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Arc consistency}
+
+Simplest form of propagation makes each arc \defn{consistent}
+
+\mat{$X\rightarrow Y$} is consistent iff\al
+  for \emph{every} value \mat{$x$} of \mat{$X$} there is \emph{some} allowed \mat{$y$}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.8\maxfigwidth
+\fig{\sfile{figures}{ac-example3.ps}}
+
+If \mat{$X$} loses a value, neighbors of \mat{$X$} need to be rechecked
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Arc consistency}
+
+Simplest form of propagation makes each arc \defn{consistent}
+
+\mat{$X\rightarrow Y$} is consistent iff\al
+  for \emph{every} value \mat{$x$} of \mat{$X$} there is \emph{some} allowed \mat{$y$}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.8\maxfigwidth
+\fig{\sfile{figures}{ac-example4.ps}}
+
+If \mat{$X$} loses a value, neighbors of \mat{$X$} need to be rechecked
+
+Arc consistency detects failure earlier than forward checking
+
+Can be run as a preprocessor or after each assignment
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Arc consistency algorithm}
+
+\input{algorithms/ac3-algorithm}
+
+\mat{$O(n^2d^3)$}, can be reduced to \mat{$O(n^2d^2)$}
+(but detecting \emph{all} is NP-hard)
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Problem structure}
+
+\vspace*{-0.4in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{australia-csp.ps}}
+
+Tasmania and mainland are \defn{independent subproblems}
+
+Identifiable as \defn{connected components} of constraint graph
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Problem structure contd.}
+
+Suppose each subproblem has \mat{$c$} variables out of \mat{$n$} total
+
+Worst-case solution cost is \mat{$n/c \cdot d^c$}, \emph{linear} in \mat{$n$}
+
+E.g., \mat{$n\eq 80$}, \mat{$d\eq 2$}, \mat{$c\eq 20$}\al
+  \mat{$2^{80}$} = 4 billion years at 10 million nodes/sec\al
+  \mat{$4\cdot 2^{20}$} = 0.4 seconds at 10 million nodes/sec
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Tree-structured CSPs}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{tree-csp1.ps}}
+
+\note{Theorem}: if the constraint graph has no loops, the CSP can be solved in 
+\mat{$O(n\,d^2)$} time
+
+Compare to general CSPs, where worst-case time is \mat{$O(d^n)$}
+
+This property also applies to logical and probabilistic reasoning:\\
+an important example of the relation between syntactic restrictions\\
+and the complexity of reasoning.
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Algorithm for tree-structured CSPs}
+
+1. Choose a variable as root, order variables from root to leaves\\
+such that every node's parent precedes it in the ordering 
+
+\vspace*{0.2in}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{tree-csp2.ps}}
+
+2. For \mat{$j$} from \mat{$n$} down to \mat{$2$}, apply \prog{RemoveInconsistent}\mat{\mat{$(Parent(X_j),X_j)$}}
+
+3. For \mat{$j$} from \mat{$1$} to \mat{$n$}, assign \mat{$X_j$} consistently with \mat{$Parent(X_j)$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Nearly tree-structured CSPs}
+
+\defn{Conditioning}: instantiate a variable, prune its neighbors' domains
+
+\vspace*{0.2in}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{australia-cutset.ps}}
+
+
+
+\defn{Cutset conditioning}: instantiate (in all ways) a set of variables\\ 
+such that the remaining constraint graph is a tree
+
+Cutset size \mat{$c$} $\implies$ runtime \mat{$O(d^c\cdot (n-c)d^2)$}, very fast for small \mat{$c$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Iterative algorithms for CSPs}
+
+Hill-climbing, simulated annealing typically work with\\
+``complete'' states, i.e., all variables assigned
+
+To apply to CSPs:\al
+allow states with unsatisfied constraints\al
+operators \emph{reassign} variable values
+
+Variable selection: randomly select any conflicted variable
+
+Value selection by \defn{min-conflicts} heuristic:\al
+choose value that violates the fewest constraints\al
+i.e., hillclimb with \mat{$h(n)$} = total number of violated constraints
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: 4-Queens}
+
+\note{States}: 4 queens in 4 columns (\mat{$4^4 = 256$} states)
+
+\note{Operators}: move queen in column
+
+\note{Goal test}: no attacks
+
+\note{Evaluation}: \mat{$h(n)$} = number of attacks
+
+\vspace*{0.3in}
+
+\epsfxsize=0.7\textwidth
+\epsffile{\file{figures}{4queens-iterative.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Performance of min-conflicts}
+
+Given random initial state, can solve \mat{$n$}-queens in almost constant time for
+arbitrary \mat{$n$} with high probability (e.g., \mat{$n$} = 10,000,000)
+
+The same appears to be true for any randomly-generated CSP\\
+\emph{except} in a narrow range of the ratio
+\[
+R = \frac{\mbox{number of constraints}}{\mbox{number of variables}}
+\]
+
+\vspace*{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{random-csp-runtime.ps}}
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+CSPs are a special kind of problem:\al
+states defined by values of a fixed set of variables\al
+goal test defined by \defn{constraints} on variable values
+
+Backtracking = depth-first search with one variable assigned per node
+
+Variable ordering and value selection heuristics help significantly
+
+Forward checking prevents assignments that guarantee later failure
+
+Constraint propagation (e.g., arc consistency) does additional work\\
+to constrain values and detect inconsistencies
+
+The CSP representation allows analysis of problem structure
+
+Tree-structured CSPs can be solved in linear time
+
+Iterative min-conflicts is usually effective in practice
+
+
+
+
+
+
+
+\end{huge}
+\end{document}
+
+
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: 4-Queens as a CSP}
+
+Assume one queen in each column. Which row does each one go in?
+
+\begin{tabular}{lr}
+\hbox{\begin{minipage}[b]{0.6\textwidth}
+\note{Variables} \mat{$Q_1$}, \mat{$Q_2$}, \mat{$Q_3$}, \mat{$Q_4$} \\
+
+\note{Domains} \mat{$D_i = \{1,2,3,4\}$}\\
+
+
+\note{Constraints}\al
+\mat{$Q_i \neq Q_j$} (cannot be in same row)\al
+\mat{$|Q_i - Q_j| \neq |i-j|$} (or same diagonal)
+
+\end{minipage}}
+&
+\epsfxsize=2.3in
+\epsffile{\file{figures}{4queens.ps}}
+\end{tabular}
+
+
+Translate each constraint into set of allowable values for its variables
+
+E.g., values for \mat{$(Q_1,Q_2)$} are 
+\mat{$(1,3)\ (1,4)\ (2,4)\ (3,1)\ (4,1)\ (4,2)$}
+
+
+
+
+

@@ -1,0 +1,24 @@
+\code{
+\func{Back-Prop-Update}{\var{network{\ac}examples}{\ac}$\alpha$}{a network with modified weights}
+    \firstinputs{network}{a multilayer network}
+    \inputs{examples}{a set of input/output pairs}
+    \inputs{$\alpha$}{the learning rate}
+\bodysep
+    \key{repeat}
+        \key{for each} \var{e} \key{in} \var{examples} \key{do}
+            \cmt{Compute the output for this example}
+                \setq{$\mbf{O}$}{\prog{Run-Network}(\var{network}{\ac}$\mbf{I}^e$)}
+            \cmt{Compute the error and $\Delta$ for units in the output layer}
+                \setq{$\mbf{Err}^e$}{$\mbf{T}^e - \mbf{O}$}
+            \cmt{Update the weights leading to the output layer}
+                \setq{$W_{j{\ac}i}$}{$W_{j{\ac}i} + \alpha \times a_j \times Err_i^e \times g'(in_i)$}
+            \key{for each} subsequent layer \key{in} \var{network} \key{do}
+                \cmt{Compute the error at each node}
+                    \setq{$\Delta_j$}{$g'(in_j)\sum_i W_{j{\ac}i} \Delta_i$}
+                \cmt{Update the weights leading into the layer}
+                    \setq{$W_{k{\ac}j}$}{$W_{k{\ac}j} + \alpha \times I_k \times \Delta_j$}
+            \key{end}
+        \key{end}
+    \key{until} \var{network} has converged
+    \key{return} \var{network}
+}

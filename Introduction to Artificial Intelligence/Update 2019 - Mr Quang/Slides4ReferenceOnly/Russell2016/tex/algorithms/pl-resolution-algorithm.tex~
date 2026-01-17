@@ -1,0 +1,25 @@
+\code{
+\func{PL-Resolution}{\v{KB}{\ac}$\alpha$}{\v{true} or \v{false}}
+    \firstinputs{\v{KB}}{the knowledge base, a sentence in propositional logic}
+    \inputs{$\alpha$}{the query, a sentence in propositional logic}
+\bodysep
+    \setq{\v{clauses}}{the set of clauses in the CNF representation of $\v{KB}\land\lnot\alpha$}
+    \setq{\v{new}}{$\{\,\}$}
+    \k{loop do}
+          \k{for each} $C_i$, $C_j$ \k{in} \v{clauses} \k{do}
+                \setq{\v{resolvents}}{\prog{PL-Resolve}($C_i${\ac}$C_j$)}
+                \k{if} \v{resolvents} contains the empty clause \k{then return} \v{true}
+                \setq{\v{new}}{$\v{new}\union \v{resolvents}$}
+          \k{if} $\v{new}\subseteq\v{clauses}$ \k{then return} \v{false}
+          \setq{\v{clauses}}{$\v{clauses}\union\v{new}$}
+%% \fnsep
+%% \func{PL-Resolve}{$C_1${\ac}$C_2$}{a set of clauses}
+%%     \firstinputs{$C_1${\ac}$C_2$}{two clauses, each viewed as a set of literals}
+%%     \setq{\v{resolvents}}{$\{\,\}$}
+%%     \k{for each} $l_i$ \k{in} $C_1$ and $m_j$ \k{in} $C_2$ \k{do}
+%%           \k{if} $l_i$ and $m_j$ are complementary literals \k{then do}
+%%                 \setq{\v{C}}{$(C_1 - l_i)\union (C_2 - m_j)$}
+%%                 \setq{\v{resolvents}}{$\v{resolvents}\union \{C\}$}
+%%    \k{return} \v{resolvents}
+}
+

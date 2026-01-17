@@ -1,0 +1,23 @@
+set ylabel 0.7
+set xtics nomirror
+set ytics nomirror
+set tics out
+set ticscale 0.6
+set border 3 lw 2
+#For portrait mode:
+#set size 0.41857144, 0.195 
+#For eps mode:
+#set size 0.586,0.55714285
+set size 0.8,0.8
+set term postscript eps enhanced color "Helvetica" 24
+
+set data style lines
+
+set xlabel "Training set size - RESTAURANT data"
+set ylabel "Proportion correct on test set" 
+set key 80,0.6
+
+
+
+set output "restaurant-back-prop+dtl-curve.eps"
+plot 'restaurant-dtl-curve.data' using 1:2 title "Decision tree" lw 6, 'restaurant-back-prop-curve.data' using 1:2 title "Multilayer network" lw 6

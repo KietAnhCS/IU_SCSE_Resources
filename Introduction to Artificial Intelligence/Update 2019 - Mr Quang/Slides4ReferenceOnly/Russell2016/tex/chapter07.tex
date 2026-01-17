@@ -1,0 +1,882 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Logical agents}{Chapter 7}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Knowledge-based agents
+
+\blob Wumpus world
+
+\blob Logic in general---models and entailment
+
+\blob Propositional (Boolean) logic
+
+\blob Equivalence, validity, satisfiability
+
+\blob Inference rules and theorem proving\nl
+ -- forward chaining\nl
+ -- backward chaining\nl
+ -- resolution
+
+%\blob Model checking
+%
+%\blob Propositional knowledge-based agents
+%
+%\blob Boolean circuit agents
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Knowledge bases}
+
+
+\epsfxsize=0.8\maxfigwidth
+\fig{\file{figures}{kbs.ps}}
+
+\defn{Knowledge base} = set of \defn{sentences} in a \emph{formal} language
+
+\defn{Declarative} approach to building an agent (or other system):\nl
+   \defprog{Tell} it what it needs to know
+
+Then it can \defprog{Ask} itself what to do---answers should follow from the KB
+
+Agents can be viewed at the \defn{knowledge level}\nl
+   i.e., \emph{what they know}, regardless of how implemented
+
+Or at the \defn{implementation level}\nl
+   i.e., data structures in KB and algorithms that manipulate them
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{A simple knowledge-based agent}
+
+\input{\file{algorithms}{logical-agent-algorithm}}
+
+The agent must be able to:\al
+Represent states, actions, etc.\al
+Incorporate new percepts\al
+Update internal representations of the world\al
+Deduce hidden properties of the world\al
+Deduce appropriate actions
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus World PEAS description}
+
+\begin{tabular}{lr}
+\hbox{\begin{minipage}[b]{0.65\textwidth}
+\note{Performance measure} \al
+  gold +1000, death -1000\al
+  -1 per step, -10 for using the arrow
+
+\note{Environment}\al
+Squares adjacent to wumpus are smelly\al
+Squares adjacent to pit are breezy\al
+Glitter iff gold is in the same square\al
+Shooting kills wumpus if you are facing it\al
+Shooting uses up the only arrow\al
+Grabbing picks up gold if in same square\al
+Releasing drops the gold in same square
+\end{minipage}}
+&
+\epsfxsize=0.34\textwidth
+\epsffile{\file{figures}{wumpus-world.ps}}
+\end{tabular}
+
+\note{Actuators} Left turn, Right turn,\nl
+    Forward, Grab, Release, Shoot
+
+\note{Sensors} Breeze, Glitter, Smell
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus world characterization}
+
+\q{Observable} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus world characterization}
+
+\q{Observable} No---only \note{local} perception
+
+\q{Deterministic} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus world characterization}
+
+\q{Observable} No---only \note{local} perception
+
+\q{Deterministic} Yes---outcomes exactly specified
+
+\q{Episodic} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus world characterization}
+
+\q{Observable} No---only \note{local} perception
+
+\q{Deterministic} Yes---outcomes exactly specified
+
+\q{Episodic} No---sequential at the level of actions
+
+\q{Static}  
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus world characterization}
+
+\q{Observable} No---only \note{local} perception
+
+\q{Deterministic} Yes---outcomes exactly specified
+
+\q{Episodic} No---sequential at the level of actions
+
+\q{Static}  Yes---Wumpus and Pits do not move
+
+\q{Discrete} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus world characterization}
+
+\q{Observable} No---only \note{local} perception
+
+\q{Deterministic} Yes---outcomes exactly specified
+
+\q{Episodic} No---sequential at the level of actions
+
+\q{Static}  Yes---Wumpus and Pits do not move
+
+\q{Discrete} Yes
+
+\q{Single-agent} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus world characterization}
+
+\q{Observable} No---only \note{local} perception
+
+\q{Deterministic} Yes---outcomes exactly specified
+
+\q{Episodic} No---sequential at the level of actions
+
+\q{Static}  Yes---Wumpus and Pits do not move
+
+\q{Discrete} Yes
+
+\q{Single-agent} Yes---Wumpus is essentially a natural feature
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Exploring a wumpus world}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{wumpus-seq0.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Exploring a wumpus world}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{wumpus-seq1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Exploring a wumpus world}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{wumpus-seq2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Exploring a wumpus world}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{wumpus-seq3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Exploring a wumpus world}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{wumpus-seq4.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Exploring a wumpus world}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{wumpus-seq5.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Exploring a wumpus world}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{wumpus-seq6.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Exploring a wumpus world}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{wumpus-seq7.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Other tight spots}
+
+\begin{tabular}{lr}
+\epsfxsize=2.7in
+\raisebox{-0.5in}[2.5in]{\epsffile{\file{figures}{wumpus-bb.ps}}}
+&
+\hbox{\begin{minipage}[b]{0.5\textwidth}
+Breeze in (1,2) and (2,1)\al
+$\implies$ no safe actions\\
+
+Assuming pits uniformly distributed,\\
+(2,2) has pit w/ prob 0.86, vs.~0.31
+
+\end{minipage}}
+\\
+   & \\
+\epsfxsize=1.8in
+\epsffile{\file{figures}{wumpus-s.ps}}
+&
+\hbox{\begin{minipage}[b]{0.65\textwidth}
+Smell in (1,1) \al
+$\implies$ cannot move
+
+Can use a strategy of \defn{coercion}:\al
+  shoot straight ahead\al
+  wumpus was there $\implies$ dead $\implies$ safe\al
+  wumpus wasn't there $\implies$ safe\al
+
+\end{minipage}}
+\end{tabular}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Logic in general}
+
+\defn{Logics} are formal languages for representing information\al
+   such that conclusions can be drawn
+
+\defn{Syntax} defines the sentences in the language
+
+\defn{Semantics} define the ``meaning'' of sentences;\al
+   i.e., define \defn{truth} of a sentence in a world
+
+E.g., the language of arithmetic
+
+\mat{$x+2 \geq y$} is a sentence; \mat{$x2+y>{}$} is not a sentence
+
+\mat{$x+2 \geq y$} is true iff the number \mat{$x+2$} is no less
+than the number \mat{$y$}
+
+\mat{$x+2 \geq y$} is true in a world where \mat{$x\eq 7,\ y\eq 1$}\\
+\mat{$x+2 \geq y$} is false in a world where \mat{$x\eq 0,\ y\eq 6$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Entailment}
+
+\defn{Entailment} means that one thing \emph{follows from} another:
+\mat{\[KB \models \alpha\]}
+
+Knowledge base \mat{$KB$} entails sentence \mat{$\alpha$}\nl
+   if and only if\\
+\mat{$\alpha$} is true in all worlds where \mat{$KB$} is true
+
+E.g., the KB containing ``the Giants won'' and ``the Reds won''\\
+entails ``Either the Giants won or the Reds won''
+
+E.g., \mat{$x+y\eq 4$} entails  \mat{$4\eq x+y$}
+
+Entailment is a relationship between sentences (i.e., \emph{syntax})\\
+that is based on \emph{semantics}
+
+Note: brains process \emph{syntax} (of some sort)
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Models}
+
+Logicians typically think in terms of \defn{models}, which are formally\\
+structured worlds with respect to which truth can be evaluated
+
+We say \mat{$m$} \note{is a model of} a sentence \mat{$\alpha$}
+if \mat{$\alpha$} is true in \mat{$m$}
+
+\mat{$M(\alpha)$} is the set of all models of \mat{$\alpha$}
+
+Then \mat{$KB \models \alpha$} if and only if \mat{$M(KB) \subseteq M(\alpha)$}
+
+\begin{tabular}{lr}
+\hbox{\begin{minipage}[b]{0.6\textwidth}
+E.g. \mat{$KB$} = Giants won and Reds won\nl
+     \mat{$\alpha$} = Giants won
+\end{minipage}}
+&
+\epsfxsize=3.2in
+\raisebox{-2in}[0in]{\epsffile{\file{figures}{model-inclusion.ps}}}
+\end{tabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Entailment in the wumpus world}
+
+\begin{tabular}{lr}
+\hbox{\begin{minipage}[b]{0.55\textwidth}
+Situation after detecting nothing in [1,1],\\
+moving right, breeze in [2,1]\\
+\\
+
+Consider possible models for ?s\\
+assuming only pits 
+\end{minipage}}
+&
+\epsfxsize=0.4\textwidth
+\epsffile{\file{figures}{wumpus-seq1c-alt.ps}}
+\end{tabular}
+
+3 Boolean choices $\implies$ 8 possible models
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus models}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{wumpus-models1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus models}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{wumpus-models2.ps}}
+
+\mat{$KB$} = wumpus-world rules + observations
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus models}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{wumpus-models3.ps}}
+
+\mat{$KB$} = wumpus-world rules + observations
+
+\mat{$\alpha_1$} = ``[1,2] is safe'', \mat{$KB \models \alpha_1$}, proved by \defn{model checking}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus models}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{wumpus-models2.ps}}
+
+\mat{$KB$} = wumpus-world rules + observations
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus models}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{wumpus-models4.ps}}
+
+\mat{$KB$} = wumpus-world rules + observations
+
+\mat{$\alpha_2$} = ``[2,2] is safe'', \mat{$KB  \not\models \alpha_2$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference}
+
+\mat{$KB\vdash_i\alpha$} = sentence \mat{$\alpha$} can be derived from \mat{$KB$} by procedure \mat{$i$}
+
+Consequences of \mat{$KB$} are a haystack; \mat{$\alpha$} is a needle.\\
+Entailment = needle in haystack; inference = finding it
+
+\defn{Soundness}: \mat{$i$} is sound if\nl
+whenever \mat{$KB\vdash_i\alpha$}, it is also true that \mat{$KB\models\alpha$}
+
+\defn{Completeness}: \mat{$i$} is complete if\nl
+whenever \mat{$KB\models\alpha$}, it is also true that \mat{$KB\vdash_i\alpha$}
+
+Preview: we will define a logic (first-order logic) which is
+expressive enough to say almost anything of interest, and for which
+there exists a sound and complete inference procedure.
+
+That is, the procedure will answer any question whose answer follows
+from what is known by the \mat{$KB$}.
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Propositional logic: Syntax}
+
+Propositional logic is the simplest logic---illustrates basic ideas
+
+The proposition symbols \mat{$P_1$}, \mat{$P_2$} etc are sentences
+
+If \mat{$S$} is a sentence, \mat{$\lnot S$} is a sentence (\defn{negation})
+
+If \mat{$S_1$} and \mat{$S_2$} are sentences, \mat{$S_1 \land S_2$} is a sentence (\defn{conjunction})
+ 
+If \mat{$S_1$} and \mat{$S_2$} are sentences, \mat{$S_1 \lor S_2$} is a sentence (\defn{disjunction})
+
+If \mat{$S_1$} and \mat{$S_2$} are sentences, \mat{$S_1 \implies S_2$} is a sentence (\defn{implication})
+
+If \mat{$S_1$} and \mat{$S_2$} are sentences, \mat{$S_1 \lequiv S_2$} is a sentence (\defn{biconditional})
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Propositional logic: Semantics}
+
+Each model specifies true/false for each proposition symbol
+
+\begin{tabular}{lccc}
+E.g. & \mat{$P_{1,2}$} & \mat{$P_{2,2}$} & \mat{$P_{3,1}$}\\
+     & \mat{$true$}   &  \mat{$true$} &  \mat{$false$}
+\end{tabular}
+
+(With these symbols, 8 possible models, can be enumerated automatically.)
+
+Rules for evaluating truth with respect to a model \mat{$m$}:
+
+\begin{tabular}{rcclcl}
+\mat{$\lnot S$}          & is true iff & \mat{$S$} & is false & & \\
+\mat{$S_1 \land S_2$}    & is true iff & \mat{$S_1$} & is true \emph{and} & \mat{$S_2$} & is true\\
+\mat{$S_1 \lor S_2$}     & is true iff & \mat{$S_1$} & is true \emph{or} & \mat{$S_2$} & is true\\
+\mat{$S_1 \implies S_2$} & is true iff& \mat{$S_1$} & is false \emph{or} & \mat{$S_2$} & is true\\
+\qquad i.e.,  & is false iff& \mat{$S_1$} & is true \emph{and} & \mat{$S_2$} & is false\\
+\mat{$S_1 \lequiv S_2$} & is true iff& \mat{$S_1\implies S_2$} & is true \emph{and} & \mat{$S_2\implies S_1$} & is true
+\end{tabular}
+
+Simple recursive process evaluates an arbitrary sentence, e.g.,\\
+\mat{$\lnot P_{1,2}\land (P_{2,2}\lor P_{3,1})$} = \mat{$true\land (false \lor true)\eq true\land
+true \eq true$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Truth tables for connectives}
+
+\begin{center}
+\input{\file{tables}{truth-tables-table}}
+\end{center}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus world sentences}
+
+Let \mat{$P_{i,j}$} be true if there is a pit in \mat{$[i,j]$}.\\
+Let \mat{$B_{i,j}$} be true if there is a breeze in \mat{$[i,j]$}.
+\mat{\begin{eqnarray*}
+ \lnot P_{1,1}\\
+ \lnot B_{1,1}\\
+ B_{2,1}
+\end{eqnarray*}}
+``Pits cause breezes in adjacent squares''
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus world sentences}
+
+Let \mat{$P_{i,j}$} be true if there is a pit in \mat{$[i,j]$}.\\
+Let \mat{$B_{i,j}$} be true if there is a breeze in \mat{$[i,j]$}.
+\mat{\begin{eqnarray*}
+ \lnot P_{1,1}\\
+ \lnot B_{1,1}\\
+ B_{2,1}
+\end{eqnarray*}}
+``Pits cause breezes in adjacent squares''
+\mat{\begin{eqnarray*}
+ B_{1,1} &\lequiv& (P_{1,2} \lor P_{2,1})\\
+ B_{2,1} &\lequiv& (P_{1,1} \lor P_{2,2}\lor P_{3,1})
+\end{eqnarray*}}
+``A square is breezy \emph{if and only if} there is an adjacent pit''
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Truth tables for inference}
+
+\begin{LARGE}
+\begin{center}
+\input{\file{tables}{wumpus-model-table}}
+\end{center}
+\end{LARGE}
+
+Enumerate rows (different assignments to symbols),\\
+if \mat{KB} is true in row, check that \mat{$\alpha$} is too
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference by enumeration}
+
+Depth-first enumeration of all models is sound and complete 
+
+\input{\file{algorithms}{tt-entails-algorithm}}
+
+\mat{$O(2^n)$} for \mat{$n$} symbols; problem is \emph{co-NP-complete}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Logical equivalence}
+
+Two sentences are \defn{logically equivalent} iff true in same models:\al
+\mat{$\alpha\equiv\beta$} if and only if \mat{$\alpha\models\beta$} 
+and \mat{$\beta\models\alpha$}
+
+\input{\file{tables}{logical-equivalence-table}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Validity and satisfiability}
+
+A sentence is \defn{valid} if it is true in \emph{all} models,\nl
+e.g., \mat{$True$},\quad \mat{$A \lor \lnot A$}, \quad \mat{$A \implies A$}, \quad 
+      \mat{$(A \land (A \implies B)) \implies B$}
+
+Validity is connected to inference via the \defn{Deduction Theorem}:\nl
+      \mat{$KB \models \alpha$} if and only if \mat{$(KB \implies \alpha)$} is valid
+
+A sentence is \defn{satisfiable} if it is true in \emph{some} model\nl
+e.g., \mat{$A\lor B$},\qquad \mat{$C$}
+
+A sentence is \defn{unsatisfiable} if it is true in \emph{no} models\nl
+e.g., \mat{$A\land \lnot A$}
+
+Satisfiability is connected to inference via the following:\nl
+      \mat{$KB \models \alpha$} if and only if \mat{$(KB \land \lnot \alpha)$} is unsatisfiable\\
+i.e., prove \mat{$\alpha$} by \note{{\it reductio ad absurdum}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Proof methods}
+
+Proof methods divide into (roughly) two kinds:\al
+
+\note{Application of inference rules}\al
+    -- Legitimate (sound) generation of new sentences from old\al
+    -- \defn{Proof} = a sequence of inference rule applications\nl
+       Can use inference rules as operators in a standard search alg.\al
+    -- Typically require translation of sentences into a \defn{normal form}
+
+\note{Model checking}\al
+    truth table enumeration (always exponential in \mat{$n$})\al
+    improved backtracking, e.g., Davis--Putnam--Logemann--Loveland\al
+    heuristic search in model space (sound but incomplete)\nl
+       e.g., min-conflicts-like hill-climbing algorithms
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward and backward chaining}
+
+\defn{Horn Form} (restricted)\nl
+    KB = \emph{conjunction} of \emph{Horn clauses}\al
+    Horn clause = \nl
+     \blob proposition symbol;  or\nl
+     \blob (conjunction of symbols) \mat{$\implies$} symbol\al
+    E.g., \mat{$C \land (B \implies A) \land (C \land D \implies B)$}
+
+\defn{Modus Ponens} (for Horn Form): complete for Horn KBs
+\mat{\[\frac{\alpha_1,\ldots,\alpha_n,\qquad \alpha_1\land \cdots \land \alpha_n\implies \beta}{\beta} 
+\]}
+Can be used with \defn{forward chaining} or \defn{backward chaining}.\\
+These algorithms are very natural and run in \emph{linear} time
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining}
+
+Idea: fire any rule whose premises are satisfied in the \mat{$KB$},\nl
+   add its conclusion to the \mat{$KB$}, until query is found
+
+\begin{minipage}{0.48\maxfigwidth}
+\input{tables/fc-example-table}
+\end{minipage}\hfill
+\begin{minipage}{0.48\maxfigwidth}
+\epsfxsize=0.25\maxfigwidth
+\centerline{\epsffile{\file{figures}{pl-horn-example.ps}}}
+\end{minipage}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining algorithm}
+
+\input{\file{algorithms}{pl-fc-algorithm}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{fc-horn-example01c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{fc-horn-example02c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{fc-horn-example03c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{fc-horn-example04c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{fc-horn-example05c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{fc-horn-example06c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{fc-horn-example07c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{fc-horn-example08c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Proof of completeness}
+
+FC derives every atomic sentence that is entailed by \mat{$KB$}
+
+1. FC reaches a \defn{fixed point} where no new atomic sentences are derived
+
+2. Consider the final state as a model \mat{$m$}, assigning true/false to symbols
+
+3. Every clause in the original \mat{$KB$} is true in \mat{$m$}\al
+   \emph{Proof}:  Suppose a clause \mat{$a_1\land\ldots\land a_k\textimplies b$} is false in \mat{$m$}\al
+   Then \mat{$a_1\land\ldots\land a_k$} is true in \mat{$m$} and \mat{$b$} is false in \mat{$m$}\al
+   Therefore the algorithm has not reached a fixed point!
+
+4. Hence \mat{$m$} is a model of \mat{$KB$}
+
+5. If \mat{$KB\models q$}, \mat{$q$} is true in \emph{every} model of \mat{$KB$}, including \mat{$m$}
+
+\note{General idea}: construct any model of \mat{$KB$} by sound inference, check \mat{$\alpha$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining}
+
+Idea: work backwards from the query \mat{$q$}:\al
+   to prove \mat{$q$} by BC,\nl
+      check if \mat{$q$} is known already, or\nl
+      prove by BC all premises of some rule concluding \mat{$q$}
+
+Avoid loops: check if new subgoal is already on the goal stack
+
+Avoid repeated work: check if new subgoal \al
+  1) has already been proved true, or\al
+  2) has already failed
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example01c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example02c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example03c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example04c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example03c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example05c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example06c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example07c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example08c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example09c.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Backward chaining example}
+
+\epsfxsize=0.45\maxfigwidth
+\fig{\file{figures}{bc-horn-example10c.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Forward vs.~backward chaining}
+
+FC is \defn{data-driven}, cf. automatic, unconscious processing,\nl
+e.g., object recognition, routine decisions
+
+May do lots of work that is irrelevant to the goal
+
+BC is \defn{goal-driven}, appropriate for problem-solving,\nl
+e.g., Where are my keys? How do I get into a PhD program?
+
+Complexity of BC can be \emph{much less} than linear in size of KB
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Resolution}
+
+\defn{Conjunctive Normal Form} (CNF---universal)\nl
+    \emph{conjunction} of $\underbrace{\mbox{\emph{disjunctions} of \emph{literals}}}$\nl
+    \phantom{\emph{conjunction} of \emph{disjuncti}}\emph{clauses}\nl
+    E.g., \mat{$(A \lor \lnot B) \land (B \lor \lnot C \lor \lnot D)$}
+
+\defn{Resolution} inference rule (for CNF): complete for propositional logic
+\mat{\[\frac {\ell_1 \lor \cdots\lor \ell_k,\qquad m_1 \lor \cdots\lor m_n}
+        {\ell_1 \lor \cdots\lor \ell_{i-1}\lor \ell_{i+1}\lor\cdots\lor \ell_k
+        \lor m_1 \lor \cdots \lor m_{j-1}\lor m_{j+1}\lor\cdots\lor m_n}
+\]}
+where \mat{$\ell_i$} and \mat{$m_j$} are complementary literals. E.g.,\hfill\epsfxsize=1.75in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{wumpus-seq5c.ps}}}
+\mat{\[
+   \frac{P_{1,3} \lor P_{2,2},\qquad\lnot P_{2,2}}
+       {P_{1,3}}
+\]}
+Resolution is sound and complete for propositional logic
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conversion to CNF}
+
+\mat{$B_{1,1} \textlequiv (P_{1,2} \lor P_{2,1})$}
+
+1.  Eliminate \mat{$\lequivsymbol$}, replacing \mat{$\alpha\textlequiv \beta$} with \mat{$(\alpha\implies
+\beta)\land (\beta\implies \alpha)$}.
+\mat{\[
+   (B_{1,1} \implies (P_{1,2} \lor P_{2,1})) \land 
+   ((P_{1,2} \lor P_{2,1})\implies B_{1,1})
+\]}
+2. Eliminate \mat{$\impliessymbol$}, replacing \mat{$\alpha\textimplies \beta$} with \mat{$\lnot
+\alpha\lor \beta$}.
+\mat{\[
+   (\lnot B_{1,1} \lor P_{1,2} \lor P_{2,1}) \land 
+   (\lnot(P_{1,2} \lor P_{2,1})\lor B_{1,1})
+\]}
+3. Move \mat{$\lnot$} inwards using de Morgan's rules and double-negation:
+\mat{\[
+   (\lnot B_{1,1} \lor P_{1,2} \lor P_{2,1}) \land 
+   ((\lnot P_{1,2} \land \lnot P_{2,1})\lor B_{1,1})
+\]}
+4. Apply distributivity law (\mat{${\lor}$} over \mat{${\land}$}) and flatten:
+\mat{\[
+   (\lnot B_{1,1} \lor P_{1,2} \lor P_{2,1}) \land 
+   (\lnot P_{1,2} \lor B_{1,1}) \land (\lnot P_{2,1} \lor B_{1,1})
+\]}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Resolution algorithm}
+
+Proof by contradiction, i.e., show \mat{$KB\land\lnot\alpha$} unsatisfiable
+
+\input{\file{algorithms}{pl-resolution-algorithm}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Resolution example}
+
+\mat{$KB = (B_{1,1} \lequiv (P_{1,2} \lor P_{2,1})) \land \lnot B_{1,1}$}
+\mat{$\alpha = \lnot P_{1,2}$}
+
+\vspace*{0.5in}
+
+\epsfxsize=1.1\textwidth
+\fig{\file{figures}{wumpus-resolution.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Logical agents apply \defn{inference} to a \defn{knowledge base}\al
+to derive new information and make decisions
+
+Basic concepts of logic:\al
+-- \defn{syntax}: formal structure of \defn{sentences}\al
+-- \defn{semantics}: \defn{truth} of sentences wrt \defn{models}\al
+-- \defn{entailment}: necessary truth of one sentence given another\al
+-- \defn{inference}: deriving sentences from other sentences\al
+-- \defn{soundess}: derivations produce only entailed sentences\al
+-- \defn{completeness}: derivations can produce all entailed sentences
+
+Wumpus world requires the ability to represent partial
+and negated information, reason by cases, etc.
+
+Forward, backward chaining are linear-time, complete for Horn clauses\\
+Resolution is complete for propositional logic
+
+Propositional logic lacks expressive power
+
+
+\end{huge} 
+\end{document}

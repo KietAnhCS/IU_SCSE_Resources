@@ -1,0 +1,33 @@
+/*
+    Document   : ch5_1
+    Created on : 15-10-2010, 16:40:36
+    Author     : Khanh
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/*
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+root {
+    display: block;
+}
+body {
+    font: 100% Arial, Helvetica, sans-serif;
+    background: #CCD7FF;
+    color: #333333;
+}
+
+#container {
+    width:900px;
+    background: #FFFFFF;
+    position: absolute;
+    margin: 0px auto;
+    padding-left: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+}
+

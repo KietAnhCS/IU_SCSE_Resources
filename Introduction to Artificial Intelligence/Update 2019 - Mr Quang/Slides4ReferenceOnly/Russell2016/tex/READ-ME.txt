@@ -1,0 +1,18 @@
+This directory contains the source files for the latest version of
+the LaTeX lecture slides for AIMA2e. These are current as of December 2004.
+
+Postscript files (both full-size and 6-per-page for hardcopy) are
+in the slides-ps directory; pdfs are in slides-pdf.
+
+To make your own versions, copy the entire slides-tex directory (and
+its subdirectories) to your own machine. Run
+   latex chapterNN.tex
+where NN is the chapter number, followed by
+   dvips -o chapterNN.ps -t landscape chapterNN
+to make the postscript file.
+
+The "publish" file contains the full sequence of commands for
+producing one particular chapter's slides, including the
+6-per-page version.
+
+

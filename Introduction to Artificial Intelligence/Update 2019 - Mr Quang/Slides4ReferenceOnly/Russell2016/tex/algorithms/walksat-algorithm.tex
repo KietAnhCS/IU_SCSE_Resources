@@ -1,0 +1,16 @@
+\code{
+\func{WalkSAT}{\v{clauses}{\ac}\v{p}{\ac}\v{max-flips}}{a satisfying model or \v{failure}}
+    \firstinputs{\v{clauses}}{a set of clauses in propositional logic}
+    \inputs{\v{p}}{the probability of choosing to do a ``random walk'' move, typically around 0.5}
+    \inputs{\v{max-flips}}{number of flips allowed before giving up}
+\bodysep
+    \setq{\v{model}}{a random assignment of \v{true}/\v{false} to the symbols in \v{clauses}}
+    \k{for} $\v{i}\eq 1$ \k{to} \v{max-flips} \k{do} 
+          \k{if} \v{model} satisfies \v{clauses} \k{then return} \v{model}
+          \setq{\v{clause}}{a randomly selected clause from \v{clauses} that is false in \v{model}}
+          \k{with probability} \v{p} flip the value in \v{model} of a randomly selected symbol from \v{clause}
+          \k{else} flip whichever symbol in \v{clause} maximizes the number of satisfied clauses
+    \k{return} \v{failure}
+}
+
+

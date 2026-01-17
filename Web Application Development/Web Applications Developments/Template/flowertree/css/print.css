@@ -1,0 +1,118 @@
+/* 
+** flowertree - print stylesheet
+** This CSS file makes print layout look pretty ;-)
+** 
+** Nov 18, 2006 - (version 1.0)
+** 
+** This is a part of the open source layout by 
+** Jonas John (www.jonasjohn.de) !
+*/
+
+/* page overall: */
+
+body,div,p,img,form,h1,h2,h3,h4,h5,h6 { 
+    margin: 0; 
+    padding: 0; 
+    border: 0;
+}
+
+ul {
+	padding-left: 2em;	
+}
+
+body {
+	/* BG-Color: */
+	text-align: center;
+	margin-top: 1em;
+}
+
+.page {
+	/* Page width: */
+	width: 95%;
+}
+
+#logo {
+	margin: 0 auto;
+	text-align: left;
+	font-family: Union, Trebuchet MS, Arial;
+	font-size: 1.7em;	
+	margin-bottom: 0.2em;
+}
+
+#logo a:link, #logo a:visited, #logo a:hover, #logo a:active {
+	text-decoration: none;
+	/* logo color 1: */
+	color: #C43917;
+}
+
+#logo_black {
+	/* logo color 2: */
+	color: #000000;
+}
+
+#contentbox {
+	border-top: 2px solid #ccc;          
+	margin: 0 auto;
+	text-align: left;
+}
+
+/* menu: */
+
+#menu {
+	display: none;
+}
+
+/*
+ Styles that apply to the 
+ content area:
+*/
+
+#content {
+	width: 100%; 
+	font-family: Arial, Verdana, Arial;
+	font-size: 1em;
+	padding-top: 1.2em;
+}
+
+#content p {
+	font-size: 0.9em;
+}
+
+/* heading */
+#content h1 {
+	font-size: 1.25em;
+	font-family: Trebuchet MS;
+	margin-top: 0.2em;
+	margin-bottom: 0.3em;
+	color: #BF2016;
+}
+
+
+
+/* link colors */
+#content a:link {
+	color: #C2361D;
+}
+
+#content a:hover, #content a:active {
+	color: #33201D;
+}
+
+#content a:visited {
+	color: #892614;
+}
+
+#copyright {
+	font-family: Verdana, Arial;
+	margin-top: 1em;
+	float: left;
+	border-top: 2px solid #cccccc;
+	width: 100%;
+	padding-top: 0.5em;
+	font-size: 0.70em;
+}
+
+#copyright br {
+	display: none;
+}
+

@@ -1,0 +1,18 @@
+\code{
+\func{Minimax-Decision}{\var{state}}{\var{an action}}
+    \firstinputs{\var{state}}{current state in game}
+\bodysep
+    \key{return} the \var{a} in \prog{Actions}(\var{state}) maximizing \prog{Min-Value}(\prog{Result}(\var{a}{\ac}\var{state}))
+\fnsep
+\func{Max-Value}{\var{state}}{\var{a utility value}}
+    \key{if} \prog{Terminal-Test}(\var{state}) \key{then} \key{return} \prog{Utility}(\var{state})
+    \setq{\var{v}}{\(-\infty\)}
+    \key{for} \var{a, s} in \prog{Successors}(\var{state}) \key{do} \setq{\var{v}}{\prog{Max}(\var{v}, \prog{Min-Value}(\var{s}))}
+    \key{return} \var{v}
+\fnsep
+\func{Min-Value}{\var{state}}{\var{a utility value}}
+    \key{if} \prog{Terminal-Test}(\var{state}) \key{then} \key{return} \prog{Utility}(\var{state})
+    \setq{\var{v}}{\(\infty\)}
+    \key{for} \var{a, s} in \prog{Successors}(\var{state}) \key{do} \setq{\var{v}}{\prog{Min}(\var{v}, \prog{Max-Value}(\var{s}))}
+    \key{return} \var{v}
+}

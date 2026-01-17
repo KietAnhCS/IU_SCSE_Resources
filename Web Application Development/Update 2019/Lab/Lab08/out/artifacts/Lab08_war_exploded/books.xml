@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE books [
+        <!ELEMENT books (book)*>
+        <!ELEMENT book (isbn-10|title|author|publisher|publication-date|price)*>
+        <!ELEMENT isbn-10 (#PCDATA)>
+        <!ELEMENT title (#PCDATA)>
+        <!ELEMENT author (#PCDATA)>
+        <!ELEMENT publisher (#PCDATA)>
+        <!ELEMENT publication-date (#PCDATA)>
+        <!ELEMENT price (#PCDATA)>
+        ]>
+<books>
+    <book>
+        <isbn-10>0470114878</isbn-10>
+        <title>Beginning XML, 4th Edition (Programmer to Programmer)</title>
+        <author>David Hunter, Jeff Rafter, Joe Fawcett, and Eric van Dist</author>
+        <publisher>Wrox</publisher>
+        <publication-date>May 21, 2007</publication-date>
+        <price>26.39</price>
+    </book>
+    <book>
+        <isbn-10>0596007647</isbn-10>
+        <title>XML in a Nutshell, Third Edition</title>
+        <author>Elliotte Rusty Harold and W. Scott Means</author>
+        <publisher>O'Reilly Media, Inc.</publisher>
+        <publication-date>September 2004</publication-date>
+        <price>26.37</price>
+    </book>
+    <book>
+        <isbn-10>0596004206</isbn-10>
+        <title>Learning XML, Second Edition</title>
+        <author>Erik Ray</author>
+        <publisher>O'Reilly Media, Inc.</publisher>
+        <publication-date>September 22, 2003</publication-date>
+        <price>26.37</price>
+    </book>
+    <book>
+        <isbn-10>0130655678</isbn-10>
+        <title>Definitive XML Schema (The Charles F. Goldfarb Definitive XML Series)</title>
+        <author>Priscilla Walmsley</author>
+        <publisher>Prentice Hall PTR</publisher>
+        <publication-date>December 17, 2001</publication-date>
+        <price>33.38</price>
+    </book>
+</books>

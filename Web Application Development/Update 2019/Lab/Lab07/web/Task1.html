@@ -1,0 +1,39 @@
+<head>
+    <title>Task 1</title>
+</head>
+<body onload="focusOnLoaded()">
+    <b>Register to become a member of the website</b><br><br>
+    <form method="POST" onsubmit="onFormSubmit()">
+        <table>
+            <tr>
+                <td>Full name:</td>
+                <td><input type="text" name="name" id="name" onchange="checkName()"/></td>
+                <td id="nameCheck"></td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input type="text" name="email" id="email" onchange="checkEmail()"/></td>
+                <td id="emailCheck"></td>
+            </tr>
+            <tr>
+                <td>Username:</td>
+                <td><input type="text" name="username" id="username" onchange="checkUsername()"/></td>
+                <td id="usernameCheck"></td>
+            </tr>
+            <tr>
+                <td>Choose a password:</td>
+                <td><input type="password" name="psw" id="psw" onchange="checkPassword()"/></td>
+                <td id="pswCheck"></td>
+            </tr>
+            <tr>
+                <td>Re-enter a password:</td>
+                <td><input type="password" name="repsw" id="repsw" onkeyup="checkRePassword()"/></td>
+                <td id="repswCheck"></td>
+            </tr>
+            <tr>
+                <td><input type="submit" name="submit" id="submit"/></td>
+            </tr>
+        </table>
+    </form>
+    <script type="text/javascript" src="Task1.js"></script>
+</body>

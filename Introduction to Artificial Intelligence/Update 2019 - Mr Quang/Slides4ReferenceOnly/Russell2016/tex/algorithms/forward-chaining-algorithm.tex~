@@ -1,0 +1,24 @@
+\code{
+\func{FOL-FC-Ask}{\v{KB}{\ac}$\alpha$}{a substitution or \v{false}}
+    \firstinputs{\v{KB}}{the knowledge base, a set of first-order definite clauses}
+    \inputs{$\alpha$}{the query, an atomic sentence}
+    \firstlocal{new}{the new sentences inferred on each iteration}
+\bodysep
+    \key{repeat until} \v{new} is empty
+          \setq{\v{new}}{$\emptyset$}
+          \key{for each} sentence \v{r} \key{in} \v{KB} \key{do} 
+                \setq{$({\ts}\v{p}_1\land\ldots\land \v{p}_n\implies \v{q})$}{\noprog{Standardize-Apart}(\v{r})} 
+                \key{for each} $\theta$ such that \noprog{Subst}($\theta${\ac}$\v{p}_1 \land \ldots \land \v{p}_n$) = \noprog{Subst}($\theta${\ac}$\v{p}'_1 \land \ldots \land \v{p}'_n$) 
+                                  for some $\v{p}'_1,\ldots,\v{p}'_n$ in \v{KB}
+                      \setq{$\v{q}'$}{\noprog{Subst}($\theta${\ac}$\v{q}$)}
+                      \key{if} $\v{q}'$ is not a renaming of some sentence already in \v{KB} or \v{new} \key{then do}
+                            add $\v{q}'$ to \v{new}
+                            \setq{$\phi$}{\prog{Unify}($\v{q}'${\ac}$\alpha$)}
+                            \k{if} $\phi$ is not \v{fail} \key{then return} $\phi$
+          add \v{new} to \v{KB}
+    \key{return} \v{false}
+}
+
+
+
+

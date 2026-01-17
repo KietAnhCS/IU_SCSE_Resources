@@ -1,0 +1,22 @@
+\code{
+\func{PL-Wumpus-Agent}{{\ts}\var{percept}}{an \var{action}}
+    \firstinputs{percept}{a list, [\v{stench},\v{breeze},\v{glitter}]}
+    \firststatic{KB}{a knowledge base, initially containing the ``physics'' of the wumpus world}
+    \static{x{\ac}y{\ac}orientation}{the agent's position (initially [1,1]) and orientation (initially \v{right})}
+    \static{visited}{an array indicating which squares have been visited, initially \v{false}}
+    \static{action}{the agent's most recent action, initially null}
+    \static{plan}{an action sequence, initially empty}
+\bodysep
+    update \v{x},\v{y},\v{orientation}, \v{visited} based on \v{action}
+    \k{if} \v{stench} \k{then} \noprog{Tell}(\var{KB}{\ac}$S_{x,y}$) \k{else} \noprog{Tell}(\var{KB}{\ac}$\lnot S_{x,y}$)
+    \k{if} \v{breeze} \k{then} \noprog{Tell}(\var{KB}{\ac}$B_{x,y}$) \k{else} \noprog{Tell}(\var{KB}{\ac}$\lnot B_{x,y}$)
+    \k{if} \v{glitter} \k{then} \setq{\v{action}}{\v{grab}}
+    \k{else if} \v{plan} is nonempty then \setq{\v{action}}{\noprog{Pop}(\v{plan})}
+    \k{else if} for some fringe square [\v{i},\v{j}], \noprog{Ask}(\var{KB}{\ac}$(\lnot P_{i,j}\land \lnot W_{i,j})$) is \v{true} \k{or}
+               for some fringe square [\v{i},\v{j}], \noprog{Ask}(\var{KB}{\ac}$(P_{i,j}\lor W_{i,j})$) is \v{false} \k{then do}
+          \setq{\v{plan}}{\noprog{A$^*$-Graph-Search}(\noprog{Route-Problem}([\v{x},\v{y}]{\ac}\v{orientation}{\ac}[\v{i},\v{j}],\v{visited}))}
+          \setq{\v{action}}{\noprog{Pop}(\v{plan})}
+    \k{else} \setq{\v{action}}{a randomly chosen move}
+    \key{return} \var{action}
+}
+

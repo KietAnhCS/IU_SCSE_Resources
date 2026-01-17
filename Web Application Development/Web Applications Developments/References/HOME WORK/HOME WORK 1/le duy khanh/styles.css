@@ -1,0 +1,278 @@
+{
+margin: 0px;
+padding: 0px;
+}
+
+a{
+	font-family: "Times New Roman", Times, serif;
+	color: #1f4155;
+	font-weight:bold;
+	text-decoration: none;
+	font-size: 12px;
+}
+
+a:hover {
+	
+	color: #000000;
+}
+
+body {	
+	background: #269fdb url(images/bg.jpg) top repeat-x;
+	font: 12px Arial, Helvetica, sans-serif;
+	color: #000000;
+}
+
+#content{
+	margin: 0 auto;
+	width: 1008px;
+	text-align: left;
+}
+
+#main{
+	width: 1008px;
+	margin: 0 auto;
+	clear:both;
+	background: url(images/mainbg.png) repeat-y;
+}
+
+#header {
+	width: 681px;
+	height: 370px;
+	background: url(images/header.jpg) no-repeat top right;
+}
+
+#logo {
+	height: 93px;
+	text-align: left;
+	padding-left: 460px;
+	padding-top:280px;
+}
+
+
+#logo a {
+	text-decoration: none;
+	text-transform: lowercase;
+	font-style: italic;
+	font-size: 18px;
+	color: #ffffff;
+}
+
+#logo H2 a{
+	font-size: 12px;
+}
+
+#menu{
+	width: 620px;
+	height: 49px;
+	background: url(images/menu.jpg);
+	background-repeat: no-repeat;
+	background-position: right;
+	padding-left: 380px;
+	margin-top: 95px;
+}
+
+#menu ul {
+	padding-left: 0px;
+	margin: 0px;
+	list-style:none;
+}
+
+#menu li {
+	display: inline;
+	list-style: none;
+	padding-left:0px;
+}
+
+#menu a {
+	float: left;
+	width: 120px;
+	height: 34px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: #ffffff;
+	font-weight: bold;
+	padding-top: 15px;
+	font-size: 15px;
+	
+}
+
+#menu a:hover{
+	width: 120px;
+	height: 34px;
+	background: url(images/menuhover.png);
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+#left{
+	width: 308px;
+	margin-left: 7px;
+}
+
+#left_top{
+	background: url(images/left_top.jpg) no-repeat;
+	height:7px;
+}
+#left H3{
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 18px;
+	font-weight: normal;
+	color: #0f3349;
+	height: 30px;
+	text-align: center;
+	margin-bottom: 10px;
+	background: url(images/title.gif);
+	background-repeat: repeat-x;
+	background-position: bottom;
+	margin-left: 1px;
+	margin-right: 3px;
+	padding-top: 10px;
+}
+
+.leftbg{
+	background: url(images/leftbg.jpg);
+    background-repeat: no-repeat;
+    background-position: top;
+	min-height:220px;
+	margin-top:1px;
+	margin-left: 2px;
+}
+
+#left ul{
+	list-style: none;
+	margin-bottom: 30px;
+	margin-left: 10px;
+	padding-top: 5px;
+}
+
+#left li{
+	background: url(images/ls.png) no-repeat 2px 3px;
+	padding-left: 25px;
+	margin-bottom: 10px;
+}
+
+#left ul li a{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:12px;
+	text-decoration:none;
+	color: #000000;
+	font-weight:normal;
+}
+
+#left ul li a:hover {
+	color: #3f5c6d;
+}
+
+.comnews{
+	background: url(images/ls2.png) no-repeat top left;
+	margin-left: 15px;
+	padding-left: 25px;
+}
+
+.comnews h2{
+	font-family: Arial, Helvetica, sans-serif;
+	color: #093960;
+	font-weight:bold;
+	font-size:12px;
+}
+
+.comnews p{
+	padding-right: 20px;
+	line-height:20px;
+}
+
+.comnews a{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #155a84;
+	font-weight:bold;
+	text-decoration:underline;
+}
+
+.lefthr{
+	background: url(images/lefthr.png) repeat-x;
+	height:1px;
+	margin-left: 1px;
+	margin-right: 3px;
+	margin-bottom: 18px;
+}
+
+#right{
+	float: right;
+	width: 681px;
+	margin-right: 8px;
+}
+
+#right H4{
+	height: 30px;
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 18px;
+	font-weight: normal;
+	color: #0f3349;
+	margin-left: 2px;
+	margin-right: 2px;
+	background: url(images/title.gif);
+    background-repeat: repeat-x;
+    background-position: bottom;
+	padding-left: 15px;
+	margin-bottom: 15px;
+	padding-top: 15px;
+}
+
+#right p {
+	margin: 0;
+	padding: 0;
+	padding-bottom: 10px;
+	padding-left: 15px;
+	padding-right: 15px;
+	line-height:20px;
+}
+
+.read{
+	text-align:right;
+	padding-right: 30px;
+	padding-bottom: 10px;
+}
+.read a{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #115079;
+	font-weight:normal;
+	text-decoration:none;
+}
+
+.read a:hover{
+	color: #000000;
+}
+
+#rightleft{
+	float:left;
+	width: 340px;
+}
+
+#rightright{
+	float:right;
+	width: 340px;
+}
+#footer {
+	height: 40px;
+	width: 1002px;
+	clear: both;
+	padding-top: 19px;
+	background: url(images/footer.jpg);
+	background-repeat: repeat-x;
+    background-position: top;
+	margin-left: 3px;
+}
+
+#footer p {
+	margin: 0;
+	font-size: 10px;
+	text-align: center;
+	color: #ffffff;
+}
+
+#footer a {
+	color: #ffffff;
+}

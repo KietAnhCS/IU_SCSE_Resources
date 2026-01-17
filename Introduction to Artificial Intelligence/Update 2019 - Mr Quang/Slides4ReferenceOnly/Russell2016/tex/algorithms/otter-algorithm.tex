@@ -1,0 +1,27 @@
+\code{
+\proc{Otter}{\var{sos{\ac}usable}}
+    \firstinputs{sos}{a set of support---clauses defining the problem (a global variable)}
+    \inputs{usable}{background knowledge potentially relevant to the problem}
+\bodysep
+    \key{repeat} 
+          \setq{clause}{the lightest member of} \var{sos}
+          {\rm move} \var{clause} from \var{sos} to \var{usable}
+          \prog{Process}(\prog{Infer}(\var{clause{\ac}usable}), \var{sos})
+    \key{until} \var{sos} $=$ [$\,$] \key{or} {\rm a refutation has been found}
+\fnsep
+\func{Infer}{\var{clause{\ac}usable}}{clauses}
+\bodysep
+    resolve \var{clause} with each member of \var{usable}
+    \key{return} the resulting clauses after applying \prog{Filter}
+\fnsep
+\proc{Process}{\var{clauses{\ac}sos}} 
+\bodysep
+    \key{for each} \var{clause} \key{in} \var{clauses} \key{do}
+          \setq{\var{clause}}{\prog{Simplify}(\var{clause})}
+          merge identical literals
+          discard clause if it is a tautology
+          \setq{\var{sos}}{[\var{clause} | \var{sos}]}     
+          \key{if} \var{clause} has no literals \key{then} a refutation has been found
+          \key{if} \var{clause} has one literal \key{then} look for unit refutation
+    \key{end}
+}

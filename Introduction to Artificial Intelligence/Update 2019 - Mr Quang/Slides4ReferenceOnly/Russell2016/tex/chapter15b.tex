@@ -1,0 +1,230 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Speech recognition (briefly)}{Chapter 15, Section 6}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Speech as probabilistic inference
+
+\blob Speech sounds
+
+\blob Word pronunciation
+
+\blob Word sequences
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Speech as probabilistic inference}
+
+\emph{It's not easy to wreck a nice beach}
+
+Speech signals are noisy, variable, ambiguous
+
+What is the \emph{most likely} word sequence, given the speech signal?\al
+I.e., choose \mat{$Words$} to maximize \mat{$P(Words|signal)$}
+
+Use Bayes' rule:
+\mat{\[
+P(Words|signal) = \alpha P(signal|Words) P(Words)
+\]}%
+I.e., decomposes into \defn{acoustic model} + \defn{language model}
+
+\mat{$Words$} are the hidden state sequence, \mat{$signal$} is the observation sequence
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Phones}
+
+All human speech is composed from 40-50 \defn{phones}, determined by the\\
+configuration of \defn{articulators} (lips, teeth, tongue, vocal cords, air flow)
+
+Form an intermediate level of hidden states between words and signal\nl
+  \mat{$\Rightarrow$} acoustic model = pronunciation model + phone model
+
+ARPAbet designed for American English
+
+\input{tables/darpabet-partial-table}
+
+E.g., ``ceiling'' is [s iy l ih ng] / [s iy l ix ng] / [s iy l en]
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Speech sounds}
+
+Raw signal is the microphone displacement as a function of time;\\
+processed into overlapping 30ms \defn{frames}, each described by \defn{features}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.9\textwidth
+\fig{\file{figures}{sr-acoustic-frames.ps}}
+
+Frame features are typically \defn{formants}---peaks in the power spectrum
+
+
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Phone models}
+
+Frame features in \mat{$P(features|phone)$} summarized by\al
+  -- an integer in \mat{$[0\ldots 255]$} (using \defn{vector quantization}); or\al
+  -- the parameters of a mixture of Gaussians
+
+\defn{Three-state phones}: each phone has three phases (Onset, Mid, End)\al
+ E.g., [t] has silent Onset, explosive Mid, hissing End\al
+ $\Rightarrow$ \mat{$P(features|phone,phase)$}
+
+\defn{Triphone context}: each phone becomes \mat{$n^2$} distinct phones,
+depending on the phones to its left and right\al
+  E.g., [t] in ``star'' is written [t(s,aa)] (different from ``tar''!)
+
+Triphones useful for handling \defn{coarticulation} effects: the articulators
+have inertia and cannot switch instantaneously between positions\al
+E.g., [t] in ``eighth'' has tongue against front teeth
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Phone model example}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{sr-hmm.ps}}
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Word pronunciation models}
+
+Each word is described as a distribution over phone sequences
+
+Distribution represented as an HMM transition model
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{sr-tomato-b.ps}}
+
+\mat{\begin{formula}
+P([towmeytow]|\mbox{``tomato''}) = P([towmaatow]|\mbox{``tomato''}) = 0.1 \\
+P([tahmeytow]|\mbox{``tomato''}) = P([tahmaatow]|\mbox{``tomato''}) = 0.4
+\end{formula}}
+
+Structure is created manually, transition probabilities learned from data
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Isolated words}
+
+Phone models + word models fix likelihood \mat{$P(e_{1:t}|word)$} for \defn{isolated word}
+\mat{\[
+P(word|e_{1:t}) = \alpha P(e_{1:t}|word) P(word)
+\]}%
+Prior probability \mat{$P(word)$} obtained simply by counting word frequencies
+
+\mat{$P(e_{1:t}|word)$} can be computed recursively: define
+\mat{\[
+  \bell_{1:t}\eq \pv(\X_t,\e_{1:t})
+\]}%
+and use the recursive update
+\mat{\[
+  \bell_{1:t+1} = \noprog{Forward}(\ell_{1:t},\e_{t+1})
+\]}%
+and then \mat{$P(e_{1:t}|word) = \mysum_{\sx_t} \bell_{1:t}(\x_t)$}
+
+Isolated-word dictation systems with training reach 95--99\% accuracy
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Continuous speech}
+
+Not just a sequence of isolated-word recognition problems!\al
+-- Adjacent words highly correlated\al
+-- Sequence of most likely words $\neq$ most likely sequence of words\al
+-- Segmentation: there are few gaps in speech\al
+-- Cross-word coarticulation---e.g., ``next thing''
+
+Continuous speech systems manage 60--80\% accuracy on a good day
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Language model}
+
+Prior probability of a word sequence is given by chain rule:
+\mat{\[
+P(w_{1}\cdots w_{n}) = \prod_{i=1}^{n} P(w_i|w_{1}\cdots w_{i-1})
+\]}%
+\defn{Bigram model}:
+\mat{\[
+   P(w_i|w_{1}\cdots w_{i-1}) \approx P(w_i|w_{i-1})
+\]}%
+Train by counting all word pairs in a large text corpus
+
+More sophisticated models (trigrams, grammars, etc.) help a little bit
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Combined HMM}
+
+States of the combined language+word+phone model are labelled by\\
+the word we're in + the phone in that word + the phone state in that phone
+
+Viterbi algorithm finds the most likely \emph{phone state} sequence
+
+Does segmentation by considering all possible word sequences and boundaries
+
+Doesn't always give the most likely word sequence because\\
+each word sequence is the sum over many state sequences
+
+Jelinek invented A$^*$ in 1969 a way to find most likely word sequence\al
+   where ``step cost'' is \mat{$-\log P(w_i|w_{i-1})$}
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{DBNs for speech recognition}
+
+\vspace{0.5in}
+
+\epsfxsize=1.1\textwidth
+\fig{\file{figures}{speech-dbn.ps}}
+
+Also easy to add variables for, e.g., gender, accent, speed.\\
+Zweig and Russell (1998) show up to 40\% error reduction over HMMs
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Since the mid-1970s, speech recognition has been formulated as probabilistic inference
+
+Evidence = speech signal, hidden variables = word and phone sequences
+
+``Context'' effects (coarticulation etc.) are handled by augmenting state
+
+Variability in human speech (speed, timbre, etc., etc.) and background noise\\
+make continuous speech recognition in real settings an open problem
+  
+
+
+
+\end{huge} 
+\end{document}
+

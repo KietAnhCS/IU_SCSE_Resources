@@ -1,0 +1,81 @@
+@charset "UTF-8";
+/* CSS Document */
+
+#container{
+	text-align:left;
+	width:800px;
+	margin:auto;
+}
+#nav{
+	background-color:#CCC;
+	height:30px;
+}
+#navContainer{
+	width:800px;
+}
+.navText{
+	font-size:10px;
+	padding-right:20px;
+	float:right;
+}
+.title{
+	clear:both;
+	border-bottom-width: thin;
+	border-bottom-style: solid;
+	border-bottom-color: #CCC;
+}
+.projectShowCase{
+	margin-left:100px;
+	float:left;
+}
+.prjectDescription{
+	width:280px;
+	margin-top:20px;
+	padding-left:20px;
+	float:right;
+	border-left-width: thin;
+	border-left-style: solid;
+	border-left-color: #CCC;
+}
+.thumb{
+	margin-top:15px;
+	padding-right:5px;
+	padding-left:5px;
+	float:left;
+}
+.thumb img{
+	border:none;
+}
+.prjectDescription a{
+	background-color:#FFF;
+}
+.prjectDescription a:hover{
+	background-color:#CCC;
+}
+.prjectDescription a:active{
+	background-color:#CCC;
+
+}
+#footer{
+	clear:both;
+	background-color:#CCC;
+	height:30px;
+	padding-right:10px;
+	width:790px;
+}
+.contact{
+	color:#666;
+	margin-top:5px;
+	font-size:10px;
+	float:right;
+	padding-left:10px;
+	margin-right:20px;
+	border-left-width: thin;
+	border-left-style: dotted;
+	border-left-color: #666;
+}
+.floatright{
+	color:#666;
+	float:left;
+	margin-left:10px;
+}

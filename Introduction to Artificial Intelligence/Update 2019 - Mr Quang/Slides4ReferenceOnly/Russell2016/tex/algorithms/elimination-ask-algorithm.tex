@@ -1,0 +1,13 @@
+\code{
+\func{Elimination-Ask}{\v{X}{\ac}\e{\ac}\v{bn}}{a distribution over \v{X}}
+    \firstinputs{X}{the query variable}
+    \inputs{\e}{evidence specified as an event}
+    \inputs{bn}{a belief network specifying joint distribution $\pv(X_1,\ldots,X_n)$}
+\bodysep
+    \setq{\v{factors}}{$\emptylist$}; \setq{\v{vars}}{\noprog{Reverse}(\noprog{Vars}[\v{bn}])}
+    \k{for each} \v{var} \k{in} \v{vars} \k{do}
+          \setq{\v{factors}}{$[\noprog{Make-Factor}(\v{var}{\ac}\v{\e})|\v{factors}]$}
+          \k{if} \v{var} is a hidden variable \k{then} \setq{\v{factors}}{\noprog{Sum-Out}(\v{var}{\ac}\v{factors})}
+    \k{return} \prog{Normalize}(\prog{Pointwise-Product}(\v{factors}))
+}
+

@@ -1,0 +1,662 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Game playing}{Chapter 6}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Games
+
+\blob Perfect play\nl
+-- minimax decisions\nl
+-- $\alpha$--$\beta$ pruning
+
+\blob Resource limits and approximate evaluation
+
+\blob Games of chance
+
+\blob Games of imperfect information
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Games vs.~search problems}
+
+``Unpredictable'' opponent $\Rightarrow$ solution is a \note{strategy}\\
+specifying a move for every possible opponent reply
+
+Time limits $\Rightarrow$ unlikely to find goal, must approximate
+
+Plan of attack:
+\begin{itemize}
+\item Computer considers possible lines of play (Babbage, 1846)
+\item Algorithm for perfect play (Zermelo, 1912; Von Neumann, 1944)
+\item Finite horizon, approximate evaluation (Zuse, 1945; Wiener, 1948; \\
+      Shannon, 1950)
+\item First chess program (Turing, 1951)
+\item Machine learning to improve evaluation accuracy (Samuel, 1952--57)
+\item Pruning to allow deeper search (McCarthy, 1956)
+\end{itemize}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Types of games}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.05\textwidth
+\fig{\file{figures}{game-types.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Game tree (2-player, deterministic, turns)}
+
+
+\epsfxsize=0.9\textwidth
+\fig{\file{figures}{tictactoe.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Minimax}
+
+Perfect play for deterministic, perfect-information games
+
+Idea: choose move to position with highest \defn{minimax value}\nl
+= best achievable payoff against best play
+
+E.g., 2-ply game:
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{minimax.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Minimax algorithm}
+
+\input{\file{algorithms}{minimax-algorithm}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of minimax}
+
+\q{Complete} 
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of minimax}
+
+\q{Complete} Only if tree is finite (chess has specific rules for this).\nl
+NB a finite strategy can exist even in an infinite tree!
+
+\q{Optimal} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of minimax}
+
+\q{Complete} Yes, if tree is finite (chess has specific rules for this)
+
+\q{Optimal} Yes, against an optimal opponent. Otherwise??
+
+\q{Time complexity} 
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of minimax}
+
+\q{Complete} Yes, if tree is finite (chess has specific rules for this)
+
+\q{Optimal} Yes, against an optimal opponent. Otherwise??
+
+\q{Time complexity} \mat{$O(b^m)$}
+
+\q{Space complexity} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of minimax}
+
+\q{Complete} Yes, if tree is finite (chess has specific rules for this)
+
+\q{Optimal} Yes, against an optimal opponent. Otherwise??
+
+\q{Time complexity} \mat{$O(b^m)$}
+
+\q{Space complexity} \mat{$O(bm)$} (depth-first exploration)
+
+For chess, \mat{$b\approx 35$}, \mat{$m \approx 100$} for ``reasonable'' games\nl
+$\Rightarrow$ exact solution completely infeasible
+
+But do we need to explore every path?
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{$\alpha$--$\beta$ pruning example}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{alpha-beta-progress1.ps}}
+
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{$\alpha$--$\beta$ pruning example}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{alpha-beta-progress2.ps}}
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{$\alpha$--$\beta$ pruning example}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{alpha-beta-progress3.ps}}
+
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{$\alpha$--$\beta$ pruning example}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{alpha-beta-progress4.ps}}
+
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{$\alpha$--$\beta$ pruning example}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{alpha-beta-progress5.ps}}
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Why is it called $\alpha$--$\beta$?}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.4\textwidth
+\fig{\file{figures}{alpha-beta-general.ps}}
+
+\mat{$\alpha$} is the best value (to {\sc max}) found so far off the current path
+
+If \mat{$V$} is worse than \mat{$\alpha$}, {\sc max} will avoid it
+$\Rightarrow$ prune that branch
+
+Define \mat{$\beta$} similarly for {\sc min}
+
+
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{The $\alpha$--$\beta$ algorithm}
+
+\vspace*{-0.2in}
+
+\input{\file{algorithms}{alpha-beta-algorithm}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of $\alpha$--$\beta$}
+
+Pruning \emph{does not} affect final result
+
+Good move ordering improves effectiveness of pruning
+
+With ``perfect ordering,'' time complexity = \mat{$O(b^{m/2})$}\nl
+$\Rightarrow$ \emph{doubles} solvable depth
+
+A simple example of the value of reasoning about which 
+computations are relevant (a form of \note{metareasoning})
+
+Unfortunately, \mat{$35^{50}$} is still impossible!
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Resource limits}
+
+Standard approach:
+\begin{itemize}
+\item Use {\sc Cutoff-Test} instead of {\sc Terminal-Test}\nl
+e.g., depth limit (perhaps add \defn{quiescence search})
+\item Use {\sc Eval} instead of {\sc Utility}\nl
+i.e., \defn{evaluation function} that estimates desirability of position
+\end{itemize}
+
+Suppose we have \mat{$100$} seconds, explore \mat{$10^4$} nodes/second\nl
+$\Rightarrow$ \mat{$10^6$} nodes per move $\approx$ \mat{$35^{8/2}$}\nl
+$\Rightarrow$ $\alpha$--$\beta$ reaches depth 8 $\Rightarrow$ pretty good chess program
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Evaluation functions}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.95\textwidth
+\fig{\file{figures}{chess-evaluation-bc.ps}}
+
+For chess, typically \note{linear} weighted sum of \defn{features}
+\mat{\[
+{\sc Eval}(s) = w_1 f_1(s) + w_2 f_2(s) + \ldots + w_n f_n(s)
+\]}
+e.g., \mat{$w_1 = 9$} with \\
+\mat{$f_1(s)$} = (number of white queens) -- (number of black queens),\ \ etc.
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Digression: Exact values don't matter}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.05\textwidth
+\fig{\file{figures}{ordinal-utility.ps}}
+
+Behaviour is preserved under any \emph{monotonic} transformation of
+{\sc Eval}
+
+Only the order matters:\nl
+payoff in deterministic games acts as an \defn{ordinal utility} function
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Deterministic games in practice}
+
+Checkers: Chinook ended 40-year-reign of human world champion Marion
+Tinsley in 1994. Used an endgame database defining perfect play for
+all positions involving 8 or fewer pieces on the board, a total of
+443,748,401,247 positions.
+
+Chess: Deep Blue defeated human world champion Gary Kasparov
+in a six-game match in 1997. Deep Blue searches 200 million positions
+per second, uses very sophisticated evaluation, and undisclosed methods for
+extending some lines of search up to 40 ply.
+
+Othello: human champions refuse to compete against computers, who are
+too good.
+
+Go: human champions refuse to compete against computers, who are too
+bad. In go, $b > 300$, so most programs use pattern knowledge bases to
+suggest plausible moves.
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Nondeterministic games: backgammon}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.65\maxfigwidth
+\fig{\file{figures}{backgammon-position.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Nondeterministic games in general}
+
+In nondeterministic games, chance introduced by dice, card-shuffling
+
+Simplified example with coin-flipping:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{expectiminimax-simple.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Algorithm for nondeterministic games}
+
+{\sc Expectiminimax} gives perfect play
+
+Just like {\sc Minimax}, except we must also handle chance nodes:
+
+$\ldots$\\
+\key{if} \var{state} is a {\sc Max} node \key{then}\nl
+   \key{return} the highest {\sc ExpectiMinimax-Value} of {\sc Successors}(\var{state})\\
+\key{if} \var{state} is a {\sc Min} node \key{then}\nl
+   \key{return} the lowest {\sc ExpectiMinimax-Value} of {\sc Successors}(\var{state})\\
+\key{if} \var{state} is a chance node \key{then}\nl
+   \key{return} average of {\sc ExpectiMinimax-Value} of {\sc Successors}(\var{state})\\
+$\ldots$
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Nondeterministic games in practice}
+
+Dice rolls increase $b$: 21 possible rolls with 2 dice\\
+Backgammon $\approx$ 20 legal moves (can be 6,000 with 1-1 roll)
+\[
+{\rm depth}\ 4 = 20 \times (21 \times 20)^3 \approx 1.2\times 10^9
+\]
+
+As depth increases, probability of reaching a given node shrinks\nl
+$\Rightarrow$ value of lookahead is diminished
+
+$\alpha$--$\beta$ pruning is much less effective
+
+{\sc TDGammon} uses depth-2 search + very good {\sc Eval}\nl
+$\approx$ world-champion level
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Digression: Exact values DO matter}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.05\textwidth
+\fig{\file{figures}{chance-evaluation.ps}}
+
+
+Behaviour is preserved only by \note{positive linear} transformation of
+{\sc Eval}
+
+Hence {\sc Eval} should be proportional to the expected payoff
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Games of imperfect information}
+
+E.g., card games, where opponent's initial cards are unknown
+
+Typically we can calculate a probability for each possible deal
+
+Seems just like having one big dice roll at the beginning of the game\mat{$^*$}
+
+\note{Idea}: compute the minimax value of each action in each deal,\nl
+   then choose the action with highest expected value over all deals\mat{$^*$}
+
+Special case: if an action is optimal for all deals, it's optimal.\mat{$^*$}
+
+GIB, current best bridge program, approximates this idea by\al
+1) generating 100 deals consistent with bidding information\al
+2) picking the action that wins most tricks on average 
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+Four-card bridge/whist/hearts hand, {\sc Max} to play first
+
+\vspace*{0.1in}
+
+\epsfxsize=1.08\textwidth
+\fig{\sfile{figures}{card-tree1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+Four-card bridge/whist/hearts hand, {\sc Max} to play first
+
+\vspace*{0.1in}
+
+\epsfxsize=1.08\textwidth
+\fig{\sfile{figures}{card-tree2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+Four-card bridge/whist/hearts hand, {\sc Max} to play first
+
+\vspace*{0.1in}
+
+\epsfxsize=1.08\textwidth
+\fig{\sfile{figures}{card-tree3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Commonsense example}
+
+Road A leads to a small heap of gold pieces\\
+Road B leads to a fork:\nl
+   take the left fork and you'll find a mound of jewels;\nl
+   take the right fork and you'll be run over by a bus.
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Commonsense example}
+
+Road A leads to a small heap of gold pieces\\
+Road B leads to a fork:\nl
+   take the left fork and you'll find a mound of jewels;\nl
+   take the right fork and you'll be run over by a bus.
+
+Road A leads to a small heap of gold pieces\\
+Road B leads to a fork:\nl
+   take the left fork and you'll  be run over by a bus;\nl
+   take the right fork and you'll find a mound of jewels.
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Commonsense example}
+
+Road A leads to a small heap of gold pieces\\
+Road B leads to a fork:\nl
+   take the left fork and you'll find a mound of jewels;\nl
+   take the right fork and you'll be run over by a bus.
+
+Road A leads to a small heap of gold pieces\\
+Road B leads to a fork:\nl
+   take the left fork and you'll  be run over by a bus;\nl
+   take the right fork and you'll find a mound of jewels.
+
+Road A leads to a small heap of gold pieces\\
+Road B leads to a fork:\nl
+   guess correctly and you'll find a mound of jewels;\nl
+   guess incorrectly and you'll be run over by a bus.
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Proper analysis}
+
+\mat{*} Intuition that the value of an action is the average of its values\\
+in all actual states is \emph{WRONG}
+
+With partial observability, value of an action depends on the\\
+\defn{information state} or \defn{belief state} the agent is in
+
+Can generate and search a tree of information states
+
+Leads to rational behaviors such as\al
+\blob Acting to obtain information\al
+\blob Signalling to one's partner\al
+\blob Acting randomly to minimize information disclosure
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Games are fun to work on! (and dangerous)
+
+They illustrate several important points about AI
+
+\blob perfection is unattainable $\Rightarrow$ must approximate
+
+\blob good idea to think about what to think about
+
+\blob uncertainty constrains the assignment of values to states
+
+\blob optimal decisions depend on information state, not real state
+
+Games are to AI as grand prix racing is to automobile design
+
+
+
+\end{huge}
+\end{document}
+
+
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning in nondeterministic game trees}
+
+A version of $\alpha$-$\beta$ pruning is possible:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-pruning1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning in nondeterministic game trees}
+
+A version of $\alpha$-$\beta$ pruning is possible:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-pruning2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning in nondeterministic game trees}
+
+A version of $\alpha$-$\beta$ pruning is possible:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-pruning3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning in nondeterministic game trees}
+
+A version of $\alpha$-$\beta$ pruning is possible:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-pruning4.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning in nondeterministic game trees}
+
+A version of $\alpha$-$\beta$ pruning is possible:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-pruning5.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning in nondeterministic game trees}
+
+A version of $\alpha$-$\beta$ pruning is possible:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-pruning6.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning in nondeterministic game trees}
+
+A version of $\alpha$-$\beta$ pruning is possible:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-pruning7.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning in nondeterministic game trees}
+
+A version of $\alpha$-$\beta$ pruning is possible:
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-pruning8.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning contd.}
+
+More pruning occurs if we can bound the leaf values
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-bounded1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning contd.}
+
+More pruning occurs if we can bound the leaf values
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-bounded2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning contd.}
+
+More pruning occurs if we can bound the leaf values
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-bounded3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning contd.}
+
+More pruning occurs if we can bound the leaf values
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-bounded4.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning contd.}
+
+More pruning occurs if we can bound the leaf values
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-bounded5.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pruning contd.}
+
+More pruning occurs if we can bound the leaf values
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{expectiminimax-bounded6.ps}}
+
+
+
+

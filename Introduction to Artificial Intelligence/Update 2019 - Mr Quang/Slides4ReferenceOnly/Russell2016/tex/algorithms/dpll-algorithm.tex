@@ -1,0 +1,20 @@
+\code{
+\func{DPLL-Satisfiable?}{\v{s}}{\v{true} or \v{false}}
+    \firstinputs{\v{s}}{a sentence in propositional logic}
+\bodysep
+    \setq{\v{clauses}}{the set of clauses in the CNF representation of $\v{s}$}
+    \setq{\v{symbols}}{a list of the proposition symbols in \v{s}}
+    \k{return} \prog{DPLL}(\v{clauses}{\ac}\v{symbols}{\ac}$[\,]$)
+\fnsep
+\func{DPLL}{\v{clauses}{\ac}\v{symbols}{\ac}\v{model}}{\v{true} or \v{false}}
+\bodysep
+    \k{if} every clause in \v{clauses} is true in \v{model} \k{then return} \v{true}
+    \k{if} some clause in \v{clauses} is false in \v{model} \k{then return} \v{true}
+    \setq{\v{P}{\ac}\v{value}}{\prog{Find-Pure-Symbol}(\v{symbols}{\ac}\v{clauses}{\ac}\v{model})}
+    \k{if} \v{P} is non-null \k{then return} \prog{DPLL}(\v{clauses}{\ac}\v{symbols}--\v{P}{\ac}$[P\eq \v{value}|\v{model}]$)
+    \setq{\v{P}{\ac}\v{value}}{\prog{Find-Unit-Clause}(\v{clauses}{\ac}\v{model})}
+    \k{if} \v{P} is non-null \k{then return} \prog{DPLL}(\v{clauses}{\ac}\v{symbols}--\v{P}{\ac}$[P\eq \v{value}|\v{model}]$)
+    \setq{\v{P}}{\noprog{First}(\v{symbols})}; \setq{\v{rest}}{\noprog{Rest}(\v{symbols})}
+    \k{return} \prog{DPLL}(\v{clauses}{\ac}\v{rest}{\ac}$[P\eq \v{true}|\v{model}]$) \k{or} \prog{DPLL}(\v{clauses}{\ac}\v{rest}{\ac}$[P\eq \v{false}|\v{model}]$) 
+}
+

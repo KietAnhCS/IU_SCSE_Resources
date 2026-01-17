@@ -1,0 +1,18 @@
+\code{
+\func{Likelihood-Weighting}{\v{X}{\ac}\v{\e}{\ac}\v{bn}{\ac}\v{N}}{an estimate of $P(\v{X}|\v{\e})$}
+    \firstlocal{\v{\mbf{W}}}{a vector of weighted counts over \v{X}, initially zero}
+\bodysep
+    \k{for} \v{j} = 1 to \v{N} \k{do}
+          \setq{\v{\x}{\ac}\v{w}}{\prog{Weighted-Sample}(\v{bn})}
+          \setq{$\v{\mbf{W}}[\v{x}]$}{$\v{\mbf{W}}[\v{x}]+\v{w}$} where \v{x} is the value of \v{X} in \v{\x}
+    \k{return} \prog{Normalize}($\v{\mbf{W}}[\v{X}]$)
+\fnsep
+\func{Weighted-Sample}{\v{bn}{\ac}\v{\e}}{an event and a weight}
+\bodysep
+    \setq{\v{\x}}{an event with $n$ elements}; \setq{\v{w}}{1}
+    \k{for} \v{i} = 1 \k{to} $n$ \k{do}
+          \k{if} $\v{X_i}$ has a value $\v{x_i}$ in \v{\e}
+                \k{then} \setq{\v{w}}{$\v{w}\times P(\v{X_i}\eq \v{x_i} | \parents(\v{X_i}))$}
+                \k{else} \setq{$\v{x_i}$}{a random sample from $\pv(\v{X_i} | \parents(\v{X_i}))$}
+    \k{return} \v{\x}, \v{w}
+}

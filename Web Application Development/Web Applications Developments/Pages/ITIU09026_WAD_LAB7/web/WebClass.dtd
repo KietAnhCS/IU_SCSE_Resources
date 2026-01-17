@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+    TODO define vocabulary identification
+    PUBLIC ID: -//vendor//vocabulary//EN
+    SYSTEM ID: http://server/path/WebClass.dtd
+
+-->
+
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+
+    <!DOCTYPE WebClass SYSTEM "WebClass.dtd">
+
+    <WebClass>
+    ...
+    </WebClass>
+-->
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT WebClass (student)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT student (city|date-of-birth|idNum|name)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT name (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT idNum (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT date-of-birth (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT city (#PCDATA)>

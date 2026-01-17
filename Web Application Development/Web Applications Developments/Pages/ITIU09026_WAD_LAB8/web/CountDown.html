@@ -1,0 +1,69 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Count Down Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <SCRIPT LANGUAGE="JavaScript">
+            var timerID = null
+            var timerRunning = false
+            var start = 60
+            
+            function stopclock(){
+                if(timerRunning)
+                    clearInterval(timerID)
+                timerRunning = false
+            }
+            
+            function startclock(){
+                // Make sure the clock is stopped
+                stopclock()
+                document.getElementById('question_sheet').style.display = "block"
+                timerID = setInterval("showtime()",1000)
+                timerRunning = true
+            }
+            
+            function showtime(){
+                start -= 1;
+                if (start == -1) {
+                    document.getElementById('question_sheet').style.display = "none"
+                    document.getElementById('clock').style.display = "none"
+                    document.getElementById('submit_result').style.display = "block"
+                    stopclock()
+                }
+                var remain = "The remaining time: 0:"
+                remain += ((start < 10) ? "0" : "") + start + " [mm:ss]"
+                document.getElementById('clock').value = remain
+            }
+        </SCRIPT>
+    </head>
+    <body>
+        <form id="clockForm" action="./submitAnswer" method="post">
+            <input type="button" value="Start counting down 1:00 [mm:ss]" onClick="startclock()" id="clock" />
+            <hr />
+            <div style="display: none" id="question_sheet">
+                <table>
+                    <tr style="text-align: center">
+                        <td><b>These are test questions.</b></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Question 1: How many people are there in your class?</td>
+                        <td><input type="text" value="0" name="q1" id="q1" /></td>
+                    </tr>
+                    <tr>
+                        <td>Question 2: How do you feel now?</td>
+                        <td><input type="radio" value="Good" name="q2" /> Good; <input type="radio" value="Bad" name="q2" /> Bad</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="margin-left: auto; margin-right: auto; text-align: center; width: 100%; display: none" id="submit_result">
+                    <h3>Time is up!!!</h3>
+                    <input type="submit" value="Submit your answers" id="submit" name="submit" />
+            </div>
+        </form>
+    </body>
+</html>

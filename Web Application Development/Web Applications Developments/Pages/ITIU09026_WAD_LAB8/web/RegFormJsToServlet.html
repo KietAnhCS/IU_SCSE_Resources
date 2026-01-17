@@ -1,0 +1,49 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Register Form</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="./FormValidationSubmit.js"></script>
+    </head>
+    <body onload="generatePage()">
+        <h1><b>Register to become a member of the website</b></h1>
+        <form action="./submitRegister" method="post" onSubmit="return checkForm()" id="register">
+            <table>
+                <tr>
+                    <td>Full name:</td>
+                    <td><input type="text" style="background-color: yellow" name="name" id="name" /></td>
+                    <td><label style="color: red" id="namelab"></label></td>
+                </tr>
+                <tr>
+                    <td>Email:</td>
+                    <td><input type="text" style="background-color: yellow" name="mail" id="mail" /></td>
+                    <td><label style="color: red" id="maillab"></label></td>
+                </tr>
+                <tr>
+                    <td>Username:</td>
+                    <td><input type="text" name="username" id="username" /></td>
+                    <td><label style="color: red" id="usernamelab"></label></td>
+                </tr>
+                <tr>
+                    <td>Choose a password:</td>
+                    <td><input type="password" name="pass" id="pass" /></td>
+                    <td><label style="color: red" id="passlab"></label></td>
+                </tr>
+                <tr>
+                    <td>Re-enter password:</td>
+                    <td><input type="password" id="retype" /></td>
+                    <td><label style="color: red" id="retypelab"></label></td>
+                </tr>
+                <tr style="text-align: center">
+                    <td><input type="submit" value="Submit" id="submit" /></td>
+                    <td><label style="color: red" id="checklab"></label></td>
+                    <td></td>
+                </tr>
+            </table>
+        </form>
+    </body>
+</html>

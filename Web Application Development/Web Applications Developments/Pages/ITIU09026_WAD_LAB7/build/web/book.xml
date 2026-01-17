@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : book.xml
+    Created on : December 16, 2011, 7:43 AM
+    Author     : Trong Tin
+    Description:
+        Purpose of the document follows.
+-->
+
+<books>
+    <book>
+        <isbn-10>0470114878</isbn-10>
+        <title>Beginning XML, 4th Edition (Programmer to Programmer)</title>
+        <author>David Hunter, Jeff Rafter, Joe Fawcett, and Eric van Dist</author>
+        <publisher>Wrox</publisher>
+        <publish-date>May 21, 2007</publish-date>
+        <price>26.39</price>
+    </book>
+    <book>
+        <isbn-10>0596007647</isbn-10>
+        <title>XML in a Nutshell, Third Edition</title>
+        <author>Elliotte Rusty Harold and W.Scott Means</author>
+        <publisher>O'Reilly Media, Inc.</publisher>
+        <publish-date>September 2004</publish-date>
+        <price>26.37</price>
+    </book>
+    <book>
+        <isbn-10>0596004206</isbn-10>
+        <title>Learning XML, Second Edition</title>
+        <author>Erik Ray</author>
+        <publisher>O'Reilly Media, Inc.</publisher>
+        <publish-date>September 22, 2003</publish-date>
+        <price>26.37</price>
+    </book>
+    <book>
+        <isbn-10>0130655678</isbn-10>
+        <title>Definitive XML Schema (The Charles F. Goldfarb Definitive XML Series)</title>
+        <author>Priscilla Walmsley</author>
+        <publisher>Prentice Hall PTR</publisher>
+        <publish-date>December 17, 2001</publish-date>
+        <price>33.38</price>
+    </book>
+</books>

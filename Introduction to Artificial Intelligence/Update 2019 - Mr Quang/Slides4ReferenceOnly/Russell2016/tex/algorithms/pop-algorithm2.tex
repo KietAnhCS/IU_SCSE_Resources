@@ -1,0 +1,20 @@
+\code{
+\proc{Choose-Operator}{\var{plan{\ac}operators{\ac}$S_{need}${\ac}c}}
+\bodysep
+    \key{choose} a step $S_{add}$ from \var{operators} or \noprog{Steps}({\ts}\var{plan}) that has $c$ as an effect
+    \key{if} there is no such step \key{then fail} 
+    add the causal link $\cl{S_{add}}{c}{S_{need}}$ to \noprog{Links}({\ts}\var{plan})
+    add the ordering constraint $S_{add} \before S_{need}$ to \noprog{Orderings}({\ts}\var{plan})
+    \key{if} $S_{add}$ is a newly added step from \var{operators} \key{then}
+          add $S_{add}$ to \noprog{Steps}({\ts}\var{plan})
+          add $Start \before S_{add} \before Finish$ to \noprog{Orderings}({\ts}\var{plan})
+\fnsep
+\proc{Resolve-Threats}{\var{plan}}
+\bodysep
+    \key{for each} $S_{threat}$ that threatens a link $\cl{S_i}{c}{S_j}$ in \noprog{Links}({\ts}\var{plan}) \key{do}
+          \key{choose} either
+                {\it Demotion:} Add $S_{threat}\before S_i$ to \noprog{Orderings}({\ts}\var{plan})
+                {\it Promotion:} Add $S_j \before S_{threat}$ to \noprog{Orderings}({\ts}\var{plan})
+          \key{if not} \prog{Consistent}({\ts}\var{plan}) \key{then fail}
+    \key{end}
+}

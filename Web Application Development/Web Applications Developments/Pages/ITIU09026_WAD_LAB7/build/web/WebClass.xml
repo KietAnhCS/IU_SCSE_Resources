@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : WebClass.xml
+    Created on : December 16, 2011, 8:03 AM
+    Author     : Trong Tin
+    Description:
+        Purpose of the document follows.
+-->
+
+<WebClass>
+    <student>
+        <name>Dang Kha Doanh</name>
+        <idNum>IT060111</idNum>
+        <date-of-birth>15-02-84</date-of-birth>
+        <city>Can Tho</city>
+    </student>
+    <student>
+        <name>Chau Nhuan Phat</name>
+        <idNum>IT060112</idNum>
+        <date-of-birth>19-12-86</date-of-birth>
+        <city>Ha Long</city>
+    </student>
+    <student>
+        <name>Nguyen Phi Hung</name>
+        <idNum>IT060113</idNum>
+        <date-of-birth>05-02-83</date-of-birth>
+        <city>HCM</city>
+    </student>
+    <student>
+        <name>Duong Trieu Vi</name>
+        <idNum>IT060114</idNum>
+        <date-of-birth>05-12-88</date-of-birth>
+        <city>Ha Noi</city>
+    </student>
+    <student>
+        <name>Ngo Minh Phuong</name>
+        <idNum>IT060115</idNum>
+        <date-of-birth>28-12-84</date-of-birth>
+        <city>Da Nang</city>
+    </student>
+</WebClass>

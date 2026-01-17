@@ -1,0 +1,11 @@
+\begin{mytabular}{@{\extracolsep\fill}|@{\squad}l|ccccc@{\squad}|}
+\hline
+\tabtop \raisebox{-0.5\baselineskip}[0pt][0pt]{Criterion} & Breadth- & Uniform- & Depth- & Depth- & Iterative \\ 
+\tabbot  & First &  Cost & First & Limited & Deepening \\
+\hline
+\rule{0pt}{3ex}Complete? & Yes$^*$ & Yes$^*$ & No & Yes, if $l \ge d$ & Yes \\
+        Time      & $b^{d+1}$ & $b^{\ceiling{C^*/\epsilon}}$ & $b^m$ & $b^l$ & $b^d$ \\
+        Space     & $b^{d+1}$ & $b^{\ceiling{C^*/\epsilon}}$ & $bm$ & $bl$ & $bd$ \\
+\tabbot Optimal?  & Yes$^*$ & Yes$^*$ & No & No & Yes \\
+\hline
+\end{mytabular}

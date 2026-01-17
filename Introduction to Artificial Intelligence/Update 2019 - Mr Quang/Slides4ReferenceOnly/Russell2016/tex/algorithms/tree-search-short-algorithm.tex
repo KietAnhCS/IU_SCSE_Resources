@@ -1,0 +1,10 @@
+\code{
+\func{Tree-Search}{{\ts}\var{problem{\ac}\var{fringe}}}{a solution, or failure}
+    \setq{\var{fringe}}{\prog{Insert}(\prog{Make-Node}(\prog{Initial-State}[\var{problem}]){\ac}\var{fringe})}
+    \key{loop} \key{do}
+          \key{if} \var{fringe} is empty \key{then} \key{return} failure
+          \setq{\var{node}}{\prog{Remove-Front}(\var{fringe})}
+          \key{if} \prog{Goal-Test}[\var{problem}] applied to \noprog{State}(\var{node}) succeeds \key{return} \var{node}       
+          \setq{\var{fringe}}{\fnvar{InsertAll}(\prog{Expand}(\var{node}{\ac}\var{problem}){\ac}\var{fringe})}
+}
+

@@ -1,0 +1,22 @@
+set ylabel 0.7
+set xtics nomirror
+set ytics nomirror
+set tics out
+set ticscale 0.6
+set border 3 lw 2
+#For portrait mode:
+#set size 0.41857144, 0.195 
+#For eps mode:
+#set size 0.586,0.55714285
+set size 1,0.5
+set term postscript portrait color "Helvetica" 24
+
+set data style lines
+set xlabel "Number of balls in urn"
+set ylabel "Probability" 
+set key 7,0.52
+set yrange [0:0.5]
+
+set output "urn-nonunique-lw.eps"
+plot 'urn-nonunique-lw.data' using 1:2 title "6 draws (exact)" lw 8, 'urn-nonunique-lw.data' using 1:3 title "6 draws (approx)" lw 8
+

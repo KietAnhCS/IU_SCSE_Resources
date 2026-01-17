@@ -1,0 +1,233 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Statistical learning}{Chapter 20, Sections 1--3}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Bayesian learning
+
+\blob Maximum {\em a posteriori} and maximum likelihood learning
+
+\blob Bayes net learning\nl
+-- ML parameter learning with complete data\nl
+-- linear regression
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Full Bayesian learning}
+
+View learning as Bayesian updating of a probability distribution\\
+over the \defn{hypothesis space}
+
+\mat{$H$} is the hypothesis variable, values \mat{$h_1,h_2,\ldots$}, prior \mat{$\pv(H)$}
+
+\mat{$j$}th observation \mat{$d_j$} gives the outcome of random variable \mat{$D_j$}\\
+training data \mat{$\d \eq d_1,\ldots,d_{\Ncount}$}
+
+
+Given the data so far, each hypothesis has a posterior probability:
+\mat{\[
+  P(h_i|\d) = \alpha P(\d|h_i) P(h_i)
+\]}%
+where \mat{$P(\d|h_i)$} is called the \defn{likelihood}
+
+Predictions use a likelihood-weighted average over the hypotheses:
+\mat{\[
+  \pv(X|\d) = \mysum_i\ \pv(X|\d,h_i) P(h_i|\d) = \mysum_i\ \pv(X|h_i) P(h_i|\d)
+\]}%
+No need to pick one best-guess hypothesis!
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+Suppose there are five kinds of bags of candies:\al
+10\% are \mat{$h_1$}: 100\% cherry candies\al
+20\% are \mat{$h_2$}: 75\% cherry candies + 25\% lime candies\al
+40\% are \mat{$h_3$}: 50\% cherry candies + 50\% lime candies\al
+20\% are \mat{$h_4$}: 25\% cherry candies + 75\% lime candies\al
+10\% are \mat{$h_5$}: 100\% lime candies
+
+\vspace*{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{candy-kinds.ps}}
+
+Then we observe candies drawn from some bag: \epsfxsize=0.3\textwidth \epsffile{\file{figures}{candy-obs.ps}}
+
+What kind of bag is it? What flavour will the next candy be?
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Posterior probability of hypotheses}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.9\textwidth
+\fig{\file{graphs}{limes-bayes-post.eps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Prediction probability}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.9\textwidth
+\fig{\file{graphs}{limes-bayes-pred.eps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{MAP approximation}
+
+Summing over the hypothesis space is often intractable\\
+(e.g., 18,446,744,073,709,551,616 Boolean functions of 6 attributes)
+
+\defn{Maximum a posteriori} (MAP) learning: choose \mat{$h_{{\rm MAP}}$} maximizing \mat{$P(h_i|\d)$}
+
+I.e., maximize \mat{$P(\d|h_i)P(h_i)$} or \mat{$\log P(\d|h_i) + \log P(h_i)$}
+
+Log terms can be viewed as (negative of)\al
+\note{bits to encode data given hypothesis} + \note{bits to encode hypothesis} \\
+This is the basic idea of \defn{minimum description length} (MDL) learning
+
+For deterministic hypotheses, \mat{$P(\d|h_i)$} is 1 if consistent, 0 otherwise\nl
+$\implies$ MAP = simplest consistent hypothesis (cf.~science)
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{ML approximation}
+
+For large data sets, prior becomes irrelevant
+
+\defn{Maximum likelihood} (ML) learning: choose \mat{$h_{{\rm ML}}$} maximizing \mat{$P(\d|h_i)$}
+
+I.e., simply get the best fit to the data; identical to MAP for uniform prior\\
+(which is reasonable if all hypotheses are of the same complexity)
+
+ML is the ``standard'' (non-Bayesian) statistical learning method
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{ML parameter learning in Bayes nets}
+
+Bag from a new manufacturer; fraction \mat{$\theta$} of cherry candies?\hfill\epsfxsize=1.25in\raisebox{-1.25in}[0pt][0pt]{\epsffile{\file{figures}{ml-network1.ps}}} \\
+Any \mat{$\theta$} is possible: continuum of hypotheses \mat{$h_{\theta}$}\\
+\mat{$\theta$} is a \defn{parameter} for this simple (\note{binomial}) family of models 
+
+Suppose we unwrap \(\Ncount\) candies, \(c\) cherries and \(\ell\eq \Ncount-c\) limes\\
+These are \defn{i.i.d.} (independent, identically distributed) observations, so
+\mat{\[
+  P(\data |h_{\theta}) = \prod_{j\eq 1}^{\Ncount} P(\datum_j|h_{\theta}) =
+  \theta^c\cdot (1-\theta)^{\ell}
+\]}%
+Maximize this w.r.t.~\mat{$\theta$}---which is easier for the \defn{log-likelihood}:
+\mat{\begin{eqnarray*}
+  L(\data |h_{\theta}) &=& \log P(\data |h_{\theta}) = \sum_{j\eq 1}^{\Ncount} \log P(\datum_j|h_{\theta}) =
+  c\log\theta +  \ell\log(1-\theta) \\
+  \frac{dL(\data |h_{\theta})}{d\theta} &=& \frac{c}{\theta} -
+  \frac{\ell}{1-\theta} = 0 \qquad \implies \quad \theta =
+  \frac{c}{c+\ell} = \frac{c}{\Ncount}
+\end{eqnarray*}}%
+Seems sensible, but causes problems with 0 counts!
+
+
+
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Multiple parameters}
+
+Red/green wrapper depends probabilistically on flavor: \hspace*{0.75in}\epsfxsize=2.25in\raisebox{-2.5in}[0pt][0pt]{\epsffile{\file{figures}{ml-network2.ps}}} 
+
+Likelihood  for, e.g., cherry candy in green wrapper:
+\mat{\begin{eqnarray*}
+\lefteqn{P(\J{F}\eq \J{cherry},\J{W}\eq \J{green}|h_{\theta,\theta_1,\theta_2})}\\
+ & = & P(\J{F}\eq \J{cherry}|h_{\theta,\theta_1,\theta_2})P(\J{W}\eq
+ \J{green}|\J{F}\eq \J{cherry},h_{\theta,\theta_1,\theta_2}) \\
+ & = & \theta \cdot (1-\theta_1)
+\end{eqnarray*}}%
+\(\Ncount\) candies, \(r_c\) red-wrapped cherry candies, etc.:
+\mat{\begin{eqnarray*}
+ P(\data|h_{\theta,\theta_1,\theta_2}) &=&
+  \theta^c (1-\theta)^{\ell} \cdot \theta_1^{r_c}(1-\theta_1)^{g_c}
+  \cdot \theta_2^{r_{\ell}}(1-\theta_2)^{g_{\ell}}
+\end{eqnarray*}}%
+\mat{\begin{eqnarray*}
+L &=&  [c\log \theta + \ell\log (1-\theta) ]  \\
+  &+&   [r_c\log \theta_1 + g_c\log(1-\theta_1) ]  \\
+  &+&   [r_{\ell}\log \theta_2 + g_{\ell}\log(1-\theta_2) ]
+\end{eqnarray*}}%
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Multiple parameters contd.}
+
+Derivatives of \mat{$L$} contain only the relevant parameter:
+\mat{\[\begin{array}{rclcl}
+\displaystyle \frac{\partial L}{\partial\theta} &=& \displaystyle \frac{c}{\theta} - \displaystyle\frac{\ell}{1-\theta} = 0                  & \qquad \implies & \theta = \displaystyle \frac{c}{c+\ell} 
+\end{array}\]}%
+\mat{\[\begin{array}{rclcl}
+\displaystyle \frac{\partial L}{\partial\theta_1} &=& \displaystyle\frac{r_c}{\theta_1} - \displaystyle\frac{g_c}{1-\theta_1} = 0           & \qquad \implies & \theta_1 = \displaystyle\frac{r_c}{r_c+g_c} 
+\end{array}\]}%
+\mat{\[\begin{array}{rclcl}
+\displaystyle \frac{\partial L}{\partial\theta_2} &=& \displaystyle\frac{r_{\ell}}{\theta_2} - \displaystyle\frac{g_{\ell}}{1-\theta_2} = 0 & \qquad \implies & \theta_2 = \displaystyle\frac{r_{\ell}}{r_{\ell}+g_{\ell}}
+\end{array}\]}%
+With \defn{complete data}, \emph{parameters can be learned separately}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: linear Gaussian model}
+
+\twofig{\file{graphs}{regression-model.eps}}{\file{graphs}{regression-sample.eps}}
+
+Maximizing \mat{$\displaystyle P(y|x) = \frac{1}{\sqrt{2 \pi} \sigma} e^{-\frac{(y-(\theta_1 x+\theta_2))^2}{2\sigma^2}}$} w.r.t. \mat{$\theta_1$}, \mat{$\theta_2$}
+
+= minimizing \mat{$\displaystyle E = \sum_{j\eq 1}^{\Ncount} (y_j-(\theta_1 x_j+\theta_2))^2$}
+
+That is, minimizing the sum of squared errors gives the ML solution\\
+for a linear fit \emph{assuming Gaussian noise of fixed variance}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Full Bayesian learning gives best possible predictions but is intractable
+
+MAP learning balances complexity with accuracy on training data 
+
+Maximum likelihood assumes uniform prior, OK for large data sets
+
+1. Choose a parameterized family of models to describe the data\\
+\note{{\em requires substantial insight and sometimes new models}}
+
+2. Write down the likelihood of the data as a function of the parameters\\
+\note{{\em may require summing over hidden variables, i.e., inference}}
+
+3. Write down the derivative of the log likelihood w.r.t. each parameter
+
+4. Find the parameter values such that the derivatives are zero\\
+\note{{\em may be hard/impossible; modern optimization techniques help}}
+
+
+
+\end{huge}
+\end{document}
+
+

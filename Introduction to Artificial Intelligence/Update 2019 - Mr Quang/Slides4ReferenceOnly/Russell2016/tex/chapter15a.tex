@@ -1,0 +1,783 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Temporal probability models}{Chapter 15, Sections 1--5}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Time and uncertainty
+
+\blob Inference: filtering, prediction, smoothing
+
+\blob Hidden Markov models
+
+\blob Kalman filters (a brief mention)
+
+\blob Dynamic Bayesian networks
+
+\blob Particle filtering
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Time and uncertainty}
+
+The world changes; we need to track and predict it
+
+Diabetes management vs vehicle diagnosis
+
+Basic idea: copy state and evidence variables for each time step
+
+\mat{$\X_t$} = set of unobservable state variables at time \mat{$t$}\nl
+    e.g., \mat{$BloodSugar_t$}, \mat{$StomachContents_t$}, etc.
+
+\mat{$\E_t$} = set of observable evidence variables at time \mat{$t$}\al
+    e.g., \mat{$MeasuredBloodSugar_t$}, \mat{$PulseRate_t$}, \mat{$FoodEaten_t$}
+
+This assumes \emph{discrete time}; step size depends on problem
+
+Notation: \mat{$\X_{a:b} = \X_a, \X_{a+1},\ldots,\X_{b-1},\X_b$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Markov processes (Markov chains)}
+
+Construct a Bayes net from these variables: parents?
+
+\defn{Markov assumption}: \mat{$\X_t$} depends on \emph{bounded} subset of \mat{$\X_{0:t-1}$}
+
+\defn{First-order Markov process}: \mat{$\pv(\X_t|\X_{0:t-1}) = \pv(\X_t|\X_{t-1})$}\\
+\defn{Second-order Markov process}: \mat{$\pv(\X_t|\X_{0:t-1}) = \pv(\X_t|\X_{t-2},\X_{t-1})$}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.0\textwidth
+\fig{\file{figures}{markov-processes.ps}}
+
+\defn{Sensor Markov assumption}: \mat{$\pv(\E_t|\X_{0:t},\E_{0:t-1}) =  \pv(\E_t|\X_t)$}
+
+\defn{Stationary} process: transition model \mat{$\pv(\X_t|\X_{t-1})$} and\\
+sensor model \mat{$\pv(\E_t|\X_t)$} fixed for all \mat{$t$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{umbrella-dbn.ps}}
+
+First-order Markov assumption not exactly true in real world!
+
+Possible fixes:\al
+ 1. \emph{Increase order} of Markov process\al
+ 2. \emph{Augment state}, e.g., add \mat{$Temp_t$}, \mat{$Pressure_t$}
+
+Example: robot motion. \al
+  Augment position and velocity with \mat{$Battery_t$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference tasks}
+
+\defn{Filtering}: \mat{$\pv(\X_t|\e_{1:t})$}\al
+  \defn{belief state}---input to the decision process of a rational agent
+
+\defn{Prediction}: \mat{$\pv(\X_{t+k}|\e_{1:t})$} for \mat{$k>0$}\al
+  evaluation of possible action sequences;\al
+  like filtering without the evidence
+
+\defn{Smoothing}: \mat{$\pv(\X_k|\e_{1:t})$} for \mat{$0\leq k < t$}\al
+  better estimate of past states, essential for learning
+
+\defn{Most likely explanation}: \mat{$\arg\max_{\sx_{1:t}} P(\x_{1:t}|\e_{1:t})$}\al
+  speech recognition, decoding with a noisy channel
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Filtering}
+
+Aim: devise a \emph{recursive} state estimation algorithm:
+\mat{\[
+  \pv(\X_{t+1}|\e_{1:t+1}) = f(\e_{t+1},\pv(\X_t|\e_{1:t}))
+\]}
+\mat{\begin{eqnarray*}
+\lefteqn{\pv(\X_{t+1}|\e_{1:t+1}) = \pv(\X_{t+1}|\e_{1:t},\e_{t+1})} \\
+&=& \alpha \pv(\e_{t+1}|\X_{t+1},\e_{1:t})\pv(\X_{t+1}|\e_{1:t}) \\
+&=& \alpha \pv(\e_{t+1}|\X_{t+1})\pv(\X_{t+1}|\e_{1:t})
+\end{eqnarray*}}
+I.e., \defn{prediction} + \defn{estimation}. Prediction by summing out \mat{$\X_t$}:
+\mat{\begin{eqnarray*}
+\lefteqn{\pv(\X_{t+1}|\e_{1:t+1}) = 
+   \alpha \pv(\e_{t+1}|\X_{t+1})
+          \mysum_{\sx_t}\pv(\X_{t+1}|\x_t,\e_{1:t})P(\x_t|\e_{1:t})}\\
+&=& \alpha \pv(\e_{t+1}|\X_{t+1})
+                \mysum_{\sx_t}\pv(\X_{t+1}|\x_t)P(\x_t|\e_{1:t})
+\end{eqnarray*}}
+
+\mat{$\f_{1:t+1} = \noprog{Forward}(\f_{1:t},\e_{t+1})$} where \mat{$\f_{1:t}\eq \pv(\X_t|\e_{1:t})$}\\
+Time and space \emph{constant} (independent of \mat{$t$})
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Filtering example}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{umbrella-filter.ps}}
+
+%%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\heading{Prediction}
+%
+%\mat{$\pv(\X_{t+k+1}|\e_{1:t}) = \mysum_{\sx_{t+k}}\pv(\X_{t+k+1}|\x_{t+k})P(\x_{t+k}|\e_{1:t})$}
+%
+%As \mat{$k\rightarrow\infty$}, \mat{$P(\x_{t+k}|\e_{1:t})$} tends to the \emph{stationary distribution} of the Markov chain
+%
+%Mixing time depends on how \emph{stochastic} the chain is
+%
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Smoothing}
+
+\vspace*{0.05in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{smoothing-dbn.ps}}
+
+\vspace*{-0.1in}
+
+Divide evidence \mat{$\e_{1:t}$} into \mat{$\e_{1:k}$}, \mat{$\e_{k+1:t}$}:
+\mat{\begin{eqnarray*}
+\pv(\X_k|\e_{1:t}) & = & \pv(\X_k|\e_{1:k},\e_{k+1:t})\nonumber\\
+   & = & \alpha \pv(\X_k|\e_{1:k}) \pv(\e_{k+1:t}|\X_k,\e_{1:k}) \\
+   & = & \alpha \pv(\X_k|\e_{1:k}) \pv(\e_{k+1:t}|\X_k) \\
+   & = & \alpha \f_{1:k} \b_{k+1:t} 
+\end{eqnarray*}}
+Backward message computed by a backwards recursion:
+\mat{\begin{eqnarray*}
+\pv(\e_{k+1:t}|\X_k) 
+   & = & \mysum_{\sx_{k+1}}\pv(\e_{k+1:t}|\X_k,\x_{k+1})\pv(\x_{k+1}|\X_k)  \\
+   & = & \mysum_{\sx_{k+1}}P(\e_{k+1:t}|\x_{k+1})\pv(\x_{k+1}|\X_k)  \\
+   & = & \mysum_{\sx_{k+1}}
+           P(\e_{k+1}|\x_{k+1})P(\e_{k+2:t}|\x_{k+1})\pv(\x_{k+1}|\X_k)
+\end{eqnarray*}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Smoothing example}
+
+\vspace*{0.01in}
+
+\epsfxsize=0.72\textwidth
+\fig{\file{figures}{umbrella-smooth.ps}}
+
+\defn{Forward--backward} algorithm: cache forward messages along the way\\
+Time linear in \mat{$t$} (polytree inference), space \mat{$O(t|\f|)$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\heading{Island algorithm}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Most likely explanation}
+
+Most likely sequence \mat{$\neq$} sequence of most likely states!!!!
+
+Most likely path to each \mat{$\x_{t+1}$}\al
+  = most likely path to \emph{some} \mat{$\x_t$} plus one more step
+\mat{\begin{eqnarray*}
+\lefteqn{\max_{\sx_1\ldots\sx_t} \pv(\x_1,\ldots,\x_t,\X_{t+1} | \e_{1:t+1})} \\
+   & = &  \pv(\e_{t+1} | \X_{t+1})
+        \max_{\sx_t}\left( 
+            \pv(\X_{t+1} | \x_t) 
+            \max_{\sx_1\ldots\sx_{t-1}} P(\x_1,\ldots,\x_{t-1},\x_t | \e_{1:t})
+        \right)
+\end{eqnarray*}}
+Identical to filtering, except \mat{$\f_{1:t}$} replaced by
+\mat{\[ 
+  \m_{1:t} = \max_{\sx_1\ldots\sx_{t-1}} \pv(\x_1,\ldots,\x_{t-1},\X_t | \e_{1:t}),
+\]}
+I.e., \mat{$\m_{1:t}(i)$} gives the probability of the most likely path to state \mat{$i$}.\\
+Update has sum replaced by max, giving the \defn{Viterbi algorithm}:
+\mat{\[
+  \m_{1:t+1} = \pv(\e_{t+1} | \X_{t+1})  \max_{\sx_t}\left(
+            \pv(\X_{t+1} | \x_t) \m_{1:t}\right)
+\]}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Viterbi example}
+
+\vspace{0.3in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{umbrella-paths.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hidden Markov models}
+
+\mat{$\X_t$} is a single, discrete variable (usually \mat{$\E_t$} is too)\\
+Domain of \mat{$X_t$} is \mat{$\{1,\ldots,S\}$}
+
+\defn{Transition matrix} \mat{$\T_{ij} = P(X_t\eq j|X_{t-1}\eq i)$}, e.g., \mat{$\left(\begin{array}{cc}0.7 & 0.3 \\ 
+                                                 0.3 & 0.7 \end{array}\right)$}
+
+\defn{Sensor matrix} \mat{$\O_t$} for each time step, diagonal elements \mat{$P(e_t|X_t\eq i)$}\\
+e.g., with \mat{$U_1\eq true$}, \mat{$\O_1 = \left(\begin{array}{cc}0.9 & 0 \\ 0 & 0.2\end{array}\right)$}
+
+Forward and backward messages as column vectors:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \b_{k+1:t} &=& \T \O_{k+1} \b_{k+2:t}
+\end{eqnarray*}}
+Forward-backward algorithm needs time \mat{$O(S^2t)$} and space \mat{$O(St)$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance01.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance02.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance03.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance04.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance05.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance06.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance07.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance08.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance09.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Country dance algorithm}
+
+Can avoid storing all forward messages in smoothing by running\\
+forward algorithm backwards:
+\mat{\begin{eqnarray*}
+  \f_{1:t+1} &=& \alpha \O_{t+1} \T\transpose \f_{1:t} \\
+  \O_{t+1}^{-1} \f_{1:t+1} &=& \alpha \T\transpose \f_{1:t} \\
+  \alpha' (\T\transpose)^{-1} \O_{t+1}^{-1} \f_{1:t+1} &=&  \f_{1:t} 
+\end{eqnarray*}}
+Algorithm: forward pass computes \mat{$\f_t$}, backward pass does \mat{$\f_i$}, \mat{$\b_i$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\sfile{figures}{country-dance10.ps}}
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Kalman filters}
+
+Modelling systems described by a set of continuous variables,\al
+e.g., tracking a bird flying---\mat{$\X_t\eq X, Y, Z, \dot X,\dot Y,\dot Z$}.\al
+Airplanes, robots, ecosystems, economies, chemical plants, planets, \mat{$\ldots$}
+
+\vspace{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{kalman-network.ps}}
+
+Gaussian prior, linear Gaussian transition model and sensor model
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Updating Gaussian distributions}
+
+Prediction step: if \mat{$\pv(\X_t|\e_{1:t})$} is Gaussian, then prediction
+\mat{\[
+   \pv(\X_{t+1}|\e_{1:t}) =
+  \int_{\sx_t}\pv(\X_{t+1}|\x_t)P(\x_t|\e_{1:t}) \,d\x_t
+\]}
+is Gaussian. If \mat{$\pv(\X_{t+1}|\e_{1:t})$} is Gaussian, then the updated distribution
+\mat{\[
+  \pv(\X_{t+1}|\e_{1:t+1}) =
+  \alpha \pv(\e_{t+1}|\X_{t+1}) \pv(\X_{t+1}|\e_{1:t})
+\]}
+is Gaussian
+
+Hence \mat{$\pv(\X_t|\e_{1:t})$} is multivariate Gaussian \mat{$N(\mean_t,\covariance_t)$} for all \mat{$t$}
+
+General (nonlinear, non-Gaussian) process:
+description of posterior grows \emph{unboundedly} as \mat{$t\rightarrow\infty$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Simple 1-D example}
+
+Gaussian random walk on \mat{$X$}--axis, s.d.~\mat{$\sigma_x$}, sensor s.d.~\mat{$\sigma_z$}
+\mat{\[
+\mu_{t+1} = \frac{(\sigma_t^2+\sigma_x^2)z_{t+1} + \sigma_z^2\mu_t}
+                   {\sigma_t^2+\sigma_x^2+\sigma_z^2}
+\qquad\qquad 
+\sigma_{t+1}^2 = \frac{(\sigma_t^2+\sigma_x^2)\sigma_z^2}
+                        {\sigma_t^2+\sigma_x^2+\sigma_z^2}
+\]}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{graphs}{kalman-one-step.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{General Kalman update}
+
+Transition and sensor models:
+\mat{\[
+\begin{array}{rcl}
+  P(\x_{t+1}|\x_t) & = & N(\kftm \x_t,\kftv)(\x_{t+1}) \\
+  P(\z_t|\x_t) & = & N(\kfsm \x_t,\kfsv)(\z_t) 
+\end{array}
+\]}
+\mat{$\kftm$} is the matrix for the transition; \mat{$\kftv$} the transition noise covariance\\
+\mat{$\kfsm$} is the matrix for the sensors; \mat{$\kfsv$} the sensor noise covariance
+
+Filter computes the following update:
+\mat{\[
+\begin{array}{rcl}
+\mean_{t+1} &=& \kftm\mean_t + \kfgm_{t+1}(\z_{t+1} - \kfsm\kftm\mean_t)\\
+\covariance_{t+1} &=& (\I-\kfgm_{t+1})(\kftm\covariance_t\kftm\transpose+\kftv)
+\end{array}
+\]}
+where \mat{$\kfgm_{t+1}\eq (\kftm\covariance_t\kftm\transpose+\kftv)
+\kfsm\transpose(\kfsm(\kftm\covariance_t\kftm\transpose+\kftv)\kfsm\transpose+\kfsv)^{-1}$}\\
+is the \defn{Kalman gain matrix}
+
+\mat{$\covariance_t$} and \mat{$\kfgm_t$} are independent of observation sequence, so compute offline
+
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{2-D tracking example: filtering}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.8\maxfigwidth
+\fig{\file{figures}{kalman-filtering.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{2-D tracking example: smoothing}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.8\maxfigwidth
+\fig{\file{figures}{kalman-smoothing.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Where it breaks}
+
+Cannot be applied if the transition model is nonlinear
+
+\defn{Extended Kalman Filter} models transition as \emph{locally linear} around \mat{$\x_t\eq \mean_t$}\\
+Fails if systems is locally unsmooth
+
+\vspace{0.2in}
+
+\twofig{\file{figures}{kalman-bird1.ps}}{\file{figures}{kalman-bird2.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Dynamic Bayesian networks}
+
+\mat{$\X_t$}, \mat{$\E_t$} contain arbitrarily many variables in a replicated Bayes net
+
+\vspace{0.2in}
+
+\twofig{\file{figures}{umbrella-1slice.ps}}{\file{figures}{robot-dbn1.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{DBNs vs. HMMs}
+
+Every HMM is a single-variable DBN; every discrete DBN is an HMM
+
+\vspace*{0.2in}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{figures}{dbn-vs-hmm.ps}}
+
+Sparse dependencies \mat{$\Rightarrow$} exponentially fewer parameters;\al
+e.g., 20 state variables, three parents each\al
+DBN has \mat{$20\stimes2^3\eq 160$} parameters, HMM has \mat{$2^{20}\stimes 2^{20}\approx 10^{12}$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{DBNs vs Kalman filters}
+
+Every Kalman filter model is a DBN, but few DBNs are KFs;\\
+real world requires non-Gaussian posteriors
+
+E.g., where are bin Laden and my keys? What's the battery charge?
+
+\vspace{0.2in}
+
+\twofig{\file{figures}{robot-full-dbn.ps}}{\file{graphs}{battery8.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Exact inference in DBNs}
+
+Naive method: \defn{unroll} the network and run any exact algorithm
+
+\vspace*{0.2in}
+
+\epsfxsize=1.0\textwidth
+\fig{\file{figures}{dbn-unrolling.ps}}
+
+Problem: inference cost for each update grows with \mat{$t$}
+
+\defn{Rollup filtering}: add slice \mat{$t+1$}, ``sum out'' slice \mat{$t$} using variable elimination
+
+Largest factor is \mat{$O(d^{n+1})$}, update cost \mat{$O(d^{n+2})$}\\
+(cf. HMM update cost \mat{$O(d^{2n})$})
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Likelihood weighting for DBNs}
+
+Set of weighted samples approximates the belief state
+
+\vspace*{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{umbrella5.ps}}
+
+LW samples pay no attention to the evidence!\nl
+   \mat{$\Rightarrow$} fraction ``agreeing'' falls exponentially with \mat{$t$}\nl
+   \mat{$\Rightarrow$} number of samples required grows exponentially with \mat{$t$}
+
+\vspace*{0.0in}
+
+\epsfxsize=0.4\textwidth
+\fig{\file{graphs}{umbrella-lw.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Particle filtering}
+
+Basic idea: ensure that the population of samples (``particles'')\\
+tracks the high-likelihood regions of the state-space
+
+Replicate particles proportional to likelihood for \mat{$\e_t$}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{figures}{umbrella-particle.ps}}
+
+Widely used for tracking nonlinear systems, esp. in vision
+
+Also used for simultaneous localization and mapping in mobile robots\al
+ \mat{$10^5$}-dimensional state space
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Particle filtering contd.}
+
+Assume consistent at time \mat{$t$}: \mat{$N(\x_t|\e_{1:t})/N = P(\x_t|\e_{1:t})$}
+
+Propagate forward: populations of \mat{$\x_{t+1}$} are
+\mat{\[
+  N(\x_{t+1}|\e_{1:t}) = \mysum_{\sx_t} P(\x_{t+1}|\x_t) N(\x_t|\e_{1:t})   
+\]}
+Weight samples by their likelihood for \mat{$\e_{t+1}$}:
+\mat{\[
+  W(\x_{t+1}|\e_{1:t+1}) = P(\e_{t+1}|\x_{t+1}) N(\x_{t+1}|\e_{1:t}) 
+\]}
+Resample to obtain populations proportional to \mat{$W$}:
+\mat{\begin{eqnarray*}
+  N(\x_{t+1}|\e_{1:t+1})/N 
+    &=&  \alpha W(\x_{t+1}|\e_{1:t+1}) = \alpha P(\e_{t+1}|\x_{t+1}) N(\x_{t+1}|\e_{1:t}) \\
+    &=&  \alpha P(\e_{t+1}|\x_{t+1}) 
+            \mysum_{\sx_t} P(\x_{t+1}|\x_t) N(\x_t|\e_{1:t})\\
+    &=&  \alpha' P(\e_{t+1}|\x_{t+1}) 
+            \mysum_{\sx_t} P(\x_{t+1}|\x_t) P(\x_t|\e_{1:t}) \\
+    &=&  P(\x_{t+1}|\e_{1:t+1})
+\end{eqnarray*}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Particle filtering performance}
+
+Approximation error of particle filtering remains bounded over time,\\
+at least empirically---theoretical analysis is difficult
+
+\vspace*{0.3in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{graphs}{comparison-lw-ersof.ps}}
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Temporal models use state and sensor variables replicated over time
+
+Markov assumptions and stationarity assumption, so we need\al
+ -- transition model\mat{$\pv(\X_t|\X_{t-1})$}\al
+ -- sensor model \mat{$\pv(\E_t|\X_t)$}
+
+Tasks are filtering, prediction, smoothing, most likely sequence;\\
+\emph{all done recursively with constant cost per time step}
+
+
+Hidden Markov models have a single discrete state variable; used\\
+for speech recognition
+
+Kalman filters allow \mat{$n$} state variables, linear Gaussian, \mat{$O(n^3)$} update
+
+Dynamic Bayes nets subsume HMMs, Kalman filters; exact update intractable
+
+Particle filtering is a good approximate filtering algorithm for DBNs
+
+
+
+\end{huge} 
+\end{document}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Island algorithm}
+
+Idea: run forward-backward storing \mat{$\f_t$}, \mat{$\b_t$} at only \mat{$k-1$} points\\
+Call recursively (depth-first) on \mat{$k$} subtasks
+
+\vspace{0.3in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{island.ps}}
+
+\mat{$O(k|\f|\log_k t)$} space, \mat{$O(k\log_k t)$} more time 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Online fixed-lag smoothing}
+
+\vspace{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{fixed-lag-smoothing.ps}}
+
+Obvious method runs forward--backward for \mat{$d$} steps each time
+
+Recursively compute \mat{$\f_{1:t-d+1},\ \b_{t-d+2:t+1}$} from \mat{$\f_{1:t-d},\ \b_{t-d+1:t}$} ?
+
+Forward message OK, backward message not directly obtainable
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Online fixed-lag smoothing contd.}
+
+Define \mat{$\B_{j:k} = \myprod_{i\eq j}^k \T \O_i$}, so 
+\mat{\begin{eqnarray*}
+  \b_{t-d+1:t} &=&  \B_{t-d+1:t} \ones\\
+  \b_{t-d+2:t+1} &=&  \B_{t-d+2:t+1} \ones
+\end{eqnarray*}}
+Now we can get a recursive update for \mat{$\B$}:
+\mat{\[
+  \B_{t-d+2:t+1} = \O_{t-d+1}^{-1} \T^{-1} \B_{t-d+1:t} \T\O_{t+1}
+\]}
+Hence update cost is constant, independent of lag \mat{$d$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Approximate inference in DBNs}
+
+Particle filtering (Gordon, 1994; Kanazawa, Koller, and Russell, 1995; Blake and Isard, 1996)
+
+Factored approximation (Boyen and Koller, 1999)
+
+Loopy propagation (Pearl, 1988; Yedidia, Freeman, and Weiss, 2000)
+
+Variational approximation (Ghahramani and Jordan, 1997)
+
+Decayed MCMC (unpublished)
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Evidence reversal}
+
+Better to propose new samples conditioned on the new evidence\\
+Minimizes the variance of the posterior estimates (Kong \& Liu, 1996)
+
+\vspace*{0.2in}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{umbrella5-er.ps}}
+
+\vspace*{0.4in}
+
+\epsfxsize=0.5\textwidth
+\fig{\file{graphs}{step-all-25.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: DBN for speech recognition}
+
+\vspace{0.5in}
+
+\epsfxsize=1.1\textwidth
+\fig{\file{figures}{speech-dbn.ps}}
+
+Also easy to add variables for, e.g., gender, accent, speed.\\
+Zweig and Russell (1998) show up to 40\% error reduction over HMMs
+

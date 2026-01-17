@@ -1,0 +1,17 @@
+\code{
+\func{MCMC-Ask}{\v{X}{\ac}\mbf{e}{\ac}\v{bn}{\ac}\v{N}}{an estimate of $P(X|\mbf{e})$}
+    \firstlocal{$\mbf{N}[\v{X}]$}{a vector of counts over \v{X}, initially zero}
+    \local{\mbf{Z}}{the nonevidence variables in \v{bn}}
+    \local{\mbf{x}}{the current state of the network, initially copied from \mbf{e}}
+\bodysep
+    initialize \v{\mbf{x}} with random values for the variables in \v{\mbf{Y}}
+    \k{for} \v{j} = 1 to $N$ \k{do}
+          \setq{$\mbf{N}[\v{x}]$}{$\mbf{N}[\v{x}]+1$} where \v{x} is the value of \v{X} in \mbf{x}
+          \k{for each} $Z_i$ in \v{\mbf{Z}} \k{do}
+                sample the value of $Z_i$ in \mbf{x} from $\pv(Z_i|MB(Z_i))$ given the values of $MB(Z_i)$ in \mbf{x}
+    \k{return} \prog{Normalize}($\mbf{N}[\v{X}]$)
+}
+
+
+
+

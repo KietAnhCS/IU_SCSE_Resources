@@ -1,0 +1,197 @@
+<%@page import="Beans.Account"%>
+<%@page import="Beans.Product"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+        <title>C&S Fashion</title>
+        <link rel="stylesheet" href="style.css" type="text/css" charset="utf-8" />
+        <SCRIPT TYPE="text/javascript">
+            var request;
+            function getRequestObject() {
+                if (window.ActiveXObject) {
+                    return(new ActiveXObject("Microsoft.XMLHTTP"));
+                } else if (window.XMLHttpRequest) {
+                    return(new XMLHttpRequest());
+                } else {
+                    return(null);
+                }
+            }
+
+            function checkUsername() {
+                username = registerForm.userName.value;
+                request = getRequestObject();
+                request.onreadystatechange = handleResponse;
+                request.open("POST", "LoginServlet?action=checkUsername&username=" + username,true);
+                request.send(null);
+            }
+
+            function handleResponse() {
+                if (request.readyState == 4 ) {
+                    var text =  request.responseText;
+                    var text2 =  <%=session.getAttribute("test")%>;
+                    if(text == "false" ||  text2.toString() == "false"){
+                        alert("Your input username is already registed by other ! Please get another one.");
+                        registerForm.userName.value = "";
+                        registerForm.userName.focus();
+                    }else if (text2.toString() == "null"){
+                        registerForm.fullName.focus();
+                    }
+                    else {
+                        alert("Your input username is available.");
+                        registerForm.userName.focus();
+                    }
+                }
+            }
+            function checkInput(){
+                var fullName = registerForm.fullName;
+                if(fullName.value == ""){
+                    alert("Missing fullname");
+                    return false;
+                    fullName.focus();}
+
+                var email = registerForm.email;
+                em = /\w+\@+\w+\.+\w/ ;
+                if(em.test(email.value) == false ){
+                    alert("Please enter your real email !");
+                    email.value ="";
+                    email.focus();
+                    return false;
+
+                }
+
+                var phoneNum = registerForm.phoneNum.value;
+                if(phoneNum.toString().length < 8 || phoneNum.toString().length > 12){
+                    alert("The phone number should be more than 7 numbers and less than 13 numbers !");
+                    return false;
+                }
+
+                for(var i = 0; i < phoneNum.toString().length ; i++){
+                    var test  = parseInt(phoneNum.toString().charAt(i));
+                    if(!( test >= 0)){
+                        alert("The phone number should be a number !");
+                        return false;
+                    }
+                }
+
+
+                var userName = registerForm.userName;
+                if(userName.value == "" ){
+                    alert("Missing userName");
+                    userName.focus();
+                    return false;
+                }
+                if(userName.value.toString().length < 4 || userName.value.toString().length > 13 ){
+                    alert("Username should be more than 4 and less than 13 characters.");
+                    return false;
+                }
+
+                var password = registerForm.password;
+                var rePassword = registerForm.rePassword;
+
+                if(password.value == "" || rePassword.value == "" || password.value != rePassword.value){
+                    alert("password is not correct or missing");
+                    return false;
+                }
+                if(password.value.toString().length < 6 ){
+                    alert("password should be more than or equal to 6 characters.");
+                    return false;
+                }
+            }
+
+        </SCRIPT>
+    </head>
+
+    <body onload="checkUsername()">
+        <div id="wrapper">
+
+            <div id="header">
+                <div id="logo">
+                    <h1>C&S Fashion</h1>
+                    <p>Let's refresh your style !!! </p>
+                    <img></img>
+                </div>
+                <div id="nav">
+                    <ul>
+                        <li><a href="Homepage.jsp">Home Page</a> | </li>
+                        <li><a href="AboutUs.jsp">About Us</a> | </li>
+                        <li><a href="NewProducts.jsp">Products</a> | </li>
+                        <li><a href="Contact.jsp">Contact</a> | </li>
+                        <li><a href="Searchpage.jsp">Search</a></li>
+                        <%if (session.getAttribute("loggedIn") != "true") {%>
+                        <li style="float: right; padding-right: 10px"><a href="Login.jsp" >Login | <a href="Register.jsp">Register</a></a></li>
+                        <%} else {
+                            Account account = (Account)session.getAttribute("account");%>
+                        <li style="float: right; padding-right: 10px">Hi ! <%=account.getUsername()%><a href="LoginServlet?action=logout">,&emsp;Log out</a></li>
+                        <%}%>
+                    </ul>
+                </div>
+                <div id="gallery">
+                    <ul>
+                        <li class="gwomen"><a href="http://google.com"></a></li>
+                        <li class="gkids"><a href="http://google.com"></a></li>
+                        <li class="gmen"><a href="http://google.com"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="body">
+                <div id="categories">
+                    <h2>Categories</h2>
+                    <ul>
+                        <li><a href="Men.jsp">Men</a></li>
+                        <li><a href="Women.jsp">Women</a></li>
+                        <li><a href="Kid.jsp">Kid</a></li>
+                        <li><a href="Hat.jsp">Hat</a></li>
+                        <li><a href="Shoes.jsp">Shoes</a></li>
+                    </ul>
+                </div>
+                <div id="content">
+                    <div class="inner">
+                        <h1><center>Input information to register free account from our website </center></h1>
+                        <form action="LoginServlet?action=register" method="post" id="registerForm" onsubmit="return checkInput()">
+                            <center><table>
+                                <tr><td/>Your Full-name<td/><input type="text" name="fullname" id="fullName"/></tr>
+                                <tr><td/>Email<td/><input type="text" name="email" id="email"/></tr>
+                                <tr><td/>Phone Number<td/><input type="text" name="phonenum" id="phoneNum"/></tr>
+                                <tr><td/>Username<td/><input type="text" name="username" id="userName"/><input type="button" onclick="checkUsername()" value="Check Availability"/></tr>
+                                <tr><td/>Password<td/><input type="password" name="password" id="password"/> </tr>
+                                <tr><td/>Re-enter Password<td/><input type="password" name="rePassword" id="rePassword"/></tr>
+                                <tr><td colspan="2" align="center"/><input type="submit" value="Register" onclick="return checkUsername()"/></tr>
+                            </table></center>
+                        </form>
+                    </div>
+                </div>
+                <div id="right">
+                    <div class="cart">
+                        <div id="cart-top">
+                            <div id="cart-bot">
+                                <div id="cart-cart">
+                                    <a href="YourCart.jsp" style=" color:#000">Your Cart</a>
+                                    <%if (session.getAttribute("NumOfItem") == null) {
+                                                    session.setAttribute("NumOfItem", 0);
+                                                    session.setAttribute("totalPrice", 0);
+                                                }%>
+                                    <p class="orange">Items : <%=session.getAttribute("NumOfItem")%></p>
+                                    <p class="orange">Total price : $<%=session.getAttribute("totalPrice") %></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                        <h2>Online assistance</h2>
+                        <p style="text-align: left;"><a href="ymsgr:sendIM?hugo_lina_113"><img src="http://mail.opi.yahoo.com/online?u=hugo_lina_113&amp;m=g&amp;t=14" alt="" width="139" height="107" /></a></p>
+                        <p style="text-align: left;">&nbsp; &nbsp;&nbsp; Sell Manager </p>
+                        <p style="text-align: left;">&nbsp;Ng?c Son - <span class="phone">01267474468</span></p>
+                </div>
+                <div class="clear"> </div>
+            </div>
+            <div id="copyright">
+                <p>Copyright &copy; 2010. Design by Son.</p>
+            </div>
+        </div>
+    </body>
+</html>

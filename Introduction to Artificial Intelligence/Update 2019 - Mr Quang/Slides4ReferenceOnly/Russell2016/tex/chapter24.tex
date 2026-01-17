@@ -1,0 +1,535 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Vision}{Chapter 24}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Perception generally
+
+\blob Image formation
+
+\blob Early vision
+
+\blob 2D \mat{$\rightarrow$} 3D
+
+\blob Object recognition
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Perception generally}
+
+\defn{Stimulus} (percept) \mat{$S$}, World \mat{$W$}
+\mat{\[
+  S = g(W)
+\]}%
+E.g., \mat{$g$} = ``graphics.'' Can we do vision as inverse graphics?
+\mat{\[
+  W = g^{-1}(S)
+\]}%
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Perception generally}
+
+\defn{Stimulus} (percept) \mat{$S$}, World \mat{$W$}
+\mat{\[
+  S = g(W)
+\]}%
+E.g., \mat{$g$} = ``graphics.'' Can we do vision as inverse graphics?
+\mat{\[
+  W = g^{-1}(S)
+\]}%
+Problem: massive ambiguity!
+
+\vspace*{0.2in}
+
+\epsfxsize=1.0\textwidth
+\fig{\sfile{figures}{lecture-scene1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Perception generally}
+
+\defn{Stimulus} (percept) \mat{$S$}, World \mat{$W$}
+\mat{\[
+  S = g(W)
+\]}%
+E.g., \mat{$g$} = ``graphics.'' Can we do vision as inverse graphics?
+\mat{\[
+  W = g^{-1}(S)
+\]}%
+Problem: massive ambiguity!
+
+\vspace*{0.2in}
+
+\epsfxsize=1.0\textwidth
+\fig{\sfile{figures}{lecture-scene2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Perception generally}
+
+\defn{Stimulus} (percept) \mat{$S$}, World \mat{$W$}
+\mat{\[
+  S = g(W)
+\]}%
+E.g., \mat{$g$} = ``graphics.'' Can we do vision as inverse graphics?
+\mat{\[
+  W = g^{-1}(S)
+\]}%
+Problem: massive ambiguity!
+
+\vspace*{0.2in}
+
+\epsfxsize=1.0\textwidth
+\fig{\sfile{figures}{lecture-scene3.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Better approaches}
+
+Bayesian inference of world configurations:
+\mat{\[
+  P(W|S) = \alpha \underbrace{P(S|W)}_{\mbox{``graphics''}}\quad \underbrace{P(W)}_{\mbox{``prior knowledge''}}
+\]}%
+Better still: no need to recover exact scene!\\
+Just extract information needed for\al
+ -- \defn{navigation}\al
+ -- \defn{manipulation}\al
+ -- \defn{recognition/identification}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Vision ``subsystems''}
+
+\vspace*{0.2in}
+
+\epsfxsize=1.0\textwidth
+\fig{\file{figures}{vision-subsystems.ps}}
+
+Vision requires combining multiple cues
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Image formation}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{pinhole.ps}}
+
+\mat{$P$} is a point in the scene, with coordinates \mat{$ (X,Y,Z)$}\\
+\mat{$P'$} is its image on the image plane, with coordinates \mat{$ (x,y,z)$}
+\mat{\[x=\frac{-fX}{Z},\ y=\frac{-fY}{Z}  \]}%
+by similar triangles. Scale/distance is indeterminate!
+  
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Images}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.85\textwidth
+\fig{\file{figures}{stapler1+square.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Images contd.}
+
+\vspace*{0.2in}
+
+\twofig{\file{figures}{pixels-12x12.ps}}{\file{figures}{pixel-values.ps}}
+
+\mat{$I(x,y,t)$} is the intensity at \mat{$(x,y)$} at time \mat{$t$}
+
+CCD camera \mat{$\approx$} 1,000,000 pixels; human eyes \mat{$\approx$} 240,000,000 pixels\\
+i.e., 0.25 terabits/sec
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Color vision}
+
+Intensity varies with frequency \mat{$\rightarrow$} infinite-dimensional signal
+
+\vspace*{0.2in}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{color-vision.ps}}
+
+Human eye has three types of color-sensitive cells;\\
+each integrates the signal \mat{$\implies$} 3-element vector intensity
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Edge detection}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{figures}{stapler1.edge-test.ps}}
+
+\vspace*{-1in}
+
+Edges in image \mat{$\Leftarrow$} discontinuities in scene:\al
+1) depth\al
+2) surface orientation\al
+3) reflectance (surface markings)\al
+4) illumination (shadows, etc.)
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Edge detection contd.}
+
+1) Convolve image with spatially oriented filters (possibly multi-scale)
+\mat{\[
+  E_{\theta}(x,y) = \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f_{\theta}(u,v) I(x+u,y+v)\,du\,dv
+\]}%
+
+\vspace*{-0.3in}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{spatially-oriented-filters.ps}}
+
+\vspace*{-0.3in}
+
+2) Label above-threshold pixels with edge orientation
+
+3) Infer ``clean'' line segments by combining edge pixels with same orientation
+
+\vspace*{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{edgels.ps}}
+
+  
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Cues from prior knowledge}
+
+\begin{tabular}{l|l}
+\tabbot {\bf Shape from}\mat{$\ldots$} & {\bf Assumes} \\
+\hline
+\tabtop motion & rigid bodies, continuous motion \\
+stereo & solid, contiguous, non-repeating bodies \\
+texture & uniform texture \\
+shading & uniform reflectance \\
+contour & minimum curvature
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Motion}
+
+%Shape determines optical flow due to a moving body
+
+\vspace*{0.1in}
+
+\centerline{%
+\epsfxsize=0.3\textwidth
+\noindent\epsffile{\file{figures}{Rubic.00.ps}}%
+\hspace*{0.04\textwidth}%
+\epsfxsize=0.3\textwidth
+\epsffile{\file{figures}{Rubic.19.ps}}}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.4\textwidth
+\fig{\file{figures}{Rubic.flow.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Stereo}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.85\textwidth
+\fig{\file{figures}{stereo-pyramid.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Stereo depth resolution}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.9\textwidth
+\fig{\file{figures}{stereopsis.ps}}
+
+Simple geometry: \mat{$\delta Z = Z^2 \delta \theta/(-b)$}\\
+Physiology: \mat{$\delta\theta \geq 2.42\times 10^{-5}$} radians, \mat{$b\eq 6$}cm
+
+\mat{$Z\eq 30$}cm \mat{$\implies \delta Z \approx 0.04$}mm\\
+\mat{$Z\eq 30$}m \mat{$\implies \delta Z \approx 40$}cm
+
+Large baseline \mat{$\implies$} better resolution!
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Texture}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{chem-test.ps}}
+
+Idea: assume actual texture is uniform, compute surface shape that would produce this distortion
+
+Similar idea works for shading---assume uniform reflectance, etc.---\emph{but}\\
+interreflections give nonlocal computation of perceived intensity\\
+\mat{$\implies$} hollows seem shallower than they really are
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Edge and vertex types}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{diff-labels.ps}}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{trihedral.ps}}
+
+Assume world of solid polyhedral objects with trihedral vertices
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Vertex/edge labels}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{vertex-a.ps}}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.5\textwidth
+\fig{\file{figures}{huffman-clowes.ps}}
+
+
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling01.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling02.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling03.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling04.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling05.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling06.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling07.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling08.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling09.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling06.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling10.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling11.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling12.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling10.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%% %%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \heading{Vertex/edge labelling example}
+%% 
+%% \vspace*{0.2in}
+%% 
+%% \twofig{\sfile{figures}{edge-labelling13.ps}}{\file{figures}{huffman-clowes.ps}}
+%% 
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Vertex/edge labelling example}
+
+\vspace*{0.2in}
+
+\twofig{\sfile{figures}{edge-labelling14.ps}}{\file{figures}{huffman-clowes.ps}}
+
+CSP: variables = edges, constraints = possible node configurations
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Object recognition}
+
+Simple idea:\al
+-- extract 3-D shapes from image\al
+-- match against ``shape library''
+
+Problems:\al
+-- extracting curved surfaces from image\al
+-- representing shape of extracted object\al
+-- representing shape and variability of library object classes\al
+-- improper segmentation, occlusion\al
+-- unknown illumination, shadows, markings, noise, complexity, etc.
+
+Approaches:\al
+-- index into library by measuring invariant properties of objects\al
+-- alignment of image feature with projected library object feature\al
+-- match image against multiple stored views (\emph{aspects}) of library object\al
+-- machine learning methods based on image statistics
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Handwritten digit recognition}
+
+\noindent\framebox[\textwidth]{%
+\begin{minipage}{\maxfigwidth}%
+\noindent{\fboxsep=0.4pt
+\framebox{\epsfflex{0.095}{figures/easy21c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/easy23c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/easy16c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/easy12c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/easy20c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/easy35c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/easy13c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/easy29c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/easy17c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/easy19c.eps}}\\[6pt]
+\framebox{\epsfflex{0.095}{figures/hard53c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/hard04c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/hard20c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/hard13c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/hard01c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/hard10c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/hard34c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/hard52c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/hard05c.eps}}\hfill
+\framebox{\epsfflex{0.095}{figures/hard14c.eps}}}
+\end{minipage}}
+
+3-nearest-neighbor = 2.4\% error\\
+400--300--10 unit MLP = 1.6\% error\\
+LeNet: 768--192--30--10 unit MLP = 0.9\% error
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Shape-context matching}
+
+Basic idea: convert \emph{shape} (a relational concept) into\\
+a fixed set of \emph{attributes} using the \defn{spatial context}\\
+of each of a fixed set of points on the surface of the shape.
+
+\threefig{figures/exampleA3.eps}{figures/exampleA4.eps}{figures/bin_grid.eps}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Shape-context matching contd.}
+
+Each point is described by its local context histogram\\
+(number of points falling into each log-polar grid bin)
+
+\threefig{figures/exampleA6.eps}{figures/exampleA8.eps}{figures/exampleA7.eps}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Shape-context matching contd.}
+
+Determine total distance between shapes by sum of distances for
+corresponding points under best matching
+
+\epsfxsize=0.3\textwidth
+\fig{figures/exampleA5.eps}
+
+Simple nearest-neighbor learning gives 0.63\% error rate on NIST digit data
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Vision is hard---noise, ambiguity, complexity
+
+Prior knowledge is essential to constrain the problem
+
+Need to combine multiple cues: motion, contour, shading, texture, stereo
+
+``Library'' object representation: shape vs.~aspects
+
+Image/object matching: features, lines, regions, etc.
+
+
+
+
+\end{huge}
+\end{document}
+
+

@@ -1,0 +1,111 @@
+<%@ page import="java.sql.*" %>
+<%@ page import="java.io.*" %>
+<%!
+  public void jspInit() {
+    try {
+      Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+    }
+    catch (ClassNotFoundException e) {
+    }
+  }
+%>
+<HTML>
+<HEAD>
+<TITLE>Product Category Admin Page</TITLE>
+</HEAD>
+
+<BODY>
+<H1>Add, Update, Delete Categories</H1>
+<BR><BR>
+<B>Add New Category</B>
+<BR>
+<FORM METHOD=POST>
+<INPUT TYPE=HIDDEN NAME=action VALUE=add>
+<INPUT TYPE=TEXT NAME=category SIZE=14>
+<INPUT TYPE=SUBMIT VALUE=Add>
+</FORM>
+<HR>
+<BR>
+<%
+  String id = request.getParameter("id");
+  String category = request.getParameter("category");
+  String action = request.getParameter("action");
+  String sql;
+  StringBuffer categories = new StringBuffer(2048);
+  //Open the Categories table
+  try {
+    Connection con = DriverManager.getConnection("jdbc:odbc:JavaWeb");
+    Statement s = con.createStatement();
+    ResultSet rs;
+    if (action!=null && action.equals("add")) {
+      sql = "SELECT CategoryName FROM Categories WHERE CategoryName='" + category + "'";
+      rs = s.executeQuery(sql);
+      if (!rs.next()) {
+        sql = "INSERT INTO Categories (CategoryName) VALUES ('" + category + "')";
+        s.executeUpdate(sql);
+      }
+      else
+        out.println(category + " is already in the database");
+    }
+    else if (action!=null && action.equals("delete")) {
+      sql = "DELETE FROM Categories WHERE CategoryID=" + id;
+      s.executeUpdate(sql);
+    }
+    else if (action!=null && action.equals("update")) {
+      sql = "UPDATE Categories SET CategoryName='" + category + "'" +
+        " WHERE CategoryId=" + id;
+      s.executeUpdate(sql);
+    }
+
+    sql = "SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryName ASC";
+    rs = s.executeQuery(sql);
+
+    // Now list all categories plus the DELETE and UPDATE buttons
+    out.println("<TABLE>");
+    while (rs.next()) {
+      id = rs.getString(1);
+      category = rs.getString(2);
+%>
+
+<TR>
+<TD>
+<FORM METHOD=POST>
+<INPUT TYPE=HIDDEN NAME=id VALUE="<%=id%>">
+<INPUT TYPE=HIDDEN NAME=action VALUE="update">
+<INPUT TYPE=TEXT NAME=category VALUE="<%=category%>">
+<INPUT TYPE=SUBMIT VALUE=Update>
+</FORM>
+</TD>
+<TD>
+<FORM METHOD=POST>
+<INPUT TYPE=HIDDEN NAME=id VALUE="<%=id%>">
+<INPUT TYPE=HIDDEN NAME=action VALUE="delete">
+<INPUT TYPE=SUBMIT VALUE=Delete>
+</FORM>
+</TD>
+</TR>
+<%
+      categories.append("<OPTION VALUE=").append(id).append(">");
+      categories.append(category).append("</OPTION>\n");
+    }
+
+    out.println("</TABLE>");
+    s.close();
+    con.close();
+
+
+    //Create a text file called Categories.txt in the specified folder
+    String path = "C:\\123data\\";
+    FileWriter fw = new FileWriter(path + "categories.txt");
+    fw.write(categories.toString());
+    fw.close();
+  }
+  catch (SQLException e) {
+    out.println(e.toString());
+  }
+  catch (Exception e) {
+    out.println(e.toString());
+  }
+%>
+</BODY>
+</HTML>

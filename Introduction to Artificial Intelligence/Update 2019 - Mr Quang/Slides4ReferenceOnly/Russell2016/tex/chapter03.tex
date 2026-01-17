@@ -1,0 +1,930 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Problem solving and search}{Chapter 3}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Reminders}
+
+\emph{Assignment 0 due 5pm today}
+
+\emph{Assignment 1 posted}, due 2/9
+
+\note{Section 105 will move to 9-10am} starting next week
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Problem-solving agents
+
+\blob Problem types
+
+\blob Problem formulation
+
+\blob Example problems
+
+\blob Basic search algorithms
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Problem-solving agents}
+
+Restricted form of general agent:
+
+\input{\file{algorithms}{simple-PS-agent-algorithm}}
+
+Note: this is \note{offline} problem solving; solution executed ``eyes closed.''\\
+\note{Online} problem solving involves acting without complete knowledge.
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: Romania}
+
+On holiday in Romania; currently in Arad.\\
+Flight leaves tomorrow from Bucharest
+
+\note{Formulate goal}:\nl
+be in Bucharest
+
+\note{Formulate problem}:\nl
+\note{states}: various cities\nl
+\note{actions}: drive between cities
+
+\note{Find solution}:\nl
+sequence of cities, e.g., Arad, Sibiu, Fagaras, Bucharest
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: Romania}
+
+
+\epsfxsize=1.08\maxfigwidth
+\fig{\file{figures}{romania-distances.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Problem types}
+
+\note{Deterministic, fully observable} $\Longrightarrow$ \defn{single-state problem}\nl
+    Agent knows exactly which state it will be in; solution is a sequence
+
+\note{Non-observable} $\Longrightarrow$ \defn{conformant problem}\nl
+    Agent may have no idea where it is; solution (if any) is a sequence
+
+\note{Nondeterministic} and/or \note{partially observable} $\Longrightarrow$ \defn{contingency problem}\nl
+percepts provide \emph{new} information about current state\nl
+solution is a \defn{contingent plan} or a \defn{policy} \nl
+often \emph{interleave} search, execution
+
+\note{Unknown state space} $\Longrightarrow$ \defn{exploration problem} (``online'')
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: vacuum world}
+
+\begin{tabular}{lr}
+\hbox{\begin{minipage}[t]{0.6\textwidth}
+\note{Single-state}, start in \#5. \q{Solution} 
+\end{minipage}}
+&
+\hbox{\begin{minipage}[t]{0.4\maxfigwidth}
+\epsfxsize=0.4\maxfigwidth
+\raisebox{-0.35\maxfigwidth}[0pt][0pt]{\epsffile{\file{figures}{vacuum2-space.ps}}}
+\end{minipage}}
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: vacuum world}
+
+\begin{tabular}{lr}
+\hbox{\begin{minipage}[t]{0.6\textwidth}
+\note{Single-state}, start in \#5. \q{Solution} 
+\\
+\mat{$[Right,Suck]$}
+\\[0.5\baselineskip]
+\note{Conformant}, start in \mat{$\{1,2,3,4,5,6,7,8\}$}\\
+e.g., \mat{$Right$} goes to \mat{$\{2,4,6,8\}$}. \q{Solution}
+\end{minipage}}
+&
+\hbox{\begin{minipage}[t]{0.4\maxfigwidth}
+\epsfxsize=0.4\maxfigwidth
+\raisebox{-0.35\maxfigwidth}[0pt][0pt]{\epsffile{\file{figures}{vacuum2-space.ps}}}
+\end{minipage}}
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: vacuum world}
+
+\begin{tabular}{lr}
+\hbox{\begin{minipage}[t]{0.6\textwidth}
+\note{Single-state}, start in \#5. \q{Solution} 
+\\
+\mat{$[Right,Suck]$}
+\\[0.5\baselineskip]
+\note{Conformant}, start in \mat{$\{1,2,3,4,5,6,7,8\}$}\\
+e.g., \mat{$Right$} goes to \mat{$\{2,4,6,8\}$}. \q{Solution}
+\\
+\mat{$[Right,Suck,Left,Suck]$}
+\\[0.5\baselineskip]
+\note{Contingency}, start in \#5\\
+Murphy's Law: \mat{$Suck$} can dirty a clean carpet\\
+Local sensing: dirt, location only.\\
+\q{Solution}
+\end{minipage}}
+&
+\hbox{\begin{minipage}[t]{0.4\maxfigwidth}
+\epsfxsize=0.4\maxfigwidth
+\raisebox{-0.35\maxfigwidth}[0pt][0pt]{\epsffile{\file{figures}{vacuum2-space.ps}}}
+\end{minipage}}
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: vacuum world}
+
+\begin{tabular}{lr}
+\hbox{\begin{minipage}[t]{0.6\textwidth}
+\note{Single-state}, start in \#5. \q{Solution} 
+\\
+\mat{$[Right,Suck]$}
+\\[0.5\baselineskip]
+\note{Conformant}, start in \mat{$\{1,2,3,4,5,6,7,8\}$}\\
+e.g., \mat{$Right$} goes to \mat{$\{2,4,6,8\}$}. \q{Solution}
+\\
+\mat{$[Right,Suck,Left,Suck]$}
+\\[0.5\baselineskip]
+\note{Contingency}, start in \#5\\
+Murphy's Law: \mat{$Suck$} can dirty a clean carpet\\
+Local sensing: dirt, location only.\\
+\q{Solution}
+\\
+\mat{$[Right,\k{if}\ dirt\ \k{then}\ Suck]$}
+\end{minipage}}
+&
+\hbox{\begin{minipage}[t]{0.4\maxfigwidth}
+\epsfxsize=0.4\maxfigwidth
+\raisebox{-0.35\maxfigwidth}[0pt][0pt]{\epsffile{\file{figures}{vacuum2-space.ps}}}
+\end{minipage}}
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Single-state problem formulation}
+
+A \defn{problem} is defined by four items:
+
+\defn{initial state} \quad e.g., ``at Arad''
+
+\defn{successor function} \mat{$S(x)$} = set of action--state pairs \nl
+e.g., \mat{$S(Arad) = \{\<Arad\rightarrow Zerind, Zerind\>, \ldots \}$}
+
+\defn{goal test}, can be\nl
+\note{explicit}, e.g., \mat{$x$} = ``at Bucharest''\nl
+\note{implicit}, e.g., \mat{$NoDirt(x)$}
+
+\defn{path cost} (additive)\nl
+e.g., sum of distances, number of actions executed, etc.\nl
+\mat{$c(x,a,y)$} is the \defn{step cost}, assumed to be \mat{$\geq 0$}
+
+A \defn{solution} is a sequence of actions\\
+leading from the initial state to a goal state
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Selecting a state space}
+
+Real world is absurdly complex \nl
+$\Rightarrow$ state space must be \emph{abstracted} for problem solving
+
+(Abstract) state = set of real states
+
+(Abstract) action = complex combination of real actions\nl
+   e.g., ``Arad $\rightarrow$ Zerind'' represents a complex set\nnl
+   of possible routes, detours, rest stops, etc. \\
+For guaranteed realizability, \emph{any} real state ``in Arad''\al
+must get to \note{some} real state ``in Zerind''
+
+(Abstract) solution = \nl
+   set of real paths that are solutions in the real world
+
+Each abstract action should be ``easier'' than the original problem!
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: vacuum world state space graph}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{vacuum2-paths.ps}}
+
+\q{states}\\
+\q{actions}\\
+\q{goal test}\\
+\q{path cost}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: vacuum world state space graph}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{vacuum2-paths.ps}}
+
+\q{states}: integer dirt and robot locations (ignore dirt \note{amounts} etc.)\\
+\q{actions}\\
+\q{goal test}\\
+\q{path cost}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: vacuum world state space graph}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{vacuum2-paths.ps}}
+
+\q{states}: integer dirt and robot locations (ignore dirt \note{amounts} etc.)\\
+\q{actions}: \mat{$Left$}, \mat{$Right$}, \mat{$Suck$}, \mat{$NoOp$}\\
+\q{goal test}\\
+\q{path cost}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: vacuum world state space graph}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{vacuum2-paths.ps}}
+
+\q{states}: integer dirt and robot locations (ignore dirt \note{amounts} etc.)\\
+\q{actions}: \mat{$Left$}, \mat{$Right$}, \mat{$Suck$}, \mat{$NoOp$}\\
+\q{goal test}: no dirt\\
+\q{path cost}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: vacuum world state space graph}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{vacuum2-paths.ps}}
+
+\q{states}: integer dirt and robot locations (ignore dirt \note{amounts} etc.)\\
+\q{actions}: \mat{$Left$}, \mat{$Right$}, \mat{$Suck$}, \mat{$NoOp$}\\
+\q{goal test}: no dirt\\
+\q{path cost}: 1 per action (0 for \mat{$NoOp$})
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: The 8-puzzle}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{8puzzle.ps}}
+
+\q{states}\\
+\q{actions}\\
+\q{goal test}\\
+\q{path cost}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: The 8-puzzle}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{8puzzle.ps}}
+
+\q{states}: integer locations of tiles (ignore intermediate positions)\\
+\q{actions}\\
+\q{goal test}\\
+\q{path cost}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: The 8-puzzle}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{8puzzle.ps}}
+
+\q{states}: integer locations of tiles (ignore intermediate positions)\\
+\q{actions}: move blank left, right, up, down (ignore unjamming etc.)\\
+\q{goal test}\\
+\q{path cost}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: The 8-puzzle}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{8puzzle.ps}}
+
+\q{states}: integer locations of tiles (ignore intermediate positions)\\
+\q{actions}: move blank left, right, up, down (ignore unjamming etc.)\\
+\q{goal test}: = goal state (given)\\
+\q{path cost}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: The 8-puzzle}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{8puzzle.ps}}
+
+\q{states}: integer locations of tiles (ignore intermediate positions)\\
+\q{actions}: move blank left, right, up, down (ignore unjamming etc.)\\
+\q{goal test}: = goal state (given)\\
+\q{path cost}: 1 per move
+
+[Note: optimal solution of $n$-Puzzle family is NP-hard]
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: robotic assembly}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{figures}{stanford-arm+blocks.ps}}
+
+\q{states}: real-valued coordinates of robot joint angles\nl
+parts of the object to be assembled
+
+\q{actions}: continuous motions of robot joints
+
+\q{goal test}: complete assembly \emph{with no robot included!}
+
+\q{path cost}: time to execute
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Tree search algorithms}
+
+Basic idea:\al
+offline, simulated exploration of state space\al
+by generating successors of already-explored states\nnl
+(a.k.a.~\defn{expanding} states)
+
+\input{\file{algorithms}{informal-ts-algorithm}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Tree search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.0\textwidth
+\fig{\sfile{figures}{search-map1.ps}}
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Tree search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.0\textwidth
+\fig{\sfile{figures}{search-map2.ps}}
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Tree search example}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.0\textwidth
+\fig{\sfile{figures}{search-map3.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Implementation: states vs.~nodes}
+
+A \defn{state} is a (representation of) a physical configuration\\
+A \defn{node} is a data structure constituting part of a search tree\nl
+    includes \note{parent}, \note{children}, \note{depth}, \note{path cost} \mat{$g(x)$}\\
+States do not have parents, children, depth, or path cost!
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{state-vs-node.ps}}
+
+The {\sc Expand} function creates new nodes, filling in the various
+fields and using the {\sc SuccessorFn} of the
+problem to create the corresponding states.
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Implementation: general tree search}
+
+\input{\file{algorithms}{tree-search-algorithm}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Search strategies}
+
+A strategy is defined by picking the \emph{order of node expansion}
+
+Strategies are evaluated along the following dimensions:\nl
+\defn{completeness}---does it always find a solution if one exists?\nl
+\defn{time complexity}---number of nodes generated/expanded\nl
+\defn{space complexity}---maximum number of nodes in memory\nl
+\defn{optimality}---does it always find a least-cost solution?
+
+Time and space complexity are measured in terms of\nl
+\mat{$b$}---maximum branching factor of the search tree\nl
+\mat{$d$}---depth of the least-cost solution\nl
+\mat{$m$}---maximum depth of the state space (may be \mat{$\infty$})
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Uninformed search strategies}
+
+\defn{Uninformed} strategies use only the information available\\
+in the problem definition
+
+Breadth-first search
+
+Uniform-cost search
+
+Depth-first search
+
+Depth-limited search
+
+Iterative deepening search
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Breadth-first search}
+
+Expand shallowest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} is a FIFO queue, i.e., new successors go at end
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{bfs-progress1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Breadth-first search}
+
+Expand shallowest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} is a FIFO queue, i.e., new successors go at end
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{bfs-progress2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Breadth-first search}
+
+Expand shallowest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} is a FIFO queue, i.e., new successors go at end
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{bfs-progress3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Breadth-first search}
+
+Expand shallowest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} is a FIFO queue, i.e., new successors go at end
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{bfs-progress4.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of breadth-first search}
+
+\q{Complete} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of breadth-first search}
+
+\q{Complete} Yes (if \mat{$b$} is finite)
+
+\q{Time} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of breadth-first search}
+
+\q{Complete} Yes (if \mat{$b$} is finite)
+
+\q{Time} \mat{$1+b+b^2+b^3+\ldots +b^d + b(b^d-1)= O(b^{d+1})$}, i.e., exp.~in \mat{$d$}
+
+\q{Space} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of breadth-first search}
+
+\q{Complete} Yes (if \mat{$b$} is finite)
+
+\q{Time} \mat{$1+b+b^2+b^3+\ldots +b^d + b(b^d-1)= O(b^{d+1})$}, i.e., exp.~in \mat{$d$}
+
+\q{Space} \mat{$O(b^{d+1})$} (keeps every node in memory)
+
+\q{Optimal} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of breadth-first search}
+
+\q{Complete} Yes (if \mat{$b$} is finite)
+
+\q{Time} \mat{$1+b+b^2+b^3+\ldots +b^d + b(b^d-1)= O(b^{d+1})$}, i.e., exp.~in \mat{$d$}
+
+\q{Space} \mat{$O(b^{d+1})$} (keeps every node in memory)
+
+\q{Optimal} Yes (if cost = 1 per step); not optimal in general
+
+\emph{Space} is the big problem; can easily generate nodes at 100MB/sec\nl
+so 24hrs = 8640GB.
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Uniform-cost search}
+
+Expand least-cost unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = queue ordered by path cost, lowest first
+
+Equivalent to breadth-first if step costs all equal
+
+\q{Complete} Yes, if step cost \mat{$\geq \epsilon$}
+
+\q{Time} \# of nodes with \mat{$g \leq {}$} cost of optimal solution, \mat{$O(b^{\ceiling{C^*/\epsilon}})$}\al
+where \mat{$C^*$} is the cost of the optimal solution
+
+\q{Space} \# of nodes with \mat{$g \leq {}$} cost of optimal solution, \mat{$O(b^{\ceiling{C^*/\epsilon}})$}
+
+\q{Optimal} Yes---nodes expanded in increasing order of \mat{$g(n)$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress01.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress02.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress03.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress04.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress05.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress06.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress07.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress08.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress09.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress10.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress11.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-first search}
+
+Expand deepest unexpanded node
+
+\emph{Implementation}:\nl
+\v{fringe} = LIFO queue, i.e., put successors at front
+
+\epsfxsize=0.5\textwidth
+\fig{\sfile{figures}{dfs-progress12.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of depth-first search}
+
+\q{Complete} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of depth-first search}
+
+\q{Complete} No: fails in infinite-depth spaces, spaces with loops\nl
+Modify to avoid repeated states along path\nnl
+$\Rightarrow$ complete in finite spaces
+
+\q{Time} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of depth-first search}
+
+\q{Complete} No: fails in infinite-depth spaces, spaces with loops\nl
+Modify to avoid repeated states along path\nnl
+$\Rightarrow$ complete in finite spaces
+
+\q{Time} \mat{$O(b^m)$}: terrible if \mat{$m$} is much larger than \mat{$d$}\nl
+        but if solutions are dense, may be much faster than breadth-first
+
+\q{Space}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of depth-first search}
+
+\q{Complete} No: fails in infinite-depth spaces, spaces with loops\nl
+Modify to avoid repeated states along path\nnl
+$\Rightarrow$ complete in finite spaces
+
+\q{Time} \mat{$O(b^m)$}: terrible if \mat{$m$} is much larger than \mat{$d$}\nl
+        but if solutions are dense, may be much faster than breadth-first
+
+\q{Space} \mat{$O(bm)$}, i.e., linear space!
+
+\q{Optimal} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of depth-first search}
+
+\q{Complete} No: fails in infinite-depth spaces, spaces with loops\nl
+Modify to avoid repeated states along path\nnl
+$\Rightarrow$ complete in finite spaces
+
+\q{Time} \mat{$O(b^m)$}: terrible if \mat{$m$} is much larger than \mat{$d$}\nl
+        but if solutions are dense, may be much faster than breadth-first
+
+\q{Space} \mat{$O(bm)$}, i.e., linear space!
+
+\q{Optimal} No
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Depth-limited search}
+
+= depth-first search with depth limit \mat{$l$},\\
+i.e., nodes at depth \mat{$l$} have no successors
+
+\emph{Recursive implementation}: 
+
+\input{\file{algorithms}{recursive-dls-algorithm}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Iterative deepening search}
+
+\input{\file{algorithms}{ids-algorithm}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Iterative deepening search \mat{$l=0$}}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{ids-progress1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Iterative deepening search \mat{$l=1$}}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{ids-progress2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Iterative deepening search \mat{$l=2$}}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{ids-progress3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Iterative deepening search \mat{$l=3$}}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.1\textwidth
+\fig{\sfile{figures}{ids-progress4.ps}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of iterative deepening search}
+
+\q{Complete} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of iterative deepening search}
+
+\q{Complete} Yes
+
+\q{Time} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of iterative deepening search}
+
+\q{Complete} Yes
+
+\q{Time} \mat{$(d+1)b^0 + d b^1 + (d-1)b^2 + \ldots + b^d = O(b^d)$}
+
+\q{Space} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of iterative deepening search}
+
+\q{Complete} Yes
+
+\q{Time} \mat{$(d+1)b^0 + d b^1 + (d-1)b^2 + \ldots + b^d = O(b^d)$}
+
+\q{Space} \mat{$O(bd)$}
+
+\q{Optimal} 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of iterative deepening search}
+
+\q{Complete} Yes
+
+\q{Time} \mat{$(d+1)b^0 + d b^1 + (d-1)b^2 + \ldots + b^d = O(b^d)$}
+
+\q{Space} \mat{$O(bd)$}
+
+\q{Optimal} Yes, if step cost = 1\nl
+Can be modified to explore uniform-cost tree
+
+Numerical comparison for \mat{$b=10$} and \mat{$d=5$}, solution at far right leaf:
+\mat{\begin{eqnarray*}
+N(\mbox{IDS}) &=& 50 + 400 + 3,000 + 20,000 + 100,000 = 123,450 \\
+N(\mbox{BFS}) &=& 10 + 100 + 1,000 + 10,000 + 100,000 + 999,990 = 1,111,100
+\end{eqnarray*}}
+
+IDS does better because other nodes at depth \mat{$d$} are not expanded
+
+BFS can be modified to apply goal test when a node is \emph{generated}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary of algorithms}
+
+\input{\file{tables}{search-summary-table}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Repeated states}
+
+Failure to detect repeated states can turn a linear problem into an
+exponential one!
+
+\vspace*{0.3in}
+
+\epsfxsize=0.7\maxfigwidth
+\fig{\file{figures}{ribbon-space.ps}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Graph search}
+
+\input{\file{algorithms}{graph-search-algorithm}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Problem formulation usually requires abstracting away real-world details
+to define a state space that can feasibly be explored
+
+Variety of uninformed search strategies
+
+Iterative deepening search uses only linear space\\
+and not much more time than other uninformed algorithms
+
+Graph search can be exponentially more efficient than tree search
+
+\end{huge}
+\end{document}
+
+
+
+
+
+
+

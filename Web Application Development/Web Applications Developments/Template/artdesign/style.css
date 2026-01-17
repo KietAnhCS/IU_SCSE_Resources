@@ -1,0 +1,299 @@
+@charset "utf-8";
+/* @group Reset */
+html,body {
+background:#fff;
+margin:0;
+padding:0;
+}
+
+* {
+	margin:0;
+	padding:0;
+	color: #9FA11D;
+	border-bottom-style: none;
+}
+
+body {
+font-family:"trebuchet ms", "Lucida Sans Unicode", "LucidaGrande", Verdana, Sans-serif;
+font-size:98%;
+color:#333;
+text-align:left;
+background-image: url(images/bg_header.jpg);
+background-repeat: no-repeat;
+background-position: center top;
+}
+
+a img {
+border:none;
+}
+
+#extra h2 {
+color:#46525E;
+font-size:1.1em;
+font-family:"Lucida Sans Unicode", "LucidaGrande", Verdana, Sans-serif;
+padding:6px 0 5px 21px;
+}
+
+#content p,#extra p,#body2 p {
+color:#444;
+font-size:0.8em;
+line-height:1.8;
+padding:0 25px 10px 21px;
+}
+
+#extra p {
+padding:5px 25px 15px 21px;
+}
+
+#extra {
+	float:right;
+	width:315px;
+}
+
+#body2 {
+width:890px;
+color:#444;
+background:#fff;
+margin:0 auto;
+}
+
+#content h1,#body2 h1,#body2 h2 {
+color:#46525E;
+background:transparent;
+font-size:1.1em;
+font-family:"Lucida Sans Unicode", "LucidaGrande", Verdana, Sans-serif;
+padding:6px 0 14px 21px;
+}
+
+#content .img {
+border:1px solid #ddd;
+margin:0 8px 5px 21px;
+padding:3px;
+}
+
+#content .leftimg,#body2 .leftimg {
+float:left;
+background-color:#E5E5E5;
+margin:0 8px 0 21px;
+padding:4px;
+}
+
+#content a:hover .leftimg,#body2 a:hover .leftimg {
+float:left;
+background-color:#FF9900;
+margin:0 8px 0 21px;
+padding:4px;
+}
+
+#extra .rightimg {
+	float:left;
+	background-color:#FFF;
+	margin:0 8px 0 0;
+	padding:4px;
+	border: 1px solid #DDDCE1;
+}
+
+#extra a:hover .rightimg {
+float:left;
+background-color:#DDD;
+margin:0 8px 0 0;
+padding:4px;
+}
+
+#extra .blocimg {
+background-color:#E5E5E5;
+margin:0 8px 0 0;
+padding:4px;
+}
+
+#body ul li {
+line-height:1.5em;
+font-size:.8em;
+color:#444;
+margin:0 25px 0 60px;
+padding:0;
+}
+#content ul li {
+line-height:1.5em;
+font-size:0.8em;
+color:#444;
+margin:0 25px 10px 30px;
+}
+
+h1 {
+letter-spacing:-1px;
+font-size:30px;
+}
+
+h2 {
+font-size:24px;
+color:#B94244;
+}
+
+h3 {
+font-size:13px;
+color:#292929;
+}
+
+a {
+text-decoration:none;
+background-color:#FFF;
+color:red;
+}
+
+a:link {
+color:#8BA11D;
+}
+
+a:visited {
+color:red;
+background-color:#FFF;
+}
+
+a:hover {
+color:#333;
+background-color:transparent;
+text-decoration:none;
+}
+
+p,ul,ol {
+	margin-bottom:2em;
+	text-align:justify;
+	line-height:200%;
+}
+
+img {
+border:none;
+}
+
+.tn img {
+border:8px solid #F5F5F5;
+}
+
+hr {
+display:none;
+}
+
+/* Logo */
+#logo {
+width:890px;
+height:147px;
+margin:0 auto;
+}
+
+#logo h1 {
+float:left;
+height:54px;
+font-size:38px;
+font-weight:400;
+letter-spacing:-2px;
+padding:0 37px 0 0;
+}
+
+#logo h2 {
+	float:left;
+	text-transform:lowercase;
+	font-weight:400;
+	font-size:16px;
+	color:#333;
+	height:135px;
+	width:460px;
+	padding:10px 0 0;
+}
+
+#logo a {
+text-decoration:none;
+color:#333;
+}
+
+/* Menu */
+#menu {
+width:919px;
+height:60px;
+margin:0 auto;
+}
+
+#menu ul {
+list-style:none;
+line-height:normal;
+margin:0;
+padding:10px 0 0;
+}
+
+#menu li {
+display:inline;
+}
+
+#menu a {
+	display:block;
+	float:left;
+	height:35px;
+	text-transform:none;
+	text-decoration:none;
+	font-size:1em;
+	font-weight:400;
+	color:#666666;
+	margin:0 10px;
+	padding:5px 20px 0;
+	background-color: #F5F5F5;
+}
+
+#menu ul li a:hover {
+	color:#FFFFFF;
+	background-color: #FFCFCE;
+}
+
+#menu .active a {
+	background-color: #FFCFCE;
+}
+
+/* Page */
+#page {
+width:918px;
+margin:0 auto;
+}
+
+/* Content */
+#content {
+float:left;
+width:550px;
+padding:0 0 0 24px;
+}
+
+/*------------ end header --------------- 
+
+/*------------------------------------------------footer--------------------*/
+#footer {
+	width: 960px;
+	height: 83px;
+	margin: 0 auto;
+	border-top-width: thin;
+	border-top-style: dotted;
+	border-top-color: #E5E5E5;
+}
+
+#footer p {
+	padding-top: 20px;
+	text-align: center;
+	font-size: .8em;
+	font-weight: bold;
+}
+a.link,
+a:visited.link {
+	background: white;
+	border-bottom: 1px dotted #6e99bf;
+	color: #02689b;
+	line-height: 1.6em;
+	outline: none;
+	padding: 1px;
+	text-decoration: none;
+}
+a:hover.link,
+a:focus.link {
+	background: #eaf3f8;
+	color: black;
+	text-decoration: none;
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	border-bottom-color: #E30078;
+}

@@ -1,0 +1,820 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Communication and Language}{Chapter 22}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Communication
+
+\blob Grammar
+
+\blob Syntactic analysis
+
+\blob Problems
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Communication}
+
+``Classical'' view (pre-1953):\al
+   language consists of sentences that are true/false (cf.~logic)
+
+``Modern'' view (post-1953):\al
+   language is a form of action
+
+Wittgenstein (1953) \emph{Philosophical Investigations}\\
+Austin (1962) \emph{How to Do Things with Words}\\
+Searle (1969) \emph{Speech Acts}
+
+Why?
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Communication}
+
+``Classical'' view (pre-1953):\al
+   language consists of sentences that are true/false (cf.~logic)
+
+``Modern'' view (post-1953):\al
+   language is a form of action
+
+Wittgenstein (1953) \emph{Philosophical Investigations}\\
+Austin (1962) \emph{How to Do Things with Words}\\
+Searle (1969) \emph{Speech Acts}
+
+Why? \hspace*{5.5in}\epsfxsize=2in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{lamppost.ps}}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Communication}
+
+``Classical'' view (pre-1953):\al
+   language consists of sentences that are true/false (cf.~logic)
+
+``Modern'' view (post-1953):\al
+   language is a form of action
+
+Wittgenstein (1953) \emph{Philosophical Investigations}\\
+Austin (1962) \emph{How to Do Things with Words}\\
+Searle (1969) \emph{Speech Acts}
+
+Why? \hspace*{5.5in}\epsfxsize=2in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{lamppost+dog.ps}}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Communication}
+
+``Classical'' view (pre-1953):\al
+   language consists of sentences that are true/false (cf.~logic)
+
+``Modern'' view (post-1953):\al
+   language is a form of action
+
+Wittgenstein (1953) \emph{Philosophical Investigations}\\
+Austin (1962) \emph{How to Do Things with Words}\\
+Searle (1969) \emph{Speech Acts}
+
+Why? \hspace*{5.5in}\epsfxsize=2in\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{lamppost+dog.ps}}}
+
+\emph{To change the actions of other agents}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Speech acts}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{figures}{utterance.ps}}
+
+Speech acts achieve the speaker's goals:\al
+\begin{tabular}{ll}
+  \emph{Inform} & ``There's a pit in front of you'' \\
+  \emph{Query}  & ``Can you see the gold?'' \\
+  \emph{Command} & ``Pick it up'' \\
+  \emph{Promise} & ``I'll share the gold with you'' \\
+  \emph{Acknowledge} & ``OK''
+\end{tabular}
+
+Speech act planning requires knowledge of\al
+-- Situation \al
+-- Semantic and syntactic conventions \al
+-- Hearer's goals, knowledge base, and rationality
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Stages in communication (informing)}
+
+\begin{tabular}{ll}
+  \emph{Intention} & S wants to inform H that \mat{$P$}  \\
+  \emph{Generation} & S selects words \mat{$W$} to express \mat{$P$}  in context  \mat{$C$}  \\
+  \emph{Synthesis} & S utters words \mat{$W$}  \\
+         &   \\
+  \emph{Perception} & H perceives \mat{$W'$} in context  \mat{$C'$}  \\
+  \emph{Analysis} & H infers possible meanings \mat{$P_1,\ldots P_n$}  \\
+  \emph{Disambiguation} & H infers intended meaning \mat{$P_i$}  \\
+  \emph{Incorporation} & H incorporates \mat{$P_i$} into KB
+\end{tabular}
+
+How could this go wrong?  
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Stages in communication (informing)}
+
+\begin{tabular}{ll}
+  \emph{Intention} & S wants to inform H that \mat{$P$}  \\
+  \emph{Generation} & S selects words \mat{$W$} to express \mat{$P$} in context  \mat{$C$}\\
+  \emph{Synthesis} & S utters words \mat{$W$}  \\
+         &   \\
+  \emph{Perception} & H perceives \mat{$W'$} in context  \mat{$C'$} \\
+  \emph{Analysis} & H infers possible meanings \mat{$P_1,\ldots P_n$}  \\
+  \emph{Disambiguation} & H infers intended meaning \mat{$P_i$}  \\
+  \emph{Incorporation} & H incorporates \mat{$P_i$} into KB
+\end{tabular}
+
+How could this go wrong?  \al
+-- Insincerity (S doesn't believe \mat{$P$})\al
+-- Speech wreck ignition failure \al
+-- Ambiguous utterance \al
+-- Differing understanding of current context (\mat{$C\neq C'$})\al
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Grammar}
+
+Vervet monkeys, antelopes etc.~use isolated symbols for sentences\al
+\mat{$\implies$} restricted set of communicable propositions, no \defn{generative capacity}\\
+(Chomsky (1957): \emph{Syntactic Structures})
+
+
+\defn{Grammar} specifies the compositional structure of complex messages\al
+e.g., speech (linear), text (linear), music (two-dimensional)
+
+A \defn{formal language} is a set of \defn{strings} of \defn{terminal symbols}
+
+Each string in the language can be analyzed/generated by the grammar
+
+The grammar is a set of \defn{rewrite rules}, e.g.,
+\begin{formula}
+ \bnf{S} \bnfeq \bnf{NP} \bl \bnf{VP} \\
+ \bnf{Article} \bnfeq \bnft{the \bnfor a \bnfor an} \bnfor \ldots
+\end{formula}
+Here \mat{$\bnf{S}$} is the \defn{sentence} symbol, \mat{$\bnf{NP}$} and \mat{$\bnf{VP}$} are \defn{nonterminals}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Grammar types}
+
+\defn{Regular}: \mat{$\bnf{nonterminal} \bnfeq \bnft{terminal} [\bnf{nonterminal}]$}
+\begin{formula}
+  \bnf{S} \bnfeq \bnft{a}\bnf{S}\\
+  \bnf{S} \bnfeq \Lambda
+\end{formula}
+
+\defn{Context-free}: \mat{$\bnf{nonterminal} \bnfeq \bnf{anything} $}
+\begin{formula}
+  \bnf{S} \bnfeq \bnft{a}\bnf{S}\bnft{b}
+\end{formula}
+
+\defn{Context-sensitive}: more nonterminals on right-hand side
+\begin{formula}
+  \bnf{A} \bnf{S} \bnf{B} \bnfeq \bnf{A} \bnf{A} \bnft{a} \bnf{B}\bnf{B}
+\end{formula}
+
+\defn{Recursively enumerable}: no constraints
+
+Related to Post systems and Kleene systems of rewrite rules
+
+Natural languages probably context-free, parsable in real time!
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus lexicon}
+
+\vspace*{-0.5in}
+
+\begin{eqnarray*}
+\bnf{Noun} & \bnfeq & \bnft{stench \bnfor breeze \bnfor glitter \bnfor nothing} \\
+        & &\bnfor \bnft{wumpus \bnfor pit \bnfor pits\bnfor gold \bnfor east} \bnfor \ldots \\
+\bnf{Verb} & \bnfeq & \bnft{is \bnfor see \bnfor smell \bnfor shoot \bnfor feel \bnfor stinks}\\
+        & &\bnfor \bnft{go \bnfor grab \bnfor carry \bnfor kill \bnfor turn} \bnfor \ldots \\
+\bnf{Adjective} & \bnfeq & \bnft{right \bnfor left \bnfor east \bnfor south \bnfor back \bnfor smelly} \bnfor \ldots \\
+\bnf{Adverb} & \bnfeq & \bnft{here \bnfor there \bnfor nearby \bnfor ahead} \\
+        &&\bnfor \bnft{right \bnfor left \bnfor east \bnfor south \bnfor back} \bnfor \ldots \\
+\bnf{Pronoun} & \bnfeq & \bnft{me \bnfor you \bnfor I \bnfor it} \bnfor \ldots \\
+\bnf{Name} & \bnfeq & \bnft{John} \bnfor \bnft{Mary} \bnfor \bnft{Boston}
+	\bnfor \bnft{UCB} \bnfor \bnft{PAJC} \bnfor \ldots \\
+\bnf{Article} & \bnfeq & \bnft{the \bnfor a \bnfor an} \bnfor \ldots \\
+\bnf{Preposition} & \bnfeq & \bnft{to \bnfor in \bnfor on \bnfor near} \bnfor \ldots \\
+\bnf{Conjunction} & \bnfeq & \bnft{and \bnfor or \bnfor but} \bnfor \ldots \\
+\bnf{Digit} & \bnfeq & \bnft{0\bnfor 1\bnfor 2\bnfor 3\bnfor 4\bnfor 5\bnfor 6\bnfor 7\bnfor 8\bnfor 9}
+\end{eqnarray*}
+Divided into \defn{closed} and \defn{open} classes
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus lexicon}
+
+\vspace*{-0.5in}
+
+\begin{eqnarray*}
+\bnf{Noun} & \bnfeq & \bnft{stench \bnfor breeze \bnfor glitter \bnfor nothing} \\
+        & &\bnfor \bnft{wumpus \bnfor pit \bnfor pits\bnfor gold \bnfor east} \bnfor \ldots \\
+\bnf{Verb} & \bnfeq & \bnft{is \bnfor see \bnfor smell \bnfor shoot \bnfor feel \bnfor stinks}\\
+        & &\bnfor \bnft{go \bnfor grab \bnfor carry \bnfor kill \bnfor turn} \bnfor \ldots \\
+\bnf{Adjective} & \bnfeq & \bnft{right \bnfor left \bnfor east \bnfor south \bnfor back \bnfor smelly} \bnfor \ldots \\
+\bnf{Adverb} & \bnfeq & \bnft{here \bnfor there \bnfor nearby \bnfor ahead} \\
+        &&\bnfor \bnft{right \bnfor left \bnfor east \bnfor south \bnfor back} \bnfor \ldots \\
+\bnf{Pronoun} & \bnfeq & \bnft{me \bnfor you \bnfor I \bnfor it \bnfor \mat{S/HE} \bnfor \mat{Y'ALL}} \ldots \\
+\bnf{Name} & \bnfeq & \bnft{John} \bnfor \bnft{Mary} \bnfor \bnft{Boston}
+	\bnfor \bnft{UCB} \bnfor \bnft{PAJC} \bnfor \ldots \\
+\bnf{Article} & \bnfeq & \bnft{the \bnfor a \bnfor an} \bnfor \ldots \\
+\bnf{Preposition} & \bnfeq & \bnft{to \bnfor in \bnfor on \bnfor near} \bnfor \ldots \\
+\bnf{Conjunction} & \bnfeq & \bnft{and \bnfor or \bnfor but} \bnfor \ldots \\
+\bnf{Digit} & \bnfeq & \bnft{0\bnfor 1\bnfor 2\bnfor 3\bnfor 4\bnfor 5\bnfor 6\bnfor 7\bnfor 8\bnfor 9}
+\end{eqnarray*}
+Divided into \defn{closed} and \defn{open} classes
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus grammar}
+
+\vspace*{-0.2in}
+
+\[ \begin{array}{rclcl}
+\bnf{S} &\bnfeq& \bnf{NP}  \bl \bnf{VP}             && \mbox{I + feel a breeze }\\  
+        & \bnfor & \bnf{S} \bl \bnf{Conjunction} \bl \bnf{S} && \mbox{I feel a
+breeze + and + I smell a wumpus}\\[0.2in]
+\bnf{NP} &\bnfeq& \bnf{Pronoun}                 && \mbox{I }\\
+        & \bnfor & \bnf{Noun}                   && \mbox{pits }\\
+        & \bnfor & \bnf{Article} \bl  \bnf{Noun}    && \mbox{the + wumpus }\\
+	& \bnfor & \bnf{Digit}\bl  \bnf{Digit}	&& \mbox{3 4} \\
+        & \bnfor & \bnf{NP} \bl  \bnf{PP}     && \mbox{the wumpus + to the east}\\
+	& \bnfor & \bnf{NP} \bl \bnf{RelClause} && \mbox{the wumpus + that is smelly} \\[0.2in]
+\bnf{VP} & \bnfeq & \bnf{Verb}                   && \mbox{stinks}\\
+        & \bnfor & \bnf{VP} \bl  \bnf{NP}            && \mbox{feel + a breeze}\\
+        & \bnfor & \bnf{VP} \bl  \bnf{Adjective}     && \mbox{is + smelly}\\
+        & \bnfor & \bnf{VP} \bl  \bnf{PP}            && \mbox{turn + to the east}\\
+        & \bnfor & \bnf{VP} \bl  \bnf{Adverb}        && \mbox{go + ahead}\\[0.2in]
+\bnf{PP} & \bnfeq & \bnf{Preposition}  \bl \bnf{NP}  && \mbox{to + the east}\\
+\rule[-9pt]{0pt}{10pt}\bnf{RelClause} & \bnfeq & \bnft{that} \bl \bnf{VP} &&\mbox{that + is smelly}\\
+\end{array}\]
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Grammaticality judgements}
+
+Formal language \mat{$L_1$} may differ from natural language \mat{$L_2$}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.6\textwidth
+\fig{\file{figures}{language-learning.ps}}
+
+Adjusting \mat{$L_1$} to agree with \mat{$L_2$} is a learning problem!
+
+\begin{tabular}{ll}
+  \ * & the gold grab the wumpus \\
+  \ * & I smell the wumpus the gold \\
+    & I give the wumpus the gold \\
+  \ * & I donate the wumpus the gold
+\end{tabular}
+
+Intersubjective agreement somewhat reliable, independent of semantics!\\
+Real grammars 10--500 pages, insufficient even for ``proper'' English
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Parse trees}
+
+Exhibit the grammatical structure of a sentence
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\sfile{figures}{parse-tree1.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Parse trees}
+
+Exhibit the grammatical structure of a sentence
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\sfile{figures}{parse-tree2.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Parse trees}
+
+Exhibit the grammatical structure of a sentence
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\sfile{figures}{parse-tree3.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Parse trees}
+
+Exhibit the grammatical structure of a sentence
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\sfile{figures}{parse-tree4.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Parse trees}
+
+Exhibit the grammatical structure of a sentence
+
+\vspace*{0.2in}
+
+\epsfxsize=0.8\textwidth
+\fig{\sfile{figures}{parse-tree5.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Syntax in NLP}
+
+Most view syntactic structure as an essential step towards meaning;\al
+``Mary hit John'' $\neq$ ``John hit Mary''
+
+``And since I was not informed---as a matter of fact, since I did not
+know that there were excess funds until we, ourselves, in that checkup
+after the whole thing blew up, and that was, if you'll remember, that
+was the incident in which the attorney general came to me and told me
+that he had seen a memo that indicated that there were no more
+funds.''
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Syntax in NLP}
+
+Most view syntactic structure as an essential step towards meaning;\al
+``Mary hit John'' $\neq$ ``John hit Mary''
+
+``And since I was not informed---as a matter of fact, since I did not
+know that there were excess funds until we, ourselves, in that checkup
+after the whole thing blew up, and that was, if you'll remember, that
+was the incident in which the attorney general came to me and told me
+that he had seen a memo that indicated that there were no more
+funds.''
+
+``Wouldn't the sentence 'I want to put a hyphen between the words Fish
+and And and And and Chips in my Fish-And-Chips sign' have been clearer
+if quotation marks had been placed before Fish, and between Fish and
+and, and and and And, and And and and, and and and And, and And and
+and, and and and Chips, as well as after Chips?''
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Context-free parsing}
+
+Bottom-up parsing works by replacing any substring that matches\\
+RHS of a rule with the rule's LHS
+
+Efficient algorithms (e.g., chart parsing, Section 22.3) \mat{$O(n^3)$} for context-free,
+run at several thousand words/sec for real grammars
+
+Context-free parsing \mat{$\equiv$} Boolean matrix multiplication (Lee, 2002)\nl
+\mat{$\implies$} unlikely to find faster practical algorithms 
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Logical grammars}
+
+BNF notation for grammars too restrictive:\al
+-- difficult to add ``side conditions'' (number agreement, etc.)\al
+-- difficult to connect syntax to semantics
+
+Idea: express grammar rules as logic
+\[\begin{array}{lcl}
+\bnf{X}\bnfeq\bnf{Y}\bnf{Z}        &\mbox{becomes} & \mat{Y(s_1) \land Z(s_2) \implies X(Append(s_1,s_2))} \\
+\bnf{X}\bnfeq\bnft{word}           &\mbox{becomes} & \mat{X([\mbox{``}\bnft{word}\mbox{''}])} \\
+\bnf{X}\bnfeq\bnf{Y}\bnfor \bnf{Z} &\mbox{becomes} & \mat{Y(s) \implies X(s)\quad Z(s) \implies X(s)}
+\end{array}\]
+Here, \mat{$X(s)$} means that string \mat{$s$} \emph{can be interpreted} as an \mat{$X$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Logical grammars contd.}
+
+Now it's easy to augment the rules
+\mat{\begin{eqnarray*}
+NP(s_1) &\land &EatsBreakfast(Ref(s_1)) \land VP(s_2) \\
+        &&      \implies NP(Append(s_1,[\mbox{``}\bnft{who}\mbox{''}],s_2))\\
+        && \\
+NP(s_1) &\land &Number(s_1,n) \land VP(s_2) \land Number(s_2,n) \\
+        &&      \implies S(Append(s_1,s_2))
+\end{eqnarray*}}
+Parsing is reduced to logical inference:\al
+  {\sc Ask}(\mat{$KB$}, \mat{$S([\mbox{``}\bnft{I}\mbox{'' ``}\bnft{am}\mbox{'' ``}\bnft{a}\mbox{'' ``}\bnft{wumpus}\mbox{''}])$})\\
+(Can add extra arguments to return the parse structure, semantics)
+
+Generation simply requires a query with uninstantiated variables:\al
+  {\sc Ask}(\mat{$KB$}, \mat{$S(x)$})
+
+If we add arguments to nonterminals to construct sentence semantics,
+NLP generation can be done from a given logical sentence:\al
+  {\sc Ask}(\mat{$KB$}, \mat{$S(x,At(Robot,[1,1])$})
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Real language}
+
+Real human languages provide many problems for NLP:
+
+\blob \defn{ambiguity}
+
+\blob \defn{anaphora}
+
+\blob \defn{indexicality}
+
+\blob \defn{vagueness}
+
+\blob \defn{discourse structure}
+
+\blob \defn{metonymy}
+
+\blob \defn{metaphor}
+
+\blob \defn{noncompositionality}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Ambiguity}
+
+Squad helps dog bite victim 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Ambiguity}
+
+Squad helps dog bite victim \\
+Helicopter powered by human flies
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Ambiguity}
+
+Squad helps dog bite victim \\
+Helicopter powered by human flies\\
+American pushes bottle up Germans
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Ambiguity}
+
+Squad helps dog bite victim \\
+Helicopter powered by human flies\\
+American pushes bottle up Germans\\
+\begin{tabular}{ll}I ate spaghetti with & meatballs 
+\end{tabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Ambiguity}
+
+Squad helps dog bite victim \\
+Helicopter powered by human flies\\
+American pushes bottle up Germans\\
+\begin{tabular}{ll}I ate spaghetti with & meatballs \\
+                                        & salad 
+\end{tabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Ambiguity}
+
+Squad helps dog bite victim \\
+Helicopter powered by human flies\\
+American pushes bottle up Germans\\
+\begin{tabular}{ll}I ate spaghetti with & meatballs \\
+                                        & salad \\
+                                        & abandon 
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Ambiguity}
+
+Squad helps dog bite victim \\
+Helicopter powered by human flies\\
+American pushes bottle up Germans\\
+\begin{tabular}{ll}I ate spaghetti with & meatballs \\
+                                        & salad \\
+                                        & abandon \\
+                                        & a fork 
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Ambiguity}
+
+Squad helps dog bite victim \\
+Helicopter powered by human flies\\
+American pushes bottle up Germans\\
+\begin{tabular}{ll}I ate spaghetti with & meatballs \\
+                                        & salad \\
+                                        & abandon \\
+                                        & a fork \\
+                                        & a friend 
+\end{tabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Ambiguity}
+
+Squad helps dog bite victim \\
+Helicopter powered by human flies\\
+American pushes bottle up Germans\\
+\begin{tabular}{ll}I ate spaghetti with & meatballs \\
+                                        & salad \\
+                                        & abandon \\
+                                        & a fork \\
+                                        & a friend 
+\end{tabular}
+
+Ambiguity can be lexical (polysemy), syntactic, semantic, referential
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Anaphora}
+
+Using pronouns to refer back to entities already introduced in the text
+
+After Mary proposed to John, \emph{they} found a preacher and got married.
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Anaphora}
+
+Using pronouns to refer back to entities already introduced in the text
+
+After Mary proposed to John, \emph{they} found a preacher and got married.
+
+For the honeymoon, \emph{they} went to Hawaii
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Anaphora}
+
+Using pronouns to refer back to entities already introduced in the text
+
+After Mary proposed to John, \emph{they} found a preacher and got married.
+
+For the honeymoon, \emph{they} went to Hawaii
+
+Mary saw a ring through the window and asked John for \emph{it}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Anaphora}
+
+Using pronouns to refer back to entities already introduced in the text
+
+After Mary proposed to John, \emph{they} found a preacher and got married.
+
+For the honeymoon, \emph{they} went to Hawaii
+
+Mary saw a ring through the window and asked John for \emph{it}
+
+Mary threw a rock at the window and broke \emph{it}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Indexicality}
+
+Indexical sentences refer to utterance situation (place, time, S/H, etc.)
+
+\emph{I} \emph{am} over \emph{here}
+
+Why did \emph{you} do \emph{that}?
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Metonymy}
+
+Using one noun phrase to stand for another
+
+I've read \emph{Shakespeare}
+
+\emph{Chrysler} announced record profits
+
+The \emph{ham sandwich} on Table 4 wants another beer
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Metaphor}
+
+``Non-literal'' usage of words and phrases, often systematic:
+
+I've tried killing the process but it won't die. Its parent keeps it alive.
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book\\
+red pen
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book\\
+red pen\\
+red hair
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book\\
+red pen\\
+red hair\\
+red herring
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book\\
+red pen\\
+red hair\\
+red herring
+
+small moon
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book\\
+red pen\\
+red hair\\
+red herring
+
+small moon\\
+large molecule
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book\\
+red pen\\
+red hair\\
+red herring
+
+small moon\\
+large molecule\\
+mere child
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book\\
+red pen\\
+red hair\\
+red herring
+
+small moon\\
+large molecule\\
+mere child\\
+alleged murderer
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book\\
+red pen\\
+red hair\\
+red herring
+
+small moon\\
+large molecule\\
+mere child\\
+alleged murderer\\
+real leather
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Noncompositionality}
+
+basketball shoes\\
+baby shoes\\
+alligator shoes\\
+designer shoes\\
+brake shoes
+
+red book\\
+red pen\\
+red hair\\
+red herring
+
+small moon\\
+large molecule\\
+mere child\\
+alleged murderer\\
+real leather\\
+artificial grass
+
+
+
+\end{huge}
+\end{document}
+
+

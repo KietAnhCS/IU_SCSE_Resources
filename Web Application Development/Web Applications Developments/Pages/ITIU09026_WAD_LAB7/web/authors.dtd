@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+    TODO define vocabulary identification
+    PUBLIC ID: -//vendor//vocabulary//EN
+    SYSTEM ID: http://server/path/authors.dtd
+
+-->
+
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+
+    <!DOCTYPE authors SYSTEM "authors.dtd">
+
+    <authors>
+    ...
+    </authors>
+-->
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT authors (name)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT name (lastname|firstname)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT firstname (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT lastname (#PCDATA)>

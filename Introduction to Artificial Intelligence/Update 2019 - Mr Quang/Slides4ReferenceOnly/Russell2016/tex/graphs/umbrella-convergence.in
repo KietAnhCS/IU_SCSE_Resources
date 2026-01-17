@@ -1,0 +1,23 @@
+set ylabel 0.7
+set xtics nomirror
+set ytics nomirror
+set tics out
+set ticscale 0.6
+set border 3 lw 2
+#For portrait mode:
+#set size 0.41857144, 0.195 
+#For eps mode:
+#set size 0.586,0.55714285
+set size 1,0.5
+set term postscript portrait color "Helvetica" 24
+
+set data style lines
+set xlabel "Time step"
+set ylabel "Probability of rain" 
+set key 22,0.7
+set xrange [0:25]
+set yrange [0.45:0.95]
+
+set output "umbrella-convergence.eps"
+plot 'umbrella-filter.data' using 1:2 title "Filtering (all Us)" lw 8, 'umbrella-forecast.data' using 1:2 title "Projection (two Us)" lw 8
+

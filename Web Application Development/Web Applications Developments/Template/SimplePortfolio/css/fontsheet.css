@@ -1,0 +1,44 @@
+@charset "UTF-8";
+/* CSS Document */
+
+body {
+	font-family: Verdana, Geneva, sans-serif;
+	text-align:center;
+}
+
+a{
+	color:#000;
+	text-decoration:none;
+}
+a:hover{
+	background-color:#333;
+	color:#FFF;
+}
+a:active{
+	background-color: #666;
+	color:#FFF;
+}
+h1{
+	font-weight: lighter;
+	font-size:20px;
+	color:#999;
+	font-variant:small-caps;
+	margin-left:10px;
+}
+h2 {
+	color: #333;
+	font-weight: lighter;
+	font-size:15px;
+	padding:0px;
+	margin:0px;
+}
+h3{
+	font-size:12px;
+	font-weight: lighter;
+	padding:0px;
+	margin:0px;
+}
+p{
+	font-weight: lighter;
+	font-size:10px;
+}

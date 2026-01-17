@@ -1,0 +1,209 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Local search algorithms}{Chapter 4, Sections 3--4}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Hill-climbing
+
+\blob Simulated annealing
+
+\blob Genetic algorithms (briefly)
+
+\blob Local search in continuous spaces (very briefly)
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Iterative improvement algorithms}
+
+In many optimization problems, \emph{path} is irrelevant;\\
+the goal state itself is the solution
+
+Then state space = set of ``complete'' configurations;\nl
+find \emph{optimal} configuration, e.g., TSP\nl
+or, find configuration satisfying constraints, e.g., timetable
+
+In such cases, can use \defn{iterative improvement} algorithms;\\
+keep a single ``current'' state, try to improve it
+
+Constant space, suitable for online as well as offline search
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: Travelling Salesperson Problem}
+
+Start with any complete tour, perform pairwise exchanges
+
+\vspace*{0.3in}
+
+\epsfxsize=0.7\textwidth
+\fig{\file{figures}{tsp-sequence.ps}}
+
+Variants of this approach get within 1\% of optimal very quickly with
+thousands of cities
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: \mat{$n$}-queens}
+
+Put \mat{$n$} queens on an \mat{$n \times n$} board with no two queens
+on the same\\
+row, column, or diagonal
+
+Move a queen to reduce number of conflicts
+
+\vspace*{0.3in}
+
+\epsfxsize=1.0\textwidth
+\fig{\file{figures}{4queens-iterative.ps}}
+
+Almost always solves \mat{$n$}-queens problems almost instantaneously\\
+for very large \mat{$n$}, e.g., \mat{$n\eq 1 million$}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hill-climbing (or gradient ascent/descent)}
+
+``Like climbing Everest in thick fog with amnesia''
+
+\input{\file{algorithms}{hill-climbing-algorithm}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Hill-climbing contd.}
+
+Useful to consider \defn{state space landscape}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{hill-climbing.ps}}
+
+\vspace*{-0.1in}
+
+\defn{Random-restart hill climbing} overcomes local maxima---trivially complete
+
+\defn{Random sideways moves} \smiley escape from shoulders \frowny loop on flat maxima
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Simulated annealing}
+
+Idea: escape local maxima by allowing some ``bad'' moves\\
+\emph{but gradually decrease their size and frequency}
+
+\input{\file{algorithms}{simulated-annealing-algorithm}}
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of simulated annealing}
+
+At fixed ``temperature'' $T$, state occupation probability reaches\\
+Boltzman distribution
+\mat{\[
+p(x) = \alpha e^{\frac{E(x)}{kT}}
+\]}
+$T$ decreased slowly enough $\Longrightarrow$ always reach best state \mat{$x^*$}\\
+because \mat{$e^{\frac{E(x^*)}{kT}} / e^{\frac{E(x)}{kT}} 
+= e^{\frac{E(x^*)-E(x)}{kT}} \gg 1$} for small \mat{$T$}
+
+\q{Is this necessarily an interesting guarantee}
+
+Devised by Metropolis et al., 1953, for physical process modelling
+
+Widely used in VLSI layout, airline scheduling, etc.
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Local beam search}
+
+\note{Idea}: keep $k$ states instead of 1; choose top $k$ of all their successors
+
+Not the same as $k$ searches run in parallel!\\
+Searches that find good states recruit other searches to join them
+
+\note{Problem}: quite often, all $k$ states end up on same local hill
+
+\note{Idea}: choose $k$ successors randomly, biased towards good ones
+
+Observe the close analogy to natural selection!
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Genetic algorithms}
+
+= stochastic local beam search + generate successors from \emph{pairs} of states
+
+\vspace*{0.2in}
+
+\epsfxsize=1.05\textwidth
+\fig{\file{figures}{genetic.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Genetic algorithms contd.}
+
+GAs require states encoded as strings (\defn{GPs} use \note{programs})
+
+Crossover helps \emph{iff substrings are meaningful components}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.9\textwidth
+\fig{\file{figures}{8queens-crossover.ps}}
+
+GAs $\neq$ evolution: e.g., real genes encode replication machinery!
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Continuous state spaces}
+
+Suppose we want to site three airports in Romania:\al
+-- 6-D state space defined by \mat{$(x_1,y_2)$}, \mat{$(x_2,y_2)$}, \mat{$(x_3,y_3)$}\al
+-- objective function \mat{$f(x_1,y_2,x_2,y_2,x_3,y_3)$} = \nl
+   sum of squared distances from each city to nearest airport
+
+\defn{Discretization} methods turn continuous space into discrete space,\\
+e.g., \defn{empirical gradient} considers \mat{$\pm \delta$} change in each coordinate
+
+\defn{Gradient} methods compute 
+\mat{\[
+ \nabla f=\left(
+  \frac{\partial f}{\partial x_1},\frac{\partial f}{\partial y_1},
+  \frac{\partial f}{\partial x_2},\frac{\partial f}{\partial y_2},
+  \frac{\partial f}{\partial x_3},\frac{\partial f}{\partial y_3}
+ \right)
+\]}
+to increase/reduce \mat{$f$}, e.g., by 
+\mat{$\x \leftarrow \x + \alpha \nabla f(\x)$}
+
+Sometimes can solve for \mat{$\nabla f(\x) = 0$} exactly (e.g., with one city).\\
+\defn{Newton--Raphson} (1664, 1690) iterates 
+\mat{$\x \leftarrow \x - \H^{-1}_f(\x) \nabla f(\x)$}\\
+to solve \mat{$\nabla f(\x) = 0$}, where \mat{$\H_{ij}\eq \partial^2 f/\partial x_i \partial x_j$}
+
+\end{huge}
+\end{document}
+
+
+
+
+
+
+

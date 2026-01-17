@@ -1,0 +1,18 @@
+\code{
+\func{Min-Conflicts}{\var{csp}{\ac}\var{max-steps}}{a solution or failure}
+    \firstinputs{csp}{a constraint satisfaction problem}
+    \inputs{max-steps}{the number of steps allowed before giving up}
+    \firstlocal{current}{a complete assignment}
+    \local{var}{a variable}
+    \local{value}{a value for a variable}
+\bodysep
+    \setq{\var{current}}{an initial complete assignment for \var{csp}}
+    \key{for} \var{i} = 1 to \var{max-steps} \key{do}
+          \setq{\var{var}}{a randomly chosen, conflicted variable from \noprog{Variables}[\var{csp}]}
+          \setq{\var{value}}{the value \var{v} for \var{var} that minimizes \noprog{Conflicts}(\var{var}{\ac}\var{v}{\ac}\var{current}{\ac}\var{csp})}
+          set \var{var}=\var{value} in \var{current}
+          \key{if} \var{current} is a solution for \var{csp} \key{then return} \var{current}
+    \key{end}
+    \key{return} \var{failure}
+}
+

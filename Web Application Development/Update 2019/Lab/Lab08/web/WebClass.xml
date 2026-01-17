@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE WebClass [
+        <!ELEMENT WebClass (student)*>
+        <!ELEMENT student (name|idNum|date-of-birth|city)*>
+        <!ELEMENT name (#PCDATA)>
+        <!ELEMENT idNum (#PCDATA)>
+        <!ELEMENT date-of-birth (#PCDATA)>
+        <!ELEMENT city (#PCDATA)>
+        ]>
+<WebClass>
+    <student>
+        <name>Nguyễn Thanh Xuân Tùng</name>
+        <idNum>ITITIU16144</idNum>
+        <date-of-birth>20-02-98</date-of-birth>
+        <city>Khánh Hòa</city>
+    </student>
+    <student>
+        <name>Dương Bảo Châu</name>
+        <idNum>BTBTIU16055</idNum>
+        <date-of-birth>13-11-98</date-of-birth>
+        <city>Tiền Giang</city>
+    </student>
+    <student>
+        <name>Nguyễn Phan Hùng Thuận</name>
+        <idNum>ITITIU16129</idNum>
+        <date-of-birth>27-06-98</date-of-birth>
+        <city>Hồ Chí Minh</city>
+    </student>
+    <student>
+        <name>Đỗ Trần Thanh Thảo</name>
+        <idNum>BTFTIU17054</idNum>
+        <date-of-birth>30-12-99</date-of-birth>
+        <city>Hồ Chí Minh</city>
+    </student>
+    <student>
+        <name>Lê Tuấn</name>
+        <idNum>ITITIU16142</idNum>
+        <date-of-birth>16-07-98</date-of-birth>
+        <city>Hồ Chí Minh</city>
+    </student>
+    <student>
+        <name>Nguyễn Thành Trung</name>
+        <idNum>ITITIU16138</idNum>
+        <date-of-birth>10-05-98</date-of-birth>
+        <city>Hồ Chí Minh</city>
+    </student>
+    <student>
+        <name>Trần Dức Khoa</name>
+        <idNum>ITITIU16101</idNum>
+        <date-of-birth>06-12-98</date-of-birth>
+        <city>Trà Cú</city>
+    </student>
+    <student>
+        <name>Vũ Tùng Dương</name>
+        <idNum>ITITIU16019</idNum>
+        <date-of-birth>20-02-98</date-of-birth>
+        <city>Hải Phòng</city>
+    </student>
+    <student>
+        <name>Nguyễn Trương Đạt</name>
+        <idNum>ITITIU17029</idNum>
+        <date-of-birth>16-06-99</date-of-birth>
+        <city>Hồ Chí Minh</city>
+    </student>
+    <student>
+        <name>Tăng Minh Khôi</name>
+        <idNum>ITITIU16104</idNum>
+        <date-of-birth>16-09-98</date-of-birth>
+        <city>Bình Định</city>
+    </student>
+</WebClass>

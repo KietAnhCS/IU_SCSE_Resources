@@ -1,0 +1,519 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{First-order logic}{Chapter 8}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Why FOL?
+
+\blob Syntax and semantics of FOL
+
+\blob Fun with sentences
+
+\blob Wumpus world in FOL
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Pros and cons of propositional logic}
+
+\smiley\ Propositional logic is \emph{declarative}: pieces of syntax correspond to facts
+
+\smiley\ Propositional logic allows partial/disjunctive/negated information\al
+  (unlike most data structures and databases)
+
+\smiley\ Propositional logic is \emph{compositional}: \al
+  meaning of \mat{$B_{1,1}\land P_{1,2}$} is derived from meaning of \mat{$B_{1,1}$} and of \mat{$P_{1,2}$}
+
+\smiley\ Meaning in propositional logic is \emph{context-independent}\al
+  (unlike natural language, where meaning depends on context)
+
+\frowny\ Propositional logic has very limited expressive power\al
+  (unlike natural language)\al
+  E.g., cannot say ``pits cause breezes in adjacent squares''\nl
+    except by writing one sentence for each square
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{First-order logic}
+
+Whereas propositional logic assumes world contains \emph{facts},\\
+first-order logic (like natural language) assumes the world contains
+\begin{itemize} 
+\item \defn{Objects}: people, houses, numbers, theories,
+Ronald McDonald, colors, baseball games, wars, centuries $\ldots$ 
+\item \defn{Relations}: red, round, bogus, prime, multistoried $\ldots$, \\
+brother of, bigger than, inside, part of, has color, occurred after, owns, comes between, $\ldots$
+\item \defn{Functions}: father of, best friend, third inning of, one more
+than, end of $\ldots$
+\end{itemize}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Logics in general}
+
+\input{tables/ontological-epistemological-table}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Syntax of FOL: Basic elements}
+
+\begin{tabular}{ll}
+Constants & \mat{$KingJohn,\ 2,\ UCB,\ldots$} \\
+Predicates & \mat{$Brother,\ >,\ldots$} \\
+Functions & \mat{$Sqrt,\ LeftLegOf,\ldots$} \\
+Variables & \mat{$x,\ y,\ a,\ b,\ldots$} \\
+Connectives & \mat{$\land\ \lor\ \lnot\ \implies\ \lequiv$} \\
+Equality & \mat{$=$} \\
+Quantifiers & \mat{$\forall\ \exists$} \\
+\end{tabular}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Atomic sentences}
+
+\begin{tabular}{rcl}
+Atomic sentence & = & \mat{$predicate(term_1,\ldots,term_n)$} \\
+                &   & or \mat{$term_1 = term_2$} \\
+                &   & \\
+Term            & = & \mat{$function(term_1,\ldots,term_n)$} \\
+                &   & or \mat{$constant$} or \mat{$variable$} \\
+\end{tabular}
+
+\begin{tabular}{ll}
+E.g., & \mat{$Brother(KingJohn,RichardTheLionheart)$}\\
+      & \mat{$>(Length(LeftLegOf(Richard)),Length(LeftLegOf(KingJohn)))$}\\
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Complex sentences}
+
+Complex sentences are made from atomic sentences using connectives
+\mat{\[
+\lnot S,\quad S_1\land S_2,\quad S_1 \lor S_2,\quad 
+S_1 \implies S_2,\quad S_1 \lequiv S_2
+\]}
+
+\begin{tabular}{ll}
+E.g. & \mat{$Sibling(KingJohn,Richard) \implies Sibling(Richard,KingJohn)$} \\
+     & \mat{${>}(1,2) \lor {\leq}(1,2)$} \\
+     & \mat{${>}(1,2) \land \lnot {>}(1,2)$} \\
+\end{tabular}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Truth in first-order logic}
+
+Sentences are true with respect to a \defn{model} and an \defn{interpretation}
+
+Model contains $\geq 1$ objects (\defn{domain elements}) and relations among them
+
+Interpretation specifies referents for\al
+\mat{constant symbols} $\rightarrow$ \note{objects}\al
+\mat{predicate symbols} $\rightarrow$ \note{relations}\al
+\mat{function symbols} $\rightarrow$ \note{functional relations}
+
+An atomic sentence \mat{$predicate(term_1,\ldots,term_n)$} is true\\
+iff the \note{objects} referred to by \mat{$term_1,\ldots,term_n$}\\
+are in the \note{relation} referred to by \mat{$predicate$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Models for FOL: Example}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.85\textwidth
+\fig{\file{figures}{fol-model.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Truth example}
+
+Consider the interpretation in which\\
+\mat{$Richard$} $\rightarrow$ \note{Richard the Lionheart}\\
+\mat{$John$} $\rightarrow$ \note{the evil King John}\\
+\mat{$Brother$} $\rightarrow$ \note{the brotherhood relation}
+
+Under this interpretation, \mat{$Brother(Richard,John)$} is true\\
+just in case \note{Richard the Lionheart} and \note{the evil King John}\\
+are in \note{the brotherhood relation} in the model
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Models for FOL: Lots!}
+
+Entailment in propositional logic can be computed by enumerating models
+
+We \emph{can} enumerate the FOL models for a given KB vocabulary:
+
+For each number of domain elements \mat{$n$} from \mat{$1$} to \mat{$\infty$}\\
+\tab For each \mat{$k$}-ary predicate \mat{$P_k$} in the vocabulary\\
+\tab\tab For each possible \mat{$k$}-ary relation on \mat{$n$} objects\\
+\tab\tab\tab For each constant symbol \mat{$C$} in the vocabulary\\
+\tab\tab\tab\tab For each choice of referent for \mat{$C$} from \mat{$n$} objects $\ldots$
+
+Computing entailment by enumerating FOL models is not easy!
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Universal quantification}
+
+\mat{$\All{\<variables\>} \<sentence\>$}
+
+Everyone at Berkeley is smart:\\
+\mat{$\All{x} At(x,Berkeley) \implies Smart(x)$}
+
+\mat{$\All{x} P$}\quad  is true in a model \mat{$m$} iff \mat{$P$} is true with \mat{$x$} being\\
+\emph{each} possible object in the model
+
+\emph{Roughly} speaking, equivalent to the \note{conjunction} of \note{instantiations} of \mat{$P$}
+\mat{\[
+\begin{array}{rl}
+     & (At(KingJohn,Berkeley) \implies Smart(KingJohn)) \\
+\land& (At(Richard,Berkeley) \implies Smart(Richard)) \\
+\land& (At(Berkeley,Berkeley) \implies Smart(Berkeley)) \\
+\land& \ldots
+\end{array}\]}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{A common mistake to avoid}
+
+
+Typically, \mat{$\implies$} is the main connective with \mat{$\forall$}
+
+Common mistake: using \mat{$\land$} as the main connective with \mat{$\forall$}:
+\mat{\[\All{x} At(x,Berkeley) \land Smart(x)\]}
+means ``Everyone is at Berkeley and everyone is smart''
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Existential quantification}
+
+\mat{$\Exi{\<variables\>} \<sentence\>$}
+
+Someone at Stanford is smart:\\
+\mat{$\Exi{x} At(x,Stanford) \land Smart(x)$}
+
+\mat{$\Exi{x} P$}\quad is true in a model \mat{$m$} iff \mat{$P$} is true with \mat{$x$} being\\
+\emph{some} possible object in the model
+
+\emph{Roughly} speaking, equivalent to the \note{disjunction} of \note{instantiations} of \mat{$P$}
+\mat{\[
+\begin{array}{rl}
+     & (At(KingJohn,Stanford) \land Smart(KingJohn)) \\
+\lor& (At(Richard,Stanford) \land Smart(Richard)) \\
+\lor& (At(Stanford,Stanford) \land Smart(Stanford)) \\
+\lor& \ldots
+\end{array}\]}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Another common mistake to avoid}
+
+Typically, \mat{$\land$} is the main connective with \mat{$\exists$}
+
+Common mistake: using \mat{$\implies$} as the main connective with \mat{$\exists$}:
+\mat{\[\Exi{x} At(x,Stanford) \implies Smart(x)\]}
+is true if there is anyone who is not at Stanford!
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of quantifiers}
+
+\mat{$\All{x}\All{y}$} is the same as \mat{$\All{y}\All{x}$} (\q{why})
+
+\mat{$\Exi{x}\Exi{y}$} is the same as \mat{$\Exi{y}\Exi{x}$} (\q{why})
+
+\mat{$\Exi{x}\All{y}$} is \emph{not} the same as \mat{$\All{y}\Exi{x}$}
+
+\mat{$\Exi{x}\All{y} Loves(x,y)$}\\
+``There is a person who loves everyone in the world''
+
+\mat{$\All{y}\Exi{x} Loves(x,y)$}\\
+``Everyone in the world is loved by at least one person''
+
+\note{Quantifier duality}: each can be expressed using the other
+
+\mat{$\All{x} Likes(x,IceCream)$} \qquad \mat{$\lnot \Exi{x} \lnot Likes(x,IceCream)$} 
+
+\mat{$\Exi{x} Likes(x,Broccoli)$} \qquad \mat{$\lnot \All{x} \lnot Likes(x,Broccoli)$} 
+
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Fun with sentences}
+
+Brothers are siblings
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Fun with sentences}
+
+Brothers are siblings
+
+\mat{$\All{x,y} Brother(x,y) \implies Sibling(x,y)$}.
+
+``Sibling'' is symmetric
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Fun with sentences}
+
+Brothers are siblings
+
+\mat{$\All{x,y} Brother(x,y) \implies Sibling(x,y)$}.
+
+``Sibling'' is symmetric
+
+\mat{$\All{x,y} Sibling(x,y) \lequiv Sibling(y,x)$}.
+
+One's mother is one's female parent
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Fun with sentences}
+
+Brothers are siblings
+
+\mat{$\All{x,y} Brother(x,y) \implies Sibling(x,y)$}.
+
+``Sibling'' is symmetric
+
+\mat{$\All{x,y} Sibling(x,y) \lequiv Sibling(y,x)$}.
+
+One's mother is one's female parent
+
+\mat{$\All{x,y} Mother(x,y) \lequiv (Female(x) \land Parent(x,y))$}.
+
+A first cousin is a child of a parent's sibling
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Fun with sentences}
+
+Brothers are siblings
+
+\mat{$\All{x,y} Brother(x,y) \implies Sibling(x,y)$}.
+
+``Sibling'' is symmetric
+
+\mat{$\All{x,y} Sibling(x,y) \lequiv Sibling(y,x)$}.
+
+One's mother is one's female parent
+
+\mat{$\All{x,y} Mother(x,y) \lequiv (Female(x) \land Parent(x,y))$}.
+
+A first cousin is a child of a parent's sibling
+
+\mat{$\All{x,y} FirstCousin(x,y) \lequiv 
+\Exi{p,ps} Parent(p,x) \land Sibling(ps,p) \land Parent(ps,y)$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Equality}
+
+\mat{$term_1 = term_2$} is true under a given interpretation\\
+if and only if \mat{$term_1$} and \mat{$term_2$} refer to the same object
+
+\begin{tabular}{ll}
+E.g., & \mat{$1=2$} and \mat{$\All{x} {\times}(Sqrt(x),Sqrt(x)) = x$} are satisfiable\\
+      & \mat{$2=2$} is valid
+\end{tabular}
+
+E.g., definition of (full) \mat{$Sibling$} in terms of \mat{$Parent$}:\al
+\mat{$\All{x,y} Sibling(x,y) \lequiv [\lnot(x\eq y) \land \Exi{m,f} \lnot(m\eq f) \land {}$}\nl
+\mat{$Parent(m,x) \land Parent(f,x) \land Parent(m,y) \land Parent(f,y)]$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Interacting with FOL KBs}
+
+Suppose a wumpus-world agent is using an FOL KB\\
+and perceives a smell and a breeze (but no glitter) at \mat{$t=5$}:
+
+\mat{${\sc Tell}(KB,Percept([Smell,Breeze,None],5))$}\\
+\mat{${\sc Ask}(KB,\Exi{a} Action(a,5))$}
+
+I.e., does \mat{$KB$} entail any particular actions at \mat{$t=5$}?
+
+Answer: \mat{$Yes,\ \{a/Shoot\}$}\qquad $\leftarrow$ \defn{substitution} (binding list)
+
+Given a sentence \mat{$S$} and a substitution \mat{$\sigma$},\\
+\mat{$S\sigma$} denotes the result of plugging \mat{$\sigma$} into \mat{$S$}; e.g.,\\
+\mat{$S = Smarter(x,y)$}\\
+\mat{$\sigma = \{x/Hillary,y/Bill\}$}\\
+\mat{$S\sigma = Smarter(Hillary,Bill)$}
+
+\mat{${\sc Ask(KB,S)}$} returns some/all \mat{$\sigma$} such that \mat{$KB \models S\sigma$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Knowledge base for the wumpus world}
+
+\note{``Perception''}\\
+\mat{$\All{b,g,t} Percept([Smell,b,g],t) \implies Smelt(t)$}\\
+\mat{$\All{s,b,t} Percept([s,b,Glitter],t) \implies AtGold(t)$}
+
+\note{Reflex}: \mat{$\All{t} AtGold(t) \implies Action(Grab,t)$}
+
+\note{Reflex with internal state}: do we have the gold already?\\
+\mat{$\All{t} AtGold(t) \land \lnot Holding(Gold,t) \implies Action(Grab,t)$}
+
+\mat{$Holding(Gold,t)$} cannot be observed\nl
+$\Rightarrow$ keeping track of change is essential
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Deducing hidden properties}
+
+Properties of locations:\\
+\mat{$\All{x,t} At(Agent,x,t) \land Smelt(t) \implies Smelly(x)$}\\
+\mat{$\All{x,t} At(Agent,x,t) \land Breeze(t) \implies Breezy(x)$}
+
+Squares are breezy near a pit:
+
+\defn{Diagnostic} rule---infer cause from effect\nl
+      \mat{$\All{y} Breezy(y) \implies \Exi{x} Pit(x) \land Adjacent(x,y)$}
+
+\defn{Causal} rule---infer effect from cause\nl
+      \mat{$\All{x,y} Pit(x) \land Adjacent(x,y) \implies Breezy(y)$}
+
+Neither of these is complete---e.g., the causal rule doesn't say
+whether squares far away from pits can be breezy
+
+\defn{Definition} for the \mat{$Breezy$} predicate:\nl
+      \mat{$\All{y}  Breezy(y)  \lequiv [\Exi{x} Pit(x) \land Adjacent(x,y)]$}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Keeping track of change}
+
+Facts hold in \defn{situations}, rather than eternally\\
+E.g., \mat{$Holding(Gold,Now)$} rather than just \mat{$Holding(Gold)$}
+
+\defn{Situation calculus} is one way to represent change in FOL:\nl
+   Adds a situation argument to each non-eternal predicate\nl
+   E.g., \mat{$Now$} in \mat{$Holding(Gold,Now)$} denotes a situation
+
+Situations are connected by the \mat{$Result$} function\\
+\mat{$Result(a,s)$} is the situation that results from doing \mat{$a$} in \mat{$s$}
+
+\epsfxsize=0.3\textwidth
+\fig{\file{figures}{situations2.ps}}
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Describing actions I}
+
+``Effect'' axiom---describe changes due to action\\
+\mat{$\All{s} AtGold(s) \implies Holding(Gold,Result(Grab,s))$}
+
+``Frame'' axiom---describe \emph{non-changes} due to action\\
+\mat{$\All{s} HaveArrow(s) \implies HaveArrow(Result(Grab,s))$}
+
+\defn{Frame problem}: find an elegant way to handle non-change\nl
+   (a) representation---avoid frame axioms\nl
+   (b) inference---avoid repeated ``copy-overs'' to keep track of state
+
+\defn{Qualification problem}: true descriptions of real actions require endless caveats---what if gold is slippery or nailed down or $\ldots$
+
+\defn{Ramification problem}: real actions have many secondary consequences---what about the dust on the gold, wear and tear on gloves, $\ldots$
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Describing actions II}
+
+\defn{Successor-state axioms} solve the representational frame problem 
+
+Each axiom is ``about'' a \emph{predicate} (not an action per se):
+\mat{\begin{eqnarray*}
+\mbox{P true afterwards}&\lequiv& [\mbox{an action made P true}\\
+                      &\lor   & \mbox{P true already and no action
+                                  made P false}]
+\end{eqnarray*}}
+
+For holding the gold:\al
+   \mat{$\All{a,s} Holding(Gold,Result(a,s)) \lequiv {}$}\nl
+      \mat{$[(a\eq Grab \land AtGold(s))$}\nl
+      \mat{${}\lor (Holding(Gold,s) \land a\neq Release)]$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Making plans}
+
+Initial condition in KB:\nl
+   \mat{$At(Agent,[1,1],S_0)$}\nl
+   \mat{$At(Gold,[1,2],S_0)$}
+
+Query: \mat{${\sc Ask}(KB,\Exi{s} Holding(Gold,s))$}\nl
+   i.e., in what situation will I be holding the gold?
+
+Answer: \mat{$\{s/Result(Grab,Result(Forward,S_0))\}$}\nl
+   i.e., go forward and then grab the gold
+
+This assumes that the agent is interested in plans starting at \mat{$S_0$}
+and that \mat{$S_0$} is the only situation described in the KB
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Making plans: A better way}
+
+Represent \note{plans} as action sequences \mat{$[a_1,a_2,\ldots,a_n]$}
+
+\mat{$PlanResult(p,s)$} is the result of executing \mat{$p$} in \mat{$s$}
+
+Then the query \mat{${\sc Ask}(KB,\Exi{p} Holding(Gold,PlanResult(p,S_0)))$}\\
+has the solution \mat{$\{p/[Forward,Grab]\}$}
+
+Definition of \mat{$PlanResult$} in terms of \mat{$Result$}:\al
+   \mat{$\All{s} PlanResult([\,],s) = s$}\al
+   \mat{$\All{a,p,s} PlanResult([a|p],s) = PlanResult(p,Result(a,s))$}
+
+\defn{Planning systems} are special-purpose reasoners designed to do this
+type of inference more efficiently than a general-purpose reasoner
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+First-order logic: \al
+-- objects and relations are semantic primitives\al
+-- syntax: constants, functions, predicates, equality, quantifiers
+
+Increased expressive power: sufficient to define wumpus world 
+
+Situation calculus:\al
+-- conventions for describing actions and change in FOL\al
+-- can formulate planning as inference on a situation calculus KB
+
+
+\end{huge} 
+\end{document}

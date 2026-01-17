@@ -1,0 +1,13 @@
+\code{
+\func{Hill-Climbing}{{\ts}\var{problem}}{a state that is a local maximum}
+    \firstinputs{problem}{a problem}
+    \firstlocal{current}{a node}
+    \local{neighbor}{a node}
+\bodysep
+    \setq{\var{current}}{\prog{Make-Node}(\prog{Initial-State}[\var{problem}])}
+    \key{loop do}
+          \setq{\var{neighbor}}{a highest-valued successor of \var{current}}
+          \key{if} \prog{Value}[neighbor] $<$ \prog{Value}[current] \key{then return} \prog{State}[\var{current}]
+          \setq{\var{current}}{\var{neighbor}}
+    \key{end}
+}

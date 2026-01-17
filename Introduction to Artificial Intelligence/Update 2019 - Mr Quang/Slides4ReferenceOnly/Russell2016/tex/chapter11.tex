@@ -1,0 +1,234 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage[dvips]{color}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Planning}{Chapter 11}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Search vs. planning
+
+\blob STRIPS operators
+
+\blob Partial-order planning
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Search vs. planning}
+
+Consider the task \txr{\em get milk, bananas, and a cordless drill}\\
+Standard search algorithms seem to fail miserably:
+
+\vspace*{0.1in}
+
+\epsfxsize=0.8\textwidth
+\fig{\file{figures}{supermarket1.ps}}
+
+After-the-fact heuristic/goal test inadequate
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Search vs. planning contd.}
+
+Planning systems do the following:\al
+1) open up action and goal representation to allow selection\al
+2) divide-and-conquer by subgoaling\al
+3) relax requirement for sequential construction of solutions
+
+\begin{tabular}{l|l|l}
+              & {\bf Search} & {\bf Planning} \\
+\hline
+{\bf States}  & Lisp data structures & Logical sentences \\
+{\bf Actions} & Lisp code            & Preconditions/outcomes \\
+{\bf Goal}    & Lisp code            & Logical sentence (conjunction)\\
+{\bf Plan}    & Sequence from $S_0$  & Constraints on actions
+\end{tabular}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{STRIPS operators}
+
+Tidily arranged actions descriptions, restricted language
+
+{\sc Action}: $Buy(x)$\hfill\epsfxsize=0.2\textwidth\raisebox{-1.5in}[0pt][0pt]{\epsffile{\file{figures}{operator-schema2.ps}}}\\
+{\sc Precondition}: $At(p), Sells(p,x)$\\
+{\sc Effect}: $Have(x)$
+
+[Note: this abstracts away many important details!]
+
+Restricted language $\implies$ efficient algorithm\nl
+Precondition: conjunction of positive literals\nl
+Effect: conjunction of literals
+
+A complete set of STRIPS operators can be translated\\
+into a set of successor-state axioms
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Partially ordered plans}
+
+\txr{\em Partially ordered} collection of steps with\nl
+  \txb{$Start$ step} has the initial state description as its effect\nl
+  \txb{$Finish$ step} has the goal description as its precondition\nl
+  \txb{causal links} from outcome of one step to precondition of another\nl
+  \txb{temporal ordering} between pairs of steps
+
+\txb{Open condition} = precondition of a step not yet causally linked
+
+A plan is \txb{complete} iff every precondition is achieved
+
+A precondition is \txb{achieved} iff it is the effect of an earlier step\\
+and no \txb{possibly intervening} step undoes it
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\centerline{\raisebox{-0.9\textheight}[0pt][0pt]{\epsfysize=0.95\textheight\epsffile{\file{figures}{plan-construction1.ps}}}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\centerline{\raisebox{-0.9\textheight}[0pt][0pt]{\epsfysize=0.95\textheight\epsffile{\file{figures}{plan-construction2.ps}}}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example}
+
+\vspace*{0.2in}
+
+\centerline{\raisebox{-0.9\textheight}[0pt][0pt]{\epsfysize=0.95\textheight\epsffile{\file{figures}{plan-construction3.ps}}}}
+
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Planning process}
+
+Operators on partial plans:\nl
+   \txb{add a link} from an existing action to an open condition\nl
+   \txb{add a step} to fulfill an open condition\nl
+   \txb{order} one step wrt another to remove possible conflicts
+
+Gradually move from incomplete/vague plans to complete, correct plans
+
+Backtrack if an open condition is unachievable or\\
+if a conflict is unresolvable
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{POP algorithm sketch}
+
+\input{\file{algorithms}{pop-algorithm1}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{POP algorithm contd.}
+
+\input{\file{algorithms}{pop-algorithm2}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Clobbering and promotion/demotion}
+
+A \txb{clobberer} is a potentially intervening step that destroys the
+condition achieved by a causal link. E.g., $Go(Home)$ clobbers $At(Supermarket)$:
+
+\begin{tabular}{lr}
+\epsfxsize=0.40\textwidth
+\epsffile{\file{figures}{clobber.ps}}
+&
+\hbox{\begin{minipage}[b]{0.6\textwidth}
+\vspace*{0.3in}
+
+\txb{Demotion}: put before $Go(Supermarket)$
+
+\vspace*{1.7in}
+
+\txb{Promotion}: put after $Buy(Milk)$
+
+\vspace*{1in}
+\ 
+\end{minipage}}
+\end{tabular}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Properties of POP}
+
+Nondeterministic algorithm: backtracks at \txb{choice} points on failure:\al
+ -- choice of $S_{add}$ to achieve $S_{need}$\al
+ -- choice of demotion or promotion for clobberer\al
+ -- selection of $S_{need}$ is irrevocable
+
+POP is sound, complete, and \txb{systematic} (no repetition)
+
+Extensions for disjunction, universals, negation, conditionals
+
+Can be made efficient with good heuristics derived from problem description
+
+Particularly good for problems with many loosely related subgoals
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example: Blocks world}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.9\textwidth
+\fig{\file{figures}{blocks-world.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Example contd.}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{sussman1.ps}}
+
+
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Example contd.}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{sussman2.ps}}
+
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Example contd.}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{sussman3.ps}}
+
+
+
+%%%%%%%%%%%% Overlay %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pheading{Example contd.}
+
+\vspace*{0.1in}
+
+\epsfxsize=0.9\textwidth
+\fig{\sfile{figures}{sussman4.ps}}
+
+
+
+
+\end{huge} 
+\end{document}

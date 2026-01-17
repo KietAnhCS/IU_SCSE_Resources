@@ -1,0 +1,21 @@
+set ylabel 0.7
+set xtics nomirror
+set ytics nomirror
+set tics out
+set ticscale 0.6
+set border 3 lw 2
+#For portrait mode:
+#set size 0.41857144, 0.195 
+#For eps mode:
+#set size 0.586,0.55714285
+set size 1,0.5
+set term postscript portrait color "Helvetica" 24
+
+set data style lines
+set xlabel "Training set size"
+set ylabel "% correct on test set" 
+set nokey
+
+set output "restaurant-dtl-curve.ps"
+plot 'restaurant-dtl-curve.data' using 1:2 lw 8
+

@@ -1,0 +1,608 @@
+\documentclass{article}
+\usepackage{fleqn}
+\usepackage{epsf}
+\usepackage{aima2e-slides}
+
+\begin{document}
+
+\begin{huge}
+\titleslide{Uncertainty}{Chapter 13}
+
+\sf
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Outline}
+
+\blob Uncertainty
+
+\blob Probability
+
+\blob Syntax and Semantics
+
+\blob Inference
+
+\blob Independence and Bayes' Rule
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Uncertainty}
+
+Let action \mat{$A_t$} = leave for airport \mat{$t$} minutes before flight\\
+Will \mat{$A_t$} get me there on time?
+
+Problems:\al
+1) partial observability (road state, other drivers' plans, etc.)\al
+2) noisy sensors (KCBS traffic reports)\al
+3) uncertainty in action outcomes (flat tire, etc.)\al
+4) immense complexity of modelling and predicting traffic
+
+Hence a purely logical approach either\\
+\phantom{or }1) risks falsehood: ``\mat{$A_{25}$} will get me there on time''\\
+or 2) leads to conclusions that are too weak for decision making:\nl
+``\mat{$A_{25}$} will get me there on time if there's no accident on the bridge\nl
+and it doesn't rain and my tires remain intact etc etc.''
+
+(\mat{$A_{1440}$} might reasonably be said to get me there on time\\
+but I'd have to stay overnight in the airport $\ldots$)
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Methods for handling uncertainty}
+
+\defn{Default} or \defn{nonmonotonic} logic:\al
+  Assume my car does not have a flat tire\al
+  Assume \mat{$A_{25}$} works unless contradicted by evidence\\
+Issues: What assumptions are reasonable? How to handle contradiction?
+
+\defn{Rules with fudge factors}:\al
+\mat{$A_{25} \mapsto_{0.3} AtAirportOnTime$}\al
+\mat{$Sprinkler \mapsto_{0.99} WetGrass$}\al
+\mat{$WetGrass \mapsto_{0.7} Rain$}\\
+Issues: Problems with combination, e.g., \mat{$Sprinkler$} causes \mat{$Rain$}??
+
+\defn{Probability}\al
+  Given the available evidence,\nl
+    \mat{$A_{25}$} will get me there on time with probability \mat{$0.04$}\\
+Mahaviracarya (9th C.), Cardamo (1565) theory of gambling
+
+(\defn{Fuzzy logic} handles \emph{degree of truth} NOT uncertainty e.g.,\al
+  \mat{$WetGrass$} is true to degree \mat{$0.2$})
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Probability}
+
+Probabilistic assertions \emph{summarize} effects of\al
+  \note{laziness}: failure to enumerate exceptions, qualifications, etc.\al
+  \note{ignorance}: lack of relevant facts, initial conditions, etc.
+
+\defn{Subjective} or \defn{Bayesian} probability:\\
+Probabilities relate propositions to one's own state of knowledge\nl
+e.g., \mat{$P(A_{25} | \mbox{no reported accidents}) = 0.06$}
+
+These are \emph{not} claims of a ``probabilistic
+tendency'' in the current situation\\
+(but might be learned from past experience of similar situations)
+
+Probabilities of propositions change with new evidence:\nl
+e.g., \mat{$P(A_{25} | \mbox{no reported accidents},\ \mbox{5 a.m.}) = 0.15$}
+
+(Analogous to logical entailment status \mat{$KB \models \alpha$}, not truth.)
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Making decisions under uncertainty}
+
+Suppose I believe the following:
+\mat{\begin{eqnarray*}
+P(A_{25}\mbox{ gets me there on time} | \ldots) &=& 0.04 \\
+P(A_{90}\mbox{ gets me there on time} | \ldots) &=& 0.70 \\
+P(A_{120}\mbox{ gets me there on time} | \ldots) &=& 0.95 \\
+P(A_{1440}\mbox{ gets me there on time} | \ldots) &=& 0.9999 
+\end{eqnarray*}}
+Which action to choose?
+
+Depends on my \defn{preferences} for missing flight vs. airport cuisine, etc.
+
+\defn{Utility theory} is used to represent and infer preferences
+
+\defn{Decision theory} = utility theory + probability theory
+
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Probability basics}
+
+Begin with a set \mat{$\Omega$}---the \defn{sample space}\al
+e.g., 6 possible rolls of a die.\al
+\mat{$\omega\in \Omega$} is a \defn{sample point}/\defn{possible world}/\defn{atomic event}
+
+A \defn{probability space} or \defn{probability model} is a sample space\\
+with an assignment \mat{$P(\omega)$} for every \mat{$\omega\in\Omega$} s.t.\al
+  \mat{$0\leq P(\omega) \leq 1$}\al
+  \mat{$\mysum_{\omega} P(\omega) = 1$}\\
+e.g., \mat{$P(1)\eq P(2)\eq P(3)\eq P(4)\eq P(5)\eq P(6) \eq 1/6$}.
+
+An \defn{event} \mat{$A$} is any subset of \mat{$\Omega$}
+\mat{\[
+  P(A) = \mysum_{\{\omega\in A\}} P(\omega)
+\]}
+E.g., \mat{$P(\mbox{die roll}<4) = P(1) + P(2) + P(3) = 1/6 + 1/6 + 1/6 = 1/2$}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Random variables}
+
+A \defn{random variable} is a function from sample points
+to some range, e.g., the reals or Booleans\al
+e.g., \mat{$Odd(1)\eq true$}.
+
+\mat{$P$} induces a \defn{probability distribution} for any r.v. \mat{$X$}:
+\mat{\[
+  P(X\eq x_i) = \mysum_{\{\omega: X(\omega)\eq x_i\}} P(\omega)
+\]}
+e.g., \mat{$P(Odd\eq true) = P(1) + P(3) + P(5) = 1/6 + 1/6 + 1/6 = 1/2$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Propositions}
+
+Think of a proposition as the event (set of sample points)\\
+where the proposition is true
+
+Given Boolean random variables \mat{$A$} and \mat{$B$}:\al
+  event \mat{$a$} = set of sample points where \mat{$A(\omega)\eq true$}\al
+  event \mat{$\lnot a$} = set of sample points where \mat{$A(\omega)\eq false$}\al
+  event \mat{$a\land b$} = points where \mat{$A(\omega)\eq true$} and \mat{$B(\omega)\eq true$}
+
+Often in AI applications, the sample points are \emph{defined}\\
+by the values of a set of random variables, i.e., the\\
+sample space is the Cartesian product of the ranges of the variables
+
+With Boolean variables, sample point = propositional logic model\nl
+  e.g., \mat{$A\eq true$}, \mat{$B\eq false$}, or \mat{$a\land \lnot b$}.\\
+Proposition = disjunction of atomic events in which it is true\al
+e.g., \mat{$(a\lor b) \equiv (\lnot a \land b) \lor (a \land \lnot b) \lor (a \land b) $}\al
+\mat{$\implies P(a\lor b) = P(\lnot a \land b) + P(a \land \lnot b) + P(a \land b) $}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Why use probability?}
+
+The definitions imply that certain logically related events
+must have related probabilities
+
+E.g., \mat{$P(a \lor b) = P(a) + P(b) - P(a\land b)$}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.45\textwidth
+\fig{\file{figures}{axiom3-venn.ps}}
+
+de Finetti (1931): an agent who bets according to probabilities that violate
+these axioms can be forced to bet so as to lose money regardless of outcome.
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Syntax for propositions}
+
+\defn{Propositional} or \defn{Boolean} random variables\al
+  e.g., \mat{$Cavity$} (do I have a cavity?)\al
+  \mat{$Cavity\eq true$} is a proposition, also written \mat{$cavity$}
+
+\defn{Discrete} random variables (\note{finite} or \note{infinite}) \al
+  e.g., \mat{$Weather$} is one of \mat{$\<sunny,rain,cloudy,snow\>$}\al
+  \mat{$Weather\eq rain$} is a proposition\al
+Values must be exhaustive and mutually exclusive
+
+\defn{Continuous} random variables (\note{bounded} or \note{unbounded})\al
+  e.g., \mat{$Temp\eq 21.6$}; also allow, e.g., \mat{$Temp<22.0$}.
+
+Arbitrary Boolean combinations of basic propositions
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Prior probability}
+
+\defn{Prior} or \defn{unconditional probabilities} of propositions\al
+  e.g., \mat{$P(Cavity\eq true) = 0.1$} and \mat{$P(Weather \eq sunny) = 0.72$}\\
+correspond to belief prior to arrival of any (new) evidence
+
+\defn{Probability distribution} gives values for all possible assignments:\al
+  \mat{$\pv(Weather) = \<0.72,0.1,0.08,0.1\>$} (\note{normalized}, i.e., 
+       sums to \mat{$1$})
+
+\defn{Joint probability distribution} for a set of r.v.s gives the\\
+probability of every atomic event on those r.v.s (i.e., every sample point)\al
+  \mat{$\pv(Weather,Cavity)$} = a \mat{$4 \times 2$} matrix of values:\\
+\mat{\[\begin{array}{l|llll}
+\hfil Weather \eq & sunny & rain & cloudy & snow \\
+\hline
+Cavity \eq true &0.144 &0.02 &0.016 & 0.02\\
+Cavity \eq false&0.576 &0.08 &0.064 & 0.08
+\end{array}\]}
+\emph{Every question about a domain can be answered by the joint\\
+distribution because every event is a sum of sample points}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Probability for continuous variables}
+
+Express distribution as a parameterized function of value:\al
+\mat{$P(X\eq x) = U[18,26](x)$} = uniform density between \mat{$18$} and \mat{$26$}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{uniform-density.ps}}
+
+Here \mat{$P$} is a \defn{density}; integrates to 1.\\
+\mat{$P(X\eq 20.5)=0.125$} really means
+\mat{\[
+  \lim_{dx \to 0} P(20.5 \leq X \leq 20.5+dx)/dx = 0.125
+\]}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Gaussian density}
+
+\mat{$P(x) = \frac{1}{\sqrt{2\pi} \sigma} e^{-(x-\mu)^2/2\sigma^2}$}
+
+\vspace*{0.2in}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{gaussian-density.ps}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conditional probability}
+
+\defn{Conditional} or \defn{posterior probabilities}\al
+  e.g., \mat{$P(cavity | toothache) = 0.8$}\al
+  i.e., \emph{given that} \mat{$toothache$} \emph{is all I know}\al
+  \emph{NOT} ``if \mat{$toothache$} then 80\% chance of \mat{$cavity$}''
+
+(Notation for conditional distributions:\al
+  \mat{$\pv(Cavity |Toothache)$} = 2-element vector of 2-element vectors)
+
+If we know more, e.g., \mat{$cavity$} is also given, then we have\al
+  \mat{$P(cavity | toothache,cavity) = 1$}\\
+Note: the less specific belief \emph{remains valid} after more evidence 
+arrives, but is not always \emph{useful}
+
+New evidence may be irrelevant, allowing simplification, e.g.,\al
+\mat{$P(cavity | toothache,49ersWin) = P(cavity | toothache) = 0.8$}\\
+This kind of inference, sanctioned by domain knowledge, is crucial
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conditional probability}
+
+Definition of conditional probability:
+\mat{\[
+  P(a|b) = \frac{P(a\land b)}{P(b)} \mbox{ if } P(b) \neq 0
+\]}
+\defn{Product rule} gives an alternative formulation:\al
+  \mat{$P(a\land b) = P(a|b)P(b) = P(b|a)P(a)$}
+
+A general version holds for whole distributions, e.g.,\al
+  \mat{$\pv(Weather,Cavity) = \pv(Weather|Cavity) \pv(Cavity)$}\\
+(View as a \mat{$4\times 2$} set of equations, \emph{not} matrix mult.)
+
+\defn{Chain rule} is derived by successive application of product rule:\al
+\mat{$\pv(X_1,\ldots,X_n) = \pv(X_1,\ldots,X_{n-1})\ 
+                        \pv(X_n | X_1,\ldots,X_{n-1})$}\nl
+                    = \mat{$\pv(X_1,\ldots,X_{n-2})\ 
+                        \pv(X_{n-1} | X_1,\ldots,X_{n-2})\ 
+                        \pv(X_n | X_1,\ldots,X_{n-1})$}\nl
+                  = \mat{$\ldots$}\nl
+                  = \mat{$\myprod_{i\eq 1}^n \pv(X_i | X_1,\ldots,X_{i-1})$}
+
+
+ 
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference by enumeration}
+
+Start with the joint distribution:
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{dentist-joint.ps}}
+
+For any proposition \mat{$\phi$}, sum the atomic events where it is true:\al
+ \mat{$P(\phi) = \mysum_{\omega: \omega \models \phi} P(\omega)$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference by enumeration}
+
+Start with the joint distribution:
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{dentist-joint1.ps}}
+
+For any proposition \mat{$\phi$}, sum the atomic events where it is true:\al
+ \mat{$P(\phi) = \mysum_{\omega: \omega \models \phi} P(\omega)$}
+
+\mat{$P(toothache) = 0.108 + 0.012 + 0.016 + 0.064 = 0.2$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference by enumeration}
+
+Start with the joint distribution:
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{dentist-joint2.ps}}
+
+For any proposition \mat{$\phi$}, sum the atomic events where it is true:\al
+ \mat{$P(\phi) = \mysum_{\omega: \omega \models \phi} P(\omega)$}
+
+\mat{$P(cavity \lor toothache) = 0.108 + 0.012 + 0.072 + 0.008 + 0.016 + 0.064 
+                         = 0.28$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference by enumeration}
+
+Start with the joint distribution:
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{dentist-joint3.ps}}
+
+Can also compute conditional probabilities:
+\mat{\begin{eqnarray*}
+P(\lnot cavity|toothache) 
+     &=& \frac{P(\lnot cavity \land toothache)}{P(toothache)}\\
+     &=& \frac{0.016+0.064}{0.108 + 0.012 + 0.016 + 0.064} = 0.4
+\end{eqnarray*}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Normalization}
+
+\epsfxsize=0.65\textwidth
+\fig{\file{figures}{dentist-joint4.ps}}
+
+Denominator can be viewed as a \note{normalization constant} \mat{$\alpha$}
+\mat{\begin{eqnarray*}
+ \lefteqn{\pv(Cavity|toothache) = \alpha\, \pv(Cavity,toothache)} \\
+  &=& \alpha\, [\pv(Cavity,toothache,catch)+\pv(Cavity,toothache,\lnot catch)]\\
+  &=& \alpha\, [\<0.108,0.016\> + \<0.012,0.064\>] \\
+  &=& \alpha\, \<0.12,0.08\> = \<0.6,0.4\>
+\end{eqnarray*}}
+General idea: compute distribution on query variable\\
+by fixing \defn{evidence variables} and summing over \defn{hidden variables}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Inference by enumeration, contd.}
+
+Let \mat{$\mbf{X}$} be all the variables. Typically, we want \al
+  the posterior joint distribution of the \defn{query variables} \mat{$\mbf{Y}$}\al
+  given specific values \mat{$\mbf{e}$} for the \defn{evidence variables} \mat{$\mbf{E}$}
+
+Let the \defn{hidden variables} be \mat{$\mbf{H} = \mbf{X} - \mbf{Y} - \mbf{E}$}
+
+Then the required summation of joint entries is done by \note{summing out}
+the hidden variables:
+\mat{\[
+\pv(\mbf{Y}|\mbf{E}\eq \mbf{e}) = \alpha \pv(\mbf{Y},\mbf{E}\eq \mbf{e})
+= \alpha \mysum_{\smbf{h}} \pv(\mbf{Y},\mbf{E}\eq \mbf{e},\mbf{H}\eq \mbf{h})
+\]}
+The terms in the summation are joint entries because \mat{$\mbf{Y}$}, \mat{$\mbf{E}$}, and \mat{$\mbf{H}$} together exhaust the set of random variables
+
+Obvious problems:\al
+1) Worst-case time complexity \mat{$O(d^n)$} where \mat{$d$} is the largest arity\al
+2) Space complexity \mat{$O(d^n)$} to store the joint distribution\al
+3) How to find the numbers for \mat{$O(d^n)$} entries???
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Independence}
+
+\mat{$A$} and \mat{$B$} are \defn{independent} iff\\
+\mat{$\pv(A|B) \eq \pv(A)$}\quad or\quad \mat{$\pv(B|A) \eq \pv(B)$}\quad or\quad \mat{$\pv(A, B) \eq \pv(A)\pv(B)$}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{weather-independence.ps}}
+
+\mat{$\pv(Toothache,Catch,Cavity,Weather)$}\nl
+\mat{${} = \pv(Toothache,Catch,Cavity)\pv(Weather)$}
+
+32 entries reduced to 12; for \mat{$n$} independent biased coins, \mat{$2^n \rightarrow n$}
+
+Absolute independence powerful but rare
+
+Dentistry is a large field with hundreds of variables,\\
+none of which are independent. What to do?
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conditional independence}
+
+\mat{$\pv(Toothache,Cavity,Catch)$} has \mat{$2^3 - 1$} = 7 independent entries
+
+If I have a cavity, the probability that the probe catches in it
+doesn't depend on whether I have a toothache:\al
+  (1) \mat{$P(catch|toothache,cavity) = P(catch|cavity)$}
+
+The same independence holds if I haven't got a cavity:\al
+  (2) \mat{$P(catch|toothache,\lnot cavity) = P(catch|\lnot cavity)$}
+
+\mat{$Catch$} is \defn{conditionally independent} of \mat{$Toothache$} given \mat{$Cavity$}:\al
+  \mat{$\pv(Catch|Toothache,Cavity) = \pv(Catch|Cavity)$}
+
+Equivalent statements:\al
+   \mat{$\pv(Toothache|Catch,Cavity) = \pv(Toothache|Cavity)$}\al
+   \mat{$\pv(Toothache,Catch|Cavity) = \pv(Toothache|Cavity)\pv(Catch|Cavity)$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Conditional independence contd.}
+
+Write out full joint distribution using chain rule:\al
+  \mat{$\pv(Toothache,Catch,Cavity)$}\al
+  \mat{${} = \pv(Toothache|Catch,Cavity) \pv(Catch,Cavity)$}\al
+  \mat{${} = \pv(Toothache|Catch,Cavity) \pv(Catch|Cavity)\pv(Cavity)$}\al
+  \mat{${} = \pv(Toothache|Cavity) \pv(Catch|Cavity)\pv(Cavity)$}
+
+I.e., 2 + 2 + 1 = 5 independent numbers (equations 1 and 2 remove 2)
+
+\note{In most cases, the use of conditional independence reduces the size of
+the representation of the joint distribution from exponential in \mat{$n$}
+to linear in \mat{$n$}.}
+
+\emph{Conditional independence is our most basic and robust \\
+form of knowledge about uncertain environments.}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Bayes' Rule}
+
+Product rule \mat{$P(a\land b) = P(a|b)P(b) = P(b|a)P(a)$}
+\mat{\[
+{}\implies \mbox{\defn{Bayes' rule }}  P(a|b) = \frac{P(b|a)P(a)}{P(b)}
+\]}
+or in distribution form 
+\mat{\[
+\pv(Y|X) = \frac{\pv(X|Y)\pv(Y)}{\pv(X)} = \alpha \pv(X|Y)\pv(Y)
+\]}
+Useful for assessing \defn{diagnostic} probability from \defn{causal} probability:
+\mat{\[
+  P(Cause|Effect) = \frac{P(Effect|Cause)P(Cause)}{P(Effect)}
+\]}
+E.g., let \mat{$M$} be meningitis, \mat{$S$} be stiff neck:
+\mat{\[
+  P(m|s) = \frac{P(s|m)P(m)}{P(s)} = \frac{0.8 \times 0.0001}{0.1} = 0.0008
+\]}
+Note: posterior probability of meningitis still very small!
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Bayes' Rule and conditional independence}
+
+
+\mat{\begin{eqnarray*}
+\lefteqn{\pv(Cavity|toothache \land catch)}\\
+   & = & \alpha\, \pv(toothache\land catch|Cavity) \pv(Cavity) \\
+   & = & \alpha\, \pv(toothache|Cavity)\pv(catch|Cavity) \pv(Cavity) 
+\end{eqnarray*}}
+This is an example of a \defn{naive Bayes} model:
+\mat{\[
+  \pv(Cause,Effect_1,\ldots,Effect_n) =
+       \pv(Cause)\myprod_i \pv(Effect_i|Cause)
+\]}
+
+\vspace*{0.3in}
+
+\epsfxsize=0.75\textwidth
+\fig{\file{figures}{naive-bayes.ps}}
+
+Total number of parameters is \emph{linear} in \mat{$n$}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Wumpus World}
+
+\epsfxsize=0.35\textwidth
+\fig{\file{figures}{wumpus-stuck.ps}}
+
+\mat{$P_{ij}\eq true$} iff [\mat{$i,j$}] contains a pit
+
+\mat{$B_{ij}\eq true$} iff [\mat{$i,j$}] is breezy\\
+Include only \mat{$B_{1,1},B_{1,2},B_{2,1}$} in the probability model
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Specifying the probability model}
+
+The full joint distribution is \mat{$\pv(P_{1,1},\ldots,P_{4,4},B_{1,1},B_{1,2},B_{2,1})$}
+
+Apply product rule: \mat{$\pv(B_{1,1},B_{1,2},B_{2,1}\,|\,P_{1,1},\ldots,P_{4,4}) \pv(P_{1,1},\ldots,P_{4,4})$}
+
+(Do it this way to get \mat{$P(Effect|Cause)$}.)
+
+First term: 1 if pits are adjacent to breezes, 0 otherwise
+
+Second term: pits are placed randomly, probability 0.2 per square:
+\mat{\[
+   \pv(P_{1,1},\ldots,P_{4,4}) = \myprod_{i,j\eq 1,1}^{4,4} \pv(P_{i,j}) = 0.2^n \stimes 0.8^{16-n}
+\]}
+for \mat{$n$} pits.
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Observations and query}
+
+We know the following facts:\al
+\mat{$b = \lnot b_{1,1} \land b_{1,2} \land b_{2,1}$}\al
+\mat{$known = \lnot p_{1,1} \land \lnot p_{1,2}\land \lnot p_{2,1}$}
+
+Query is \mat{$\pv(P_{1,3}|known,b)$}
+
+Define \mat{$Unknown$} = \mat{$P_{ij}$}s other than \mat{$P_{1,3}$} and \mat{$Known$}
+
+For inference by enumeration, we have
+\mat{\[
+  \pv(P_{1,3}|known,b) = \alpha \mysum_{unknown}\pv(P_{1,3},unknown,known,b)  
+\]}
+Grows exponentially with number of squares!
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Using conditional independence}
+
+Basic insight: observations are conditionally independent of
+other hidden squares given neighbouring hidden squares
+
+\vspace*{0.2in}
+
+\epsfxsize=0.35\textwidth
+\fig{\file{figures}{wumpus-variables.ps}}
+
+Define \mat{$Unknown = Fringe \cup Other$}\\
+\mat{$\pv(b|P_{1,3},Known,Unknown) = \pv(b|P_{1,3},Known,Fringe)$}
+
+Manipulate query into a form where we can use this!
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Using conditional independence contd.}
+
+\mat{\begin{eqnarray*}
+  \lefteqn{\pv(P_{1,3}|known,b) = \alpha \sum_{unknown}\pv(P_{1,3},unknown,known,b)}\\
+  &=& \alpha \sum_{unknown}\pv(b|P_{1,3},known,unknown)\pv(P_{1,3},known,unknown)\\
+  &=& \alpha \sum_{fringe}\sum_{other} \pv(b|known,P_{1,3},fringe,other)\pv(P_{1,3},known,fringe,other)\\
+  &=& \alpha \sum_{fringe}\sum_{other} \pv(b|known,P_{1,3},fringe)\pv(P_{1,3},known,fringe,other)\\
+  &=& \alpha \!\sum_{fringe} \!\pv(b|known,P_{1,3},fringe) \sum_{other}\! \pv(P_{1,3},known,fringe,other)\\
+  &=&  \alpha \sum_{fringe} \pv(b|known,P_{1,3},fringe)
+       \sum_{other} \pv(P_{1,3}) P(known)P(fringe)P(other)\\
+  &=&  \alpha\, P(known) \pv(P_{1,3}) \sum_{fringe}
+       \pv(b|known,P_{1,3},fringe) P(fringe) \sum_{other} P(other)\\
+  &=&  \alpha'\, \pv(P_{1,3}) \sum_{fringe} \pv(b|known,P_{1,3},fringe) P(fringe)
+\end{eqnarray*}}
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Using conditional independence contd.}
+
+\vspace*{0.3in}
+
+\epsfxsize=1.0\textwidth
+\fig{\file{figures}{wumpus-fringe-models.ps}}
+
+\mat{\begin{eqnarray*}
+\pv(P_{1,3}|known,b) 
+   &=&  \alpha'\, \< 0.2(0.04 + 0.16 + 0.16),\ 0.8(0.04 + 0.16) \> \\
+   &\approx& \<0.31,0.69\>\\
+   &&\\
+\pv(P_{2,2}|known,b)  &\approx&  \<0.86,0.14\>
+\end{eqnarray*}}
+
+
+%%%%%%%%%%%% Slide %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\heading{Summary}
+
+Probability is a rigorous formalism for uncertain knowledge
+
+\defn{Joint probability distribution} specifies probability of every \defn{atomic event}
+
+Queries can be answered by summing over atomic events
+
+For nontrivial domains, we must find a way to reduce the joint size
+
+\defn{Independence} and \defn{conditional independence} provide the tools
+
+
+
+
+
+
+
+
+
+
+\end{huge} 
+\end{document}

@@ -1,0 +1,16 @@
+\code{
+\func{Minimax-Decision}{\var{state}{\ac}\var{game}}{\var{an action}}
+\bodysep
+    \setq{\var{action}, \var{state}}{the \var{a}, \var{s} \key{in} \prog{Successors}(\var{state})
+                such that {\prog{Minimax-Value}(\var{s}{\ac}\var{game})} is maximized}
+    \key{return} \var{action}
+\fnsep
+\func{Minimax-Value}{\var{state{\ac}game}}{\var{a utility value}}
+\bodysep
+    \key{if} \prog{Terminal-Test}(\var{state}) \key{then}
+          \key{return} \prog{Utility}(\var{state})
+    \key{else} \key{if} {\sc max} is to move in \var{state} \key{then}
+          \key{return} the highest \prog{Minimax-Value} of \prog{Successors}(\var{state})
+    \key{else} 
+          \key{return} the lowest \prog{Minimax-Value} of \prog{Successors}(\var{state})
+}
